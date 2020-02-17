@@ -1,0 +1,16 @@
+{
+    "name": "PlayerAD",
+    "references": [
+        "CommonAD",
+        "MapAD",
+        "NpcAD"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

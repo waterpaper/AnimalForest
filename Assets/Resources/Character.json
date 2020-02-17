@@ -1,0 +1,17 @@
+{
+  "saveInfos": [
+    {
+      "ID": 1,
+      "Name": "dog",
+      "Level": 1,
+      "Exp": 0,
+      "ExpMax": 100,
+      "Hp": 100,
+      "HpMax": 100,
+      "Mp": 100,
+      "MpMax": 100,
+      "Atk": 10,
+      "Def": 0
+    }
+  ]
+}

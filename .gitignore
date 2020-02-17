@@ -1,0 +1,26 @@
+/Library
+/Log
+/Temp
+/Assets/Assets
+/Assets/Material
+/Assets/Standard Assets
+/Assets/Scenes
+/Assets/Editor
+/Assets/MTree
+/Assets/Physics Materials
+/obj
+*.pptx
+*.vs
+*.suo
+*.sIn
+*.sIn.docstates
+*.unityproj
+*.csproj
+*.pidb
+*.userprefs
+*.Ds_Store
+*.meta
+*.png
+*.FBX
+*.shader
+Thumbs.db

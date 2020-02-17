@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Ground
+  - Enemy
+  - SpwanPoint
+  - WayPoint
+  - PlayerAttack
+  - EnemyAttack
+  - DetailItemUI
+  - Npc
+  - Boss
+  - BossAttack
+  - Fire
+  - ChoiceTerrain
+  - BlueLight
+  - EventTrigger_Light
+  - EventTrigger_Terrain
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PostProcessing
+  - 
+  - Ground
+  - 
+  - Enemy
+  - PLAYER
+  - BossSkill
+  - Boss
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Particle
+    uniqueID: 2362772857
+    locked: 0

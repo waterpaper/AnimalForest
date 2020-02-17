@@ -1,0 +1,128 @@
+{
+  "saveInfos": [
+    {
+      "MapName": "Town",
+      "spawnNum": 0,
+      "spwanLocation": [],
+      "spwanMonster": [],
+      "NpcLocation": [
+        {
+          "NpcID": 1,
+          "Location": {
+            "x": 107.0,
+            "y": 53.0,
+            "z": 70.0
+          },
+          "Rotation": {
+            "x": 0.0,
+            "y": -60.0,
+            "z": 0.0
+          }
+        },
+        {
+          "NpcID": 2,
+          "Location": {
+            "x": 98.0,
+            "y": 53.0,
+            "z": 100.0
+          },
+          "Rotation": {
+            "x": 0.0,
+            "y": 200.0,
+            "z": 0.0
+          }
+        }
+      ],
+      "BossLocation": []
+    },
+    {
+      "MapName": "Start",
+      "spawnNum": 1,
+      "spwanLocation": [
+        {
+          "x": 50.0,
+          "y": 2.0,
+          "z": 76.0
+        }
+      ],
+      "spwanMonster": [
+        1
+      ],
+      "NpcLocation": [
+        {
+          "NpcID": 3,
+          "Location": {
+            "x": 5.0,
+            "y": 20.2,
+            "z": 18.0
+          },
+          "Rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      ],
+      "BossLocation": []
+    },
+    {
+      "MapName": "Field1",
+      "spawnNum": 5,
+      "spwanLocation": [
+        {
+          "x": 129.0,
+          "y": 2.0,
+          "z": 84.0
+        },
+        {
+          "x": 64.0,
+          "y": 2.0,
+          "z": 91.0
+        },
+        {
+          "x": 78.0,
+          "y": 2.0,
+          "z": 112.0
+        },
+        {
+          "x": 115.0,
+          "y": 3.0,
+          "z": 127.0
+        },
+        {
+          "x": 88.0,
+          "y": 2.0,
+          "z": 62.0
+        }
+      ],
+      "spwanMonster": [
+        1,
+        2,
+        3
+      ],
+      "NpcLocation": [],
+      "BossLocation": [
+      ]
+    },
+    {
+      "MapName": "Field1_Boss",
+      "spawnNum": 0,
+      "spwanLocation": [
+      ],
+      "spwanMonster": [
+
+      ],
+      "NpcLocation": [],
+      "BossLocation": [
+        {
+          "BossID": 100,
+          "Location": {
+            "x": 62.0,
+            "y": 5.0,
+            "z": 30.0
+          }
+        }
+      ]
+    }
+  ]
+}

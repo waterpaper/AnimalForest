@@ -1,0 +1,84 @@
+{
+  "saveInfos": [
+    {
+      "Level": 1,
+      "ExpMax": 150,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 2,
+      "ExpMax": 210,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 3,
+      "ExpMax": 280,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 4,
+      "ExpMax": 360,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 5,
+      "ExpMax": 450,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 6,
+      "ExpMax": 550,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 7,
+      "ExpMax": 660,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 8,
+      "ExpMax": 800,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 9,
+      "ExpMax": 1000,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    },
+    {
+      "Level": 10,
+      "ExpMax": 100000,
+      "AddHp": 20,
+      "AddMp": 10,
+      "AddAtk": 2,
+      "AddDef": 1
+    }
+  ]
+}

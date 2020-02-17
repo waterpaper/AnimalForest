@@ -1,0 +1,40 @@
+﻿{
+  "saveInfos": [
+    {
+      "ID": 100,
+      "BossName": "머리 큰 스켈레톤",
+      "Level": 10,
+      "Exp": 500,
+      "Hp": 1000,
+      "HpMax": 1000,
+      "Mp": 1000,
+      "MpMax": 1000,
+      "Atk": 10,
+      "Def": 30,
+      "TraceDist": 40.0,
+      "PatrolMoveSpeed": 5.0,
+      "TraceMoveSpeed": 10.0,
+      "Skill_1": {
+        "Name": "내려치기",
+        "Mp": 0,
+        "Factor": 1.0,
+        "Range": 10,
+        "Time" : 0.0
+      },
+      "Skill_2": {
+        "Name": "지진",
+        "Mp": 50,
+        "Factor": 1.5,
+        "Range": 15,
+        "Time":  7.0
+      },
+      "Skill_3": {
+        "Name": "원혼 발사",
+        "Mp": 100,
+        "Factor": 2.0,
+        "Range": 20,
+        "Time": 15.0
+      }
+    }
+  ]
+}

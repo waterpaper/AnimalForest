@@ -1,0 +1,90 @@
+﻿{
+  "saveInfos": [
+    {
+      "ID": 1,
+      "Name": "스켈레톤 처치",
+      "OrderNpcConversation": "요즘 숲을 파괴하는 스켈레톤이 늘어나서 숲이 더 파괴되고 있어. 너가 조금 처리해줄래?",
+      "TargetNpcConversation": "고마워! 덕분에 다니기 편리해질꺼야!",
+      "MinLevel": 1,
+      "Kind": 0,
+      "OrderNpc": 1,
+      "TargetNpc": 1,
+      "TargetObject": 3,
+      "TargetCount": 10,
+      "RewardExp": 100,
+      "RewardMoney": 1000,
+      "RewardItem": [
+        2
+      ]
+    },
+    {
+      "ID": 2,
+      "Name": "오크의 피리",
+      "OrderNpcConversation": "오크의 뿔피리가 필요한데 구해줄 수 있을까?",
+      "TargetNpcConversation": "자! 여기 보답이야!",
+      "MinLevel": 1,
+      "Kind": 1,
+      "OrderNpc": 2,
+      "TargetNpc": 2,
+      "TargetObject": 29,
+      "TargetCount": 10,
+      "RewardExp": 50,
+      "RewardMoney": 1500,
+      "RewardItem": [
+        19
+      ]
+    },
+    {
+      "ID": 3,
+      "Name": "스켈레톤의 분노",
+      "OrderNpcConversation": "저번에 처치한 스켈레톤의 왕이 이 숲을 파괴한 주범인거 같아. 저는 숲을 구한다고 햇지? 너가 그 스켈레톤을 물리쳐 줄수 있을까?",
+      "TargetNpcConversation": "나는 잘 모르겠지만 이 모습이 숲의 예전 모습이구나.... 자 이걸 받아줘 다른 숲도 구하러 가야지!",
+      "MinLevel": 1,
+      "Kind": 3,
+      "OrderNpc": 1,
+      "TargetNpc": 1,
+      "TargetObject": 100,
+      "TargetCount": 1,
+      "RewardExp": 200,
+      "RewardMoney": 5000,
+      "RewardItem": [
+        10
+      ]
+    },
+    {
+      "ID": 101,
+      "Name": "응급치료",
+      "OrderNpcConversation": "치료하자",
+      "TargetNpcConversation": "나는 이미 틀렸어. 저건 저주의 빛이야.",
+      "MinLevel": 1,
+      "Kind": 2,
+      "OrderNpc": 3,
+      "TargetNpc": 3,
+      "TargetObject": 3,
+      "TargetCount": 1,
+      "RewardExp": 30,
+      "RewardMoney": 1000,
+      "RewardItem": [
+        1,
+        9,
+        17
+      ]
+    },
+    {
+      "ID": 102,
+      "Name": "숲 탈출",
+      "OrderNpcConversation": "나는 이미 틀렸어. 저 빛은 몬스터가 나오는 저주의 빛이야. 하지만 빛이 있는 곳 아래로 내려가면 마을로 가는 길이 있지. 너라도 어떻게 살아가도록 해. 남은 동물들은 많지 않으니깐.",
+      "TargetNpcConversation": "이제 정신 차렸어? 정신차렸으면 일해야지.",
+      "MinLevel": 1,
+      "Kind": 0,
+      "OrderNpc": 3,
+      "TargetNpc": 1,
+      "TargetObject": 1,
+      "TargetCount": 1,
+      "RewardExp": 30,
+      "RewardMoney": 1000,
+      "RewardItem": [
+      ]
+    }
+  ]
+}
