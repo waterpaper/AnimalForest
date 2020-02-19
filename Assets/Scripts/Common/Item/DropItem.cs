@@ -62,6 +62,7 @@ public class DropItem : MonoBehaviour
             if (!animation.isPlaying && isOpened != true)
             {
                 animation.Play();
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Environment_Boxopen);
                 StartCoroutine(ParticleEffect());
                 isOpened = true;
             }

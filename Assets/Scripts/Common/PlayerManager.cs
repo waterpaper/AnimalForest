@@ -245,6 +245,7 @@ public class PlayerManager : MonoBehaviour
         Def += temp.AddDef;
 
         ParticleManager.instance.Play(ParticleName.ParticleName_Player_LevelUP, transform, Vector3.zero);
+        SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerLevelUP);
     }
 
     public bool CustomSetting(PlayerCustomKind kind, int temp)
@@ -281,6 +282,8 @@ public class PlayerManager : MonoBehaviour
 
     public void PosistionSetting()
     {
+        MoveStop();
+
         if (SceneLoader.instance.NowSceneKind() == SceneKind.Start)
         {
             this.transform.position = new Vector3(89.0f, 0.0f, 38.0f);
@@ -295,11 +298,17 @@ public class PlayerManager : MonoBehaviour
         else
             this.transform.position = SceneLoader.instance.playerLocationTemp;
     }
+
     public void Knockback(Vector3 position)
     {
         Vector3 temp = new Vector3(position.x - transform.position.x, 0.0f, position.z - transform.position.z);
 
         _rigidbody.AddForce(temp.normalized * 10.0f);
+    }
+
+    public void MoveStop()
+    {
+        _rigidbody.velocity = Vector3.zero;
     }
 
 }

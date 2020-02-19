@@ -6,6 +6,10 @@ using TMPro;
 
 public class EquipmentSlot : MonoBehaviour
 {
+    public Image itemImage;
+    public TextMeshProUGUI itemNumText;
+    public GameObject releaseButton;
+
     public enum EquipmentSlotType
     {
         EquipmentSlotType_Weapon,
@@ -18,10 +22,17 @@ public class EquipmentSlot : MonoBehaviour
 
     public EquipmentSlotType type = EquipmentSlotType.EquipmentSlotType_End;
 
+    private void Awake()
+    {
+        itemImage = transform.GetChild(0).GetComponent<Image>();
+        itemNumText = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        releaseButton = transform.GetChild(2).gameObject;
+    }
+
     public void OnDisable()
     {
-        this.transform.GetChild(0).GetComponent<Image>().enabled = false;
-        this.transform.GetChild(2).gameObject.SetActive(false);
+        itemImage.enabled = false;
+        releaseButton.SetActive(false);
     }
 
     private void FixedUpdate()
@@ -59,24 +70,24 @@ public class EquipmentSlot : MonoBehaviour
         if (itemTemp != null)
         {
             //빈칸을 출력하지 않기 위해 꺼두던 아이템이미지 컴포넌트틀 켜줍니다.
-            this.transform.GetChild(0).GetComponent<Image>().enabled = true;
-            this.transform.GetChild(0).GetComponent<Image>().sprite = DataManager.instance.ItemIcon(itemTemp.itemInfomation.ID);
+            itemImage.enabled = true;
+            itemImage.sprite = DataManager.instance.ItemIcon(itemTemp.itemInfomation.ID);
 
             if (itemTemp.count == 1)
             {
-                this.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                itemNumText.text = "";
             }
             else
             {
-                this.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = itemTemp.count.ToString();
+                itemNumText.text = itemTemp.count.ToString();
             }
-            this.transform.GetChild(2).gameObject.SetActive(true);
+            releaseButton.SetActive(true);
         }
         else
         {
-            this.transform.GetChild(0).GetComponent<Image>().enabled = false;
-            this.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-            this.transform.GetChild(2).gameObject.SetActive(false);
+            itemImage.enabled = false;
+            itemNumText.text = "";
+            releaseButton.SetActive(false);
         }
     }
 

@@ -16,7 +16,7 @@ public class ConversationUI : MonoBehaviour
     public GameObject shopButton;
     public GameObject exitButton;
     public GameObject npcQuestScollbar;
-    public GameObject questRewardTextObject;
+    public TextMeshProUGUI questRewardTextUI;
 
     public int questIndex = 0;
     public bool IsQuestCompletedUI;
@@ -29,7 +29,7 @@ public class ConversationUI : MonoBehaviour
         questOkayButton = transform.GetChild(0).GetChild(2).GetChild(1).gameObject;
         shopButton = transform.GetChild(0).GetChild(2).GetChild(2).gameObject;
         exitButton = transform.GetChild(0).GetChild(2).GetChild(3).gameObject;
-        questRewardTextObject = transform.GetChild(0).GetChild(4).gameObject;
+        questRewardTextUI = transform.GetChild(0).GetChild(4).GetComponent<TextMeshProUGUI>();
 
         npcQuestScollbar = transform.GetChild(0).GetChild(3).gameObject;
     }
@@ -95,7 +95,7 @@ public class ConversationUI : MonoBehaviour
         shopButton.SetActive(true);
         exitButton.SetActive(true);
         npcQuestScollbar.SetActive(false);
-        questRewardTextObject.SetActive(false);
+        questRewardTextUI.gameObject.SetActive(false);
         textUI.enabled = true;
 
         IsQuestCompletedUI = false;
@@ -108,7 +108,7 @@ public class ConversationUI : MonoBehaviour
         questButton.SetActive(false);
         shopButton.SetActive(false);
         textUI.enabled = false;
-        questRewardTextObject.SetActive(false);
+        questRewardTextUI.gameObject.SetActive(false);
 
     }
     public void ShopButton()
@@ -148,27 +148,28 @@ public class ConversationUI : MonoBehaviour
 
         if (completed == false)
         {
-            transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = questTemp.OrderNpcConversation;
+            textUI.text = questTemp.OrderNpcConversation;
             questOkayButton.SetActive(true);
         }
         else
         {
-            transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = questTemp.TargetNpcConversation;
+            textUI.text = questTemp.TargetNpcConversation;
             questOkayButton.SetActive(false);
             questButton.SetActive(false);
             shopButton.SetActive(false);
         }
         stringTemp.AppendFormat("Exp : {0}  Money : {1}", questTemp.RewardExp, questTemp.RewardMoney);
-
-        stringTemp.AppendFormat("\nItem : ");
-
+        
         for (int i = 0; i < questTemp.RewardItem.Count; i++)
         {
+            if(i==0)
+                stringTemp.AppendFormat("\nItem : ");
+
             stringTemp.AppendFormat("\t{0}\n\t", DataManager.instance.ItemInfo(questTemp.RewardItem[i]).Name);
         }
-        
-        questRewardTextObject.GetComponent<TextMeshProUGUI>().text = stringTemp.ToString();
-        questRewardTextObject.SetActive(true);
+
+        questRewardTextUI.text = stringTemp.ToString();
+        questRewardTextUI.gameObject.SetActive(true);
 
         questIndex = questID;
     }

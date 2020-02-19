@@ -14,6 +14,7 @@ public class PlayerAttack : MonoBehaviour
     public void startAttack()
     {
         attackRect.SetActive(true);
+        SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerAttack);
     }
 
     public void endAttack()

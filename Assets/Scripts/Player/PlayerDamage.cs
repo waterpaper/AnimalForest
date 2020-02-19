@@ -25,9 +25,9 @@ public class PlayerDamage : MonoBehaviour
             PlayerManager.instance.Hp -= temp;
 
             //데미지 ui를 출력합니다
-            var damageUITemp = Instantiate<GameObject>(DamageUIPrefab, GameUICanvas.transform);
-            damageUITemp.name = "Damage";
-            damageUITemp.GetComponent<TextMessageUI>().Setting(temp.ToString(), new Color(255, 0, 0), gameObject.transform.position, damageOffset, GameUICanvas);
+            var damageUITemp = Instantiate<GameObject>(DamageUIPrefab, GameUICanvas.transform).GetComponent<TextMessageUI>();
+            damageUITemp.gameObject.name = "Damage";
+            damageUITemp.Setting(temp.ToString(), new Color(255, 0, 0), gameObject.transform.position, damageOffset, GameUICanvas);
 
             other.gameObject.SetActive(false);
             StartCoroutine(ActiveHitParticle());
@@ -44,9 +44,9 @@ public class PlayerDamage : MonoBehaviour
             PlayerManager.instance.Hp -= temp;
 
             //데미지 ui를 출력합니다
-            var damageUITemp = Instantiate<GameObject>(DamageUIPrefab, GameUICanvas.transform);
-            damageUITemp.name = "Damage";
-            damageUITemp.GetComponent<TextMessageUI>().Setting(temp.ToString(), new Color(255,0,0), gameObject.transform.position, damageOffset, GameUICanvas);
+            var damageUITemp = Instantiate<GameObject>(DamageUIPrefab, GameUICanvas.transform).GetComponent<TextMessageUI>();
+            damageUITemp.gameObject.name = "Damage";
+            damageUITemp.Setting(temp.ToString(), new Color(255,0,0), gameObject.transform.position, damageOffset, GameUICanvas);
 
             if (attackCollider.particle != null)
             {

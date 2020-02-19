@@ -237,7 +237,6 @@ public class DataManager : MonoBehaviour
     public string EnemyDropItemTable_FileName = "EnemyDropItem";
     public string SingleConversationTable_FileName = "SingleConversationData";
     public string PlayerLevelTable_FileName = "PlayerLevel";
-    public string Sound_FileName = "Sound";
 
     PlayerData playerInfoData;
     Dictionary<int, CharacterTable> CharacterInfoTable;
@@ -251,7 +250,6 @@ public class DataManager : MonoBehaviour
     Dictionary<int, EnemyDropItemTable> EnemyDropItemInfoTable;
     Dictionary<int, SingleConversationTable> SingleConversationInfoTable;
     Dictionary<int, PlayerLevelTable> PlayerLevelInfoTable;
-    Dictionary<string, AudioClip> SoundDictionary;
 
     Sprite[] CharacterIconData;
     Sprite[] ItemIconData;
@@ -275,7 +273,6 @@ public class DataManager : MonoBehaviour
         EnemyDropItemInfoTable = new Dictionary<int, EnemyDropItemTable>();
         SingleConversationInfoTable = new Dictionary<int, SingleConversationTable>();
         PlayerLevelInfoTable = new Dictionary<int, PlayerLevelTable>();
-        SoundDictionary = new Dictionary<string, AudioClip>();
 
         LoadData();
     }
@@ -375,8 +372,6 @@ public class DataManager : MonoBehaviour
         {
             PlayerLevelInfoTable.Add(info.Level, info);
         }
-
-        //var soundList = Resources.LoadAll<AudioClip>(Sound_FileName);
     }
 
     public PlayerData playerInfo()
@@ -439,17 +434,10 @@ public class DataManager : MonoBehaviour
     {
         return SingleConversationInfoTable[id];
     }
-
     public PlayerLevelTable PlayerLevelInfo(int level)
     {
         return PlayerLevelInfoTable[level];
     }
-
-    public AudioClip SoundInfo(string str)
-    {
-        return SoundDictionary[str];
-    }
-
     public int EnemyDictionaryCount()
     {
         return EnemyInfoTable.Count;
