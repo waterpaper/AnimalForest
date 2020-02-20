@@ -93,6 +93,7 @@ public class UIManager : MonoBehaviour
         if (SceneLoader.instance.NowSceneKind() == SceneKind.Custom)
         {
             UISetting(UiKind.UiKind_CustomUi);
+            UISetting(UiKind.UiKind_LoginUI);
         }
         else
         {
