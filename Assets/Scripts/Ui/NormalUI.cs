@@ -12,7 +12,6 @@ public class NormalUI : MonoBehaviour
 
     private void Start()
     {
-        PlayerData temp = DataManager.instance.playerInfo();
         QuestScrollViewer = transform.GetChild(0).GetChild(5).gameObject;
         GetItemViewer = transform.GetChild(0).GetChild(6).gameObject;
 

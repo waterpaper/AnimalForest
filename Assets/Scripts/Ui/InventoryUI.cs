@@ -141,13 +141,13 @@ public class InventoryUI : MonoBehaviour
     {
         if (UIManager.instance.IsEquipmentUI == true)
         {
-            UIManager.instance.UISetting(UiKind.UiKind_InventoryUi);
-            UIManager.instance.UISetting(UiKind.UIKind_EquipmentUi);
+            UIManager.instance.UISetting(UiKind.UiKind_InventoryUI);
+            UIManager.instance.UISetting(UiKind.UIKind_EquipmentUI);
         }
         else if(UIManager.instance.IsShopUI ==true)
         {
-            UIManager.instance.UISetting(UiKind.UiKind_InventoryUi);
-            UIManager.instance.UISetting(UiKind.UiKind_ShopUi);
+            UIManager.instance.UISetting(UiKind.UiKind_InventoryUI);
+            UIManager.instance.UISetting(UiKind.UiKind_ShopUI);
         }
     }
 }

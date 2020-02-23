@@ -236,7 +236,6 @@ public class EnemyAi : MonoBehaviour
                 _enemyAni.SetBool(hashHit, false);
                 _enemyAni.SetBool(hashDeath, true);
                 _enemyAni.SetFloat(hashSpeed, 0.0f);
-
                 StartCoroutine(IEDeath());
                 break;
         }

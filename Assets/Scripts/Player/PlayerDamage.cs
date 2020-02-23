@@ -13,7 +13,7 @@ public class PlayerDamage : MonoBehaviour
 
     private void Start()
     {
-        GameUICanvas = UIManager.instance.gameUi.GetComponent<Canvas>();
+        GameUICanvas = UIManager.instance.gameUI.GetComponent<Canvas>();
     }
 
     private void OnTriggerEnter(Collider other)

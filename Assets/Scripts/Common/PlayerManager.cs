@@ -2,6 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct SaveItemData
+{
+    public int ItemID;
+    public int ItemCount;
+}
+
+[System.Serializable]
+public class PlayerSaveData
+{
+    public string ID;
+    public string Name;
+    public int Kind;
+    public int Money;
+    public int Level;
+    public int Exp;
+    public float Hp;
+    public float HpMax;
+    public float Mp;
+    public float MpMax;
+    public float Atk;
+    public float Def;
+
+    public int MapNumber;
+    public float MapPositionX;
+    public float MapPositionY;
+    public float MapPositionZ;
+
+    public int EquipWeaponItem;
+    public int EquipArmorItem;
+    public int EquipShieldItem;
+    public int EquipHpPotion;
+    public int EquipMpPotion;
+
+    public List<int> ClearEventList;
+    public List<SaveItemData> ItemList;
+}
+
 public class PlayerManager : MonoBehaviour
 {
     public enum PlayerCustomKind
@@ -16,7 +54,12 @@ public class PlayerManager : MonoBehaviour
     private PlayerState _playerState = null;
     private PlayerCustom _playerCustom = null;
     private Rigidbody _rigidbody;
+
+    private Save _playerDataSave;
     private static PlayerManager m_instance;
+
+    [Header("PlayerSaveFile")]
+    public string playerData_FileName = "Player";
 
     //싱글톤 접근
     public static PlayerManager instance
@@ -33,7 +76,7 @@ public class PlayerManager : MonoBehaviour
                     return null;
                 }
             }
-            else if(m_instance._playerState == null)
+            else if (m_instance._playerState == null)
             {
                 return null;
             }
@@ -41,19 +84,20 @@ public class PlayerManager : MonoBehaviour
             return m_instance;
         }
     }
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         _playerState = GetComponent<PlayerState>();
         _playerCustom = GetComponent<PlayerCustom>();
         _rigidbody = GetComponent<Rigidbody>();
 
-        PlayerData info = DataManager.instance.playerInfo();
-        _playerState.loadCharacterStatement(info);
+        _playerDataSave = new Save();
+
+        _playerState.PlayerSetting();
+        transform.position = new Vector3(0.0f, 5.0f, 0.0f);
     }
 
-    public int Id
+    public string Id
     {
         get { return _playerState.id; }
         set
@@ -218,12 +262,17 @@ public class PlayerManager : MonoBehaviour
 
     public bool IsClearEventList(int id)
     {
-        for(int i=0;i<_playerState.clearEventList.Count;i++)
+        for (int i = 0; i < _playerState.clearEventList.Count; i++)
         {
             if (id == _playerState.clearEventList[i])
                 return true;
         }
         return false;
+    }
+
+    public PlayerState GetPlayerState()
+    {
+        return _playerState;
     }
 
     public void AddClearEventList(int id)
@@ -250,7 +299,7 @@ public class PlayerManager : MonoBehaviour
 
     public bool CustomSetting(PlayerCustomKind kind, int temp)
     {
-        if(kind ==PlayerCustomKind.PlayerCustomKind_AnimalKind)
+        if (kind == PlayerCustomKind.PlayerCustomKind_AnimalKind)
         {
             if (_playerCustom.KindChange(temp) == true)
             {
@@ -311,4 +360,9 @@ public class PlayerManager : MonoBehaviour
         _rigidbody.velocity = Vector3.zero;
     }
 
+
+    public void Save()
+    {
+        _playerDataSave.SaveData();
+    }
 }

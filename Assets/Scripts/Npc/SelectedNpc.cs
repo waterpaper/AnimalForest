@@ -30,7 +30,7 @@ public class SelectedNpc : MonoBehaviour
 
             QuestManager.instance.RelayQuestComplete(GetComponent<NpcStatment>().ID);
             
-            UIManager.instance.UISetting(UiKind.UIKind_ConversationUi);
+            UIManager.instance.UISetting(UiKind.UIKind_ConversationUI);
 
             CameraManager.instance.PauseCamaraChangeON(gameObject);
         }

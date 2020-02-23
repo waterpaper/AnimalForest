@@ -43,7 +43,17 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        uiCanvas = UIManager.instance.gameUi.GetComponent<Canvas>();
+        uiCanvas = UIManager.instance.gameUI.GetComponent<Canvas>();
+    }
+
+    public Inventory GetInventory()
+    {
+        return _inventory;
+    }
+
+    public Equipment GetEquipment()
+    {
+        return _equipment;
     }
 
     public bool AddItem(Item itemTemp)

@@ -21,6 +21,6 @@ public class ConversationUI_NpcQuestScrollbarUI_Contents : MonoBehaviour
 
     public void Click()
     {
-        UIManager.instance.conversationUi.GetComponent<ConversationUI>().QuestViewSetting(questID, false);
+        UIManager.instance.conversationUI.GetComponent<ConversationUI>().QuestViewSetting(questID, false);
     }
 }
