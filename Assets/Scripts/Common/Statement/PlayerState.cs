@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerState : MonoBehaviour
 {
-    public int id;
+    public string id;
     public string name;
     public int kind;
     public float hp;
@@ -25,8 +25,31 @@ public class PlayerState : MonoBehaviour
     public float addMp;
     public float addAtk;
     public float addDef;
+
+    public void PlayerSetting()
+    {
+        id = "empty";
+        name = "empty";
+        kind = 1;
+        hp = 100;
+        mp = 100;
+        atk = 10;
+        def = 0;
+        level = 1;
+        exp = 0;
+        money = 1000;
+        expMax = 100;
+        hpMax = 100;
+        mpMax = 100;
+        addHp = 0;
+        addMp = 0;
+        addAtk = 0;
+        addDef = 0;
+
+        clearEventList = new List<int>();
+    }
    
-    public void loadCharacterStatement(PlayerData info)
+    public void loadCharacterStatement(PlayerSaveData info)
     {
         id = info.ID;
         name = info.Name;
@@ -38,13 +61,8 @@ public class PlayerState : MonoBehaviour
         level = info.Level;
         exp = info.Exp;
         money = info.Money;
-        expMax = info.ExpMax;
-        hpMax = info.HpMax;
-        mpMax = info.MpMax;
-        addHp = info.AddHp;
-        addMp = info.AddMp;
-        addAtk = info.AddAtk;
-        addDef = info.AddDef;
+        expMax = DataManager.instance.PlayerLevelInfo(level).ExpMax;
+
         clearEventList = info.ClearEventList;
     }
 }

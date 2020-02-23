@@ -80,6 +80,7 @@ public class Boss1_Skill_2 : MonoBehaviour
 
             attackRectProjector.SetActive(false);
             StartCoroutine(AttackDisable());
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Skill1_Down);
         }
         else if(other.tag == "Player")
         {

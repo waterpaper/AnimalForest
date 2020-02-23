@@ -14,6 +14,8 @@ public class ChoiceTerrain : MonoBehaviour
         {
             terrain_after.SetActive(true);
             terrain_before.SetActive(false);
+
+            SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_AfterFelid);
         }
         else
         {

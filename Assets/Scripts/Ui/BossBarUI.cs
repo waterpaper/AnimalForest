@@ -6,7 +6,7 @@ using TMPro;
 
 public class BossBarUI : MonoBehaviour
 {
-    private BossStatment _bossstatement;
+    private BossStatment _bossstatement = null;
     private TextMeshProUGUI _bossName;
     private TextMeshProUGUI _bossLevel;
     private Image _bossHpImage;
@@ -21,6 +21,8 @@ public class BossBarUI : MonoBehaviour
     private void OnEnable()
     {
         _bossstatement = UIManager.instance.nowBossStatement;
+
+        if (_bossstatement == null) return;
 
         if (_bossstatement != null)
         {

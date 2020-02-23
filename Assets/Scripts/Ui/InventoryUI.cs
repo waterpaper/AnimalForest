@@ -27,8 +27,7 @@ public class InventoryUI : MonoBehaviour
         {
             var slotTemp = Instantiate<GameObject>(slotPrefab, slotCreateLocation.transform);
 
-            slotTemp.GetComponent<DetailItemInfomationUI>().inventoryNumber = i;
-            slotTemp.GetComponent<DetailItemInfomationUI>().inventoryUI = this.gameObject;
+            slotTemp.GetComponent<DetailItemInfomationUI>().FirstSetting(this, i);
             slotTemp.name = slotTemp.name + i.ToString("00");
             slotList.Add(slotTemp);
         }
@@ -66,39 +65,48 @@ public class InventoryUI : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Image selectItemImage;
+        Image itemImage;
+        TextMeshProUGUI itemNumText; 
+
         //현재 아이템을 확인하고 인벤토리 창에 이미지와 갯수를 띄워줍니다.
         int maxCount = InventoryManager.instance.MaxInventoryItemCount();
         Item itemTemp;
 
         for (int i = 0; i < maxCount; i++)
         {
+            //컴포넌트를 연결합니다.
+            selectItemImage = slotList[i].transform.GetChild(0).GetComponent<Image>();
+            itemImage = slotList[i].transform.GetChild(1).GetComponent<Image>();
+            itemNumText = slotList[i].transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+            
             //인벤토리의 아이템 정보를 불러옵니다.
             itemTemp = InventoryManager.instance.GetItem(i);
 
             if (itemTemp == null)
             {
-                slotList[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                slotList[i].transform.GetChild(1).GetComponent<Image>().enabled = false;
-                slotList[i].transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "";
+                selectItemImage.enabled = false;
+                itemImage.enabled = false;
+                itemNumText.text = "";
                 continue;
             }
 
             if(selectNumber==i)
-                slotList[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
+                selectItemImage.enabled = true;
             else
-                slotList[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
+                selectItemImage.enabled = false;
 
             //빈칸을 출력하지 않기 위해 꺼두던 아이템이미지 컴포넌트틀 켜줍니다.
-            slotList[i].transform.GetChild(1).GetComponent<Image>().enabled = true;
-            slotList[i].transform.GetChild(1).GetComponent<Image>().sprite = DataManager.instance.ItemIcon(itemTemp.itemInfomation.ID);
+            itemImage.enabled = true;
+            itemImage.sprite = DataManager.instance.ItemIcon(itemTemp.itemInfomation.ID);
 
             if(itemTemp.count == 1)
             {
-                slotList[i].transform.GetChild(2).GetComponent<TextMeshProUGUI>().text ="";
+                itemNumText.text ="";
             }
             else
             {
-                slotList[i].transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = itemTemp.count.ToString();
+                itemNumText.text = itemTemp.count.ToString();
             }
         }
     }
@@ -133,13 +141,13 @@ public class InventoryUI : MonoBehaviour
     {
         if (UIManager.instance.IsEquipmentUI == true)
         {
-            UIManager.instance.UISetting(UiKind.UiKind_InventoryUi);
-            UIManager.instance.UISetting(UiKind.UIKind_EquipmentUi);
+            UIManager.instance.UISetting(UiKind.UiKind_InventoryUI);
+            UIManager.instance.UISetting(UiKind.UIKind_EquipmentUI);
         }
         else if(UIManager.instance.IsShopUI ==true)
         {
-            UIManager.instance.UISetting(UiKind.UiKind_InventoryUi);
-            UIManager.instance.UISetting(UiKind.UiKind_ShopUi);
+            UIManager.instance.UISetting(UiKind.UiKind_InventoryUI);
+            UIManager.instance.UISetting(UiKind.UiKind_ShopUI);
         }
     }
 }

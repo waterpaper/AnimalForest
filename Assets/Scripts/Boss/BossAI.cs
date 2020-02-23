@@ -128,16 +128,19 @@ public class BossAI : MonoBehaviour
                 _bossMovement.Stop();
                 Ani_Initialize();
                 _bossAni.SetBool(hashSkill_1, true);
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Attack);
                 break;
             case BossAction.Skill1:
                 _bossMovement.Stop();
                 Ani_Initialize();
                 _bossAni.SetBool(hashSkill_2, true);
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Skiil1_UP);
                 break;
             case BossAction.Skill2:
                 _bossMovement.Stop();
                 Ani_Initialize();
                 _bossAni.SetBool(hashSkill_3, true);
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Skill2);
                 break;
             case BossAction.Die:
                 _bossMovement.Stop();

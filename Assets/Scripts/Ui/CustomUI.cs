@@ -55,13 +55,13 @@ public class CustomUI : MonoBehaviour
     public void OkayButton()
     {
         PlayerManager.instance.Name = nameTextUI.text;
-        PlayerManager.instance.Id = kindIndex;
+        PlayerManager.instance.Kind = kindIndex;
         SceneLoader.instance.playerLocationTemp = new Vector3(88.0f, 2.0f, 42.0f);
         SceneLoader.instance.SceneLoaderStart(SceneKind.Start);
 
         CameraManager.instance.PauseCamaraChangeOFF(PlayerManager.instance.transform.gameObject);
-        UIManager.instance.UISetting(UiKind.UiKind_NormalUi);
-        UIManager.instance.UISetting(UiKind.UiKind_GameUi);
-        UIManager.instance.UISetting(UiKind.UiKind_CustomUi);
+        UIManager.instance.UISetting(UiKind.UiKind_NormalUI);
+        UIManager.instance.UISetting(UiKind.UiKind_GameUI);
+        UIManager.instance.UISetting(UiKind.UiKind_CustomUI);
     }
 }

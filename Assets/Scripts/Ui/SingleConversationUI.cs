@@ -13,7 +13,7 @@ public class SingleConversationUI : MonoBehaviour
     {
         if (PlayerManager.instance == null) return;
         //캐릭터와 맞는 이미지로 교체합니다.
-        transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = DataManager.instance.CharacterIcon(PlayerManager.instance.Id);
+        transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = DataManager.instance.CharacterIcon(PlayerManager.instance.Kind);
     }
     
     public void OkayButton()
@@ -21,7 +21,7 @@ public class SingleConversationUI : MonoBehaviour
         //확인 버튼 클릭시 현재 리스트를 제거하고 맞는 설정의 문구를 불러오거나 종료합니다.
         if(singleConversationList.Count >= 0)  singleConversationList.RemoveAt(0);
 
-        UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUi);
+        UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);
 
         if (singleConversationList.Count == 0) return;
 
@@ -30,9 +30,9 @@ public class SingleConversationUI : MonoBehaviour
         if (temp == null) return;
 
         if (temp.Type == 0)
-            UIManager.instance.UISetting(UiKind.UIKind_SingleConversationUi);
+            UIManager.instance.UISetting(UiKind.UIKind_SingleConversationUI);
         else if (temp.Type == 1)
-            UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUi);
+            UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);
 
         TextChange(temp);
     }

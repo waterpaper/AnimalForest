@@ -93,6 +93,7 @@ public class EnemyDamage : MonoBehaviour
             damageUITemp.GetComponent<TextMessageUI>().Setting(other.gameObject.GetComponent<PlayerAttackRect>().Damage.ToString(), new Color(128, 128, 0), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
 
             StartCoroutine(ActiveHitParticle());
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_EnemyHit);
         }
     }
 

@@ -4,82 +4,148 @@ using UnityEngine;
 
 public class SettingMap : MonoBehaviour
 {
-    public MapTable nowMapTemp;
+    //맵 이동시 처음에 실행되어 맵에 enemy, npc, boss와 같은 부가정보를 세팅하고 없애주는 클래스입니다.
+    //몬스터들이 이동할 수 있는 스폰포인트를 저장하고 있는 프리팹과 생성한 스폰포인트 리스트입니다.
     public GameObject spawnPointPfb;
-    public List<Vector3> spawnListTemp;
-    public List<int> monsterKindListTemp;
-    public List<NpcLocationData> npcLocationListTemp;
-    public List<BossLocationData> bossLocationListTemp;
+    public List<Vector3> spawnPointList;
+
+    //해당 맵에서 몬스터 정보를 유지하고 있는 리스트입니다.
+    public List<int> monsterKindList;
+    //해당 맵에서 npc의 위치를 가지고 있는 리스트입니다.
+    public List<NpcLocationData> npcLocationList;
+    //해당 맵에서 boss의 위치를 가지고 있는 리스트입니다.
+    public List<BossLocationData> bossLocationList;
 
     void Start()
     {
-        spawnListTemp = new List<Vector3>();
-        monsterKindListTemp = new List<int>();
-        npcLocationListTemp = new List<NpcLocationData>();
-        bossLocationListTemp = new List<BossLocationData>();
+        //초기화와 맵에 따른 데이터를 세팅해줍니다.
+        spawnPointList = new List<Vector3>();
+        monsterKindList = new List<int>();
+        npcLocationList = new List<NpcLocationData>();
+        bossLocationList = new List<BossLocationData>();
 
-        SceneKind kind = SceneLoader.instance.NowSceneKind();
-
-        if(kind == SceneKind.Town)
-        {
-            nowMapTemp = DataManager.instance.MapInfo("Town");
-        }
-        else if (kind == SceneKind.Start)
-        {
-            nowMapTemp = DataManager.instance.MapInfo("Start");
-        }
-        else if (kind == SceneKind.Field1)
-        {
-            nowMapTemp = DataManager.instance.MapInfo("Field1");
-        }
-        else if (kind == SceneKind.Field1_Boss)
-        {
-            nowMapTemp = DataManager.instance.MapInfo("Field1_Boss");
-        }
-
-        Setting(nowMapTemp);
+        Setting();
     }
 
-    void Setting(MapTable temp)
+    void Setting()
     {
-        MonsterSpawnPositionSetting(temp);
-        MonsterKindSetting(temp);
-        NpcSetting(temp);
-        BossSetting(temp);
+        //현재 맵과 정보를 불러옵니다.
+        SceneKind kind = SceneLoader.instance.NowSceneKind();
+        
+        MapTable nowMapTemp = GetMapTable(kind);
 
-        PoolManager.instance.ChangeMap(spawnListTemp, monsterKindListTemp, npcLocationListTemp, bossLocationListTemp);
+        //정보에 맞게 세팅해줍니다.
+        if (nowMapTemp != null)
+        {
+            //해당 구역은 맵 데이터가 있는 경우에만 처리합니다.
+            MonsterSpawnPositionSetting(nowMapTemp);
+            MonsterKindSetting(nowMapTemp);
+            NpcSetting(nowMapTemp);
+            BossSetting(nowMapTemp);
+        }
+
+        BGMSetting(kind);
+
+        //세팅 값에 맞게 오브젝트 풀을 바꿔주고 객체를 파괴합니다.
+        if (kind != SceneKind.Custom && kind != SceneKind.Title)
+            PoolManager.instance.ChangeMap(spawnPointList, monsterKindList, npcLocationList, bossLocationList);
+
         Destroy(this.gameObject);
+    }
+
+    //종류에 맞는 maptable을 datamanager에서 불러오는 함수입니다.
+    MapTable GetMapTable(SceneKind kind)
+    {
+        switch (kind)
+        {
+            case SceneKind.Town:
+                return DataManager.instance.MapInfo("Town");
+
+            case SceneKind.Start:
+                return DataManager.instance.MapInfo("Start");
+
+            case SceneKind.Field1:
+                return DataManager.instance.MapInfo("Field1");
+
+            case SceneKind.Field1_Boss:
+                return DataManager.instance.MapInfo("Field1_Boss");
+
+            default:
+                return null;
+        }
     }
 
     void MonsterSpawnPositionSetting(MapTable temp)
     {
+        //몬스터 스폰 포인트를 맵 설정에 맞게 생성하고 저장합니다.
+        GameObject groupObjTemp = null;
+
         for (int i = 0; i < temp.spawnNum; i++)
         {
-            GameObject objTemp = Instantiate(spawnPointPfb, temp.spwanLocation[i], Quaternion.identity);
-            spawnListTemp.Add(objTemp.transform.position);
+            if (i == 0)
+            {
+                //스폰 포인트를 모와줄 오브젝트를 생성합니다.
+                groupObjTemp = Instantiate<GameObject>(new GameObject());
+                groupObjTemp.name = "SpawnPointGroup";
+            }
+
+            GameObject objTemp = Instantiate(spawnPointPfb, groupObjTemp.transform);
+            objTemp.transform.position = temp.spwanLocation[i];
+            spawnPointList.Add(temp.spwanLocation[i]);
         }
     }
 
     void MonsterKindSetting(MapTable temp)
     {
-        for (int i = 0; i < temp.spwanMonster.Count; i++)
-        {
-            monsterKindListTemp.Add(temp.spwanMonster[i]);
-        }
+        //현재 맵에 나타나는 몬스터 id를 저장합니다.
+        temp.spwanMonster.ForEach((monsterTemp) => { monsterKindList.Add(monsterTemp); });
     }
 
     void NpcSetting(MapTable temp)
     {
-        temp.NpcLocation.ForEach((locationTemp) => { npcLocationListTemp.Add(locationTemp); });
+        //npc정보를 저장합니다.
+        temp.NpcLocation.ForEach((locationTemp) => { npcLocationList.Add(locationTemp); });
     }
 
     void BossSetting(MapTable temp)
     {
-        temp.BossLocation.ForEach((locationTemp) => { bossLocationListTemp.Add(locationTemp); });
+        //boss정보를 저장합니다.
+        temp.BossLocation.ForEach((locationTemp) => { bossLocationList.Add(locationTemp); });
+    }
+
+    void BGMSetting(SceneKind kind)
+    {
+        //맵 종류에 맞는 bgm을 재생합니다.
+        switch (kind)
+        {
+            case SceneKind.Title:
+                SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_Title);
+                break;
+            case SceneKind.Custom:
+                break;
+            case SceneKind.Start:
+                SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_StartGame);
+                break;
+            case SceneKind.Town:
+                SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_Town);
+                break;
+            case SceneKind.Field1:
+                SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_BeforeFelid);
+                break;
+            case SceneKind.Field1_Boss:
+                SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_Boss1);
+                break;
+            default:
+                SoundManager.instance.BGMStop();
+                break;
+        }
     }
 
     private void OnDestroy()
     {
-        spawnListTemp.Clear();
+        spawnPointList.Clear();
+        monsterKindList.Clear();
+        npcLocationList.Clear();
+        bossLocationList.Clear();
     }
 }

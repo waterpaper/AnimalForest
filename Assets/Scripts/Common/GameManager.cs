@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour
         get { return _isPlayerControlPause; }
         set
         {
+            if(value == true)
+                PlayerManager.instance.MoveStop();
+
             _isPlayerControlPause = value;
         }
     }
