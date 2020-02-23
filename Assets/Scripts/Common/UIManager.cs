@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum UiKind { UiKind_NormalUi, UiKind_CustomUi, UiKind_InventoryUi, UIKind_EquipmentUi, UiKind_ShopUi, UiKind_OptionUi, UiKind_GameUi, UIKind_ConversationUi, UIKind_SingleConversationUi, UIKind_SingleConversationPauseUi, UiKind_LoginUI, UiKind_AllUi,UiKind_End };
+public enum UiKind { UiKind_NormalUI, UiKind_CustomUI, UiKind_InventoryUI, UIKind_EquipmentUI, UiKind_ShopUI, UiKind_OptionUI, UiKind_GameUI, UIKind_ConversationUI, UIKind_SingleConversationUI, UIKind_SingleConversationPauseUI, UiKind_LoginUI, UIKind_SignUpUI, UiKind_AllUi,UiKind_End };
 
 public class UIManager : MonoBehaviour
 {
@@ -22,27 +22,36 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    [Header("InputButtonString")]
     //인벤토리
     public string inventoryButtonName = "Inventory";
     //옵션
     public string optionButtonName = "Option";
 
-    public GameObject normalUi;
-    public GameObject customUi;
-    public GameObject inventoryUi;
-    public GameObject equipmentUi;
-    public GameObject shopUi;
-    public GameObject optionUi;
-    public GameObject conversationUi;
-    public GameObject singleConversationUi;
-    public GameObject gameUi;
-    public GameObject loginUi;
+    [Header("UIobject")]
+    public GameObject normalUI;
+    public GameObject customUI;
+    public GameObject inventoryUI;
+    public GameObject equipmentUI;
+    public GameObject shopUI;
+    public GameObject optionUI;
+    public GameObject conversationUI;
+    public GameObject singleConversationUI;
+    public GameObject gameUI;
+    public GameObject loginUI;
+    public GameObject signUpUI;
 
+    [Header("TempStatment")]
     public BossStatment nowBossStatement;
+    public NpcStatment nowNpcStatment = null;
+
+    [Header("GetItem")]
     public GameObject GetItemContentPrefabs;
     public GameObject GetItemViewerContentLoaction;
-    public Stack<int> saveActiveUIStack;
 
+    [Header("UIStack")]
+    public Stack<int> saveActiveUIStack;
+    
     public bool IsNormalUI { get; private set; }
     public bool IsCustomUI { get; private set; }
     public bool IsInventoryUI { get; private set; }
@@ -53,9 +62,9 @@ public class UIManager : MonoBehaviour
     public bool IsSingleConversationUI { get; private set; }
     public bool IsGameUI { get; private set; }
     public bool IsLoginUI { get; private set; }
+    public bool IsSignUpUI { get; private set; }
     public bool IsBossUI { get; private set; }
 
-    public NpcStatment nowNpcStatment = null;
 
     private void Awake()
     {
@@ -64,99 +73,99 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        IsNormalUI = true;
-        IsCustomUI = true;
-        IsInventoryUI = true;
-        IsEquipmentUI = true;
-        IsShopUI = true;
-        IsOptionUI = true;
-        IsConversationUI = true;
-        IsSingleConversationUI = true;
-        IsGameUI = true;
-        IsLoginUI = true;
-        IsBossUI = false;
     }
+
     private void Start()
     {
-        UISetting(UiKind.UiKind_CustomUi);
-        UISetting(UiKind.UiKind_InventoryUi);
-        UISetting(UiKind.UIKind_EquipmentUi);
-        UISetting(UiKind.UiKind_ShopUi);
-        UISetting(UiKind.UiKind_OptionUi);
-        UISetting(UiKind.UIKind_ConversationUi);
-        UISetting(UiKind.UIKind_SingleConversationUi);
-        UISetting(UiKind.UiKind_GameUi);
-        UISetting(UiKind.UiKind_NormalUi);
-        UISetting(UiKind.UiKind_LoginUI);
+        FirstSetting();
 
-        if (SceneLoader.instance.NowSceneKind() == SceneKind.Custom)
+        saveActiveUIStack = new Stack<int>();
+
+        SceneSetting();
+    }
+
+    public void SceneSetting()
+    {
+        if (SceneLoader.instance.NowSceneKind() == SceneKind.Title)
         {
-            UISetting(UiKind.UiKind_CustomUi);
-            UISetting(UiKind.UiKind_LoginUI);
+
+        }
+        else if (SceneLoader.instance.NowSceneKind() == SceneKind.Custom)
+        {
+            if(!IsLoginUI)
+                UISetting(UiKind.UiKind_LoginUI);
         }
         else
         {
-            UISetting(UiKind.UiKind_GameUi);
-            UISetting(UiKind.UiKind_NormalUi);
+            if(!IsGameUI)
+                UISetting(UiKind.UiKind_GameUI);
+            if(!IsNormalUI)
+                UISetting(UiKind.UiKind_NormalUI);
         }
 
-        saveActiveUIStack = new Stack<int>();
     }
+
     private void FixedUpdate()
     {
-        if (Input.GetButtonDown(inventoryButtonName))
-            UISetting(UiKind.UiKind_InventoryUi);
-        else if (Input.GetButtonDown(optionButtonName))
-            UISetting(UiKind.UiKind_OptionUi);
+        SceneKind kindTemp = SceneLoader.instance.NowSceneKind();
+        if(kindTemp != SceneKind.Title && kindTemp != SceneKind.Custom)
+        {
+            if (Input.GetButtonDown(inventoryButtonName))
+                UISetting(UiKind.UiKind_InventoryUI);
+            else if (Input.GetButtonDown(optionButtonName))
+                UISetting(UiKind.UiKind_OptionUI);
+        }
     }
 
     public void UseUI(UiKind kind)
     {
         switch (kind)
         {
-            //UI를 켜주는 함수입니다.
-            case UiKind.UiKind_NormalUi:
-                normalUi.SetActive(true);
+            //UI를 켜주는 함정수사입니다.
+            case UiKind.UiKind_NormalUI:
+                normalUI.SetActive(true);
                 break;
-            case UiKind.UiKind_CustomUi:
-                customUi.SetActive(true);
+            case UiKind.UiKind_CustomUI:
+                customUI.SetActive(true);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UiKind_InventoryUi:
-                inventoryUi.SetActive(true);
+            case UiKind.UiKind_InventoryUI:
+                inventoryUI.SetActive(true);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UIKind_EquipmentUi:
-                equipmentUi.SetActive(true);
+            case UiKind.UIKind_EquipmentUI:
+                equipmentUI.SetActive(true);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UiKind_ShopUi:
-                shopUi.SetActive(true);
+            case UiKind.UiKind_ShopUI:
+                shopUI.SetActive(true);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UiKind_OptionUi:
-                optionUi.SetActive(true);
+            case UiKind.UiKind_OptionUI:
+                optionUI.SetActive(true);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UIKind_ConversationUi:
-                conversationUi.SetActive(true);
-                DisableUI(UiKind.UiKind_NormalUi);
+            case UiKind.UIKind_ConversationUI:
+                conversationUI.SetActive(true);
+                DisableUI(UiKind.UiKind_NormalUI);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UIKind_SingleConversationUi:
-                singleConversationUi.SetActive(true);
+            case UiKind.UIKind_SingleConversationUI:
+                singleConversationUI.SetActive(true);
                 break;
-            case UiKind.UIKind_SingleConversationPauseUi:
-                singleConversationUi.SetActive(true);
-                DisableUI(UiKind.UiKind_NormalUi);
+            case UiKind.UIKind_SingleConversationPauseUI:
+                singleConversationUI.SetActive(true);
+                DisableUI(UiKind.UiKind_NormalUI);
                 GameManager.instance.PlayerControlPause = true;
                 break;
-            case UiKind.UiKind_GameUi:
-                gameUi.SetActive(true);
+            case UiKind.UiKind_GameUI:
+                gameUI.SetActive(true);
                 break;
             case UiKind.UiKind_LoginUI:
-                loginUi.SetActive(true);
+                loginUI.SetActive(true);
+                break;
+            case UiKind.UIKind_SignUpUI:
+                signUpUI.SetActive(true);
                 break;
             default:
                 break;
@@ -168,51 +177,54 @@ public class UIManager : MonoBehaviour
         //UI를 꺼주는 함수입니다.
         switch (kind)
         {
-            case UiKind.UiKind_NormalUi:
-                normalUi.SetActive(false);
+            case UiKind.UiKind_NormalUI:
+                normalUI.SetActive(false);
                 break;
-            case UiKind.UiKind_CustomUi:
-                customUi.SetActive(false);
+            case UiKind.UiKind_CustomUI:
+                customUI.SetActive(false);
                 CameraManager.instance.PauseCamaraChangeOFF(PlayerManager.instance.transform.gameObject);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UiKind_InventoryUi:
-                inventoryUi.SetActive(false);
+            case UiKind.UiKind_InventoryUI:
+                inventoryUI.SetActive(false);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UIKind_EquipmentUi:
-                equipmentUi.SetActive(false);
+            case UiKind.UIKind_EquipmentUI:
+                equipmentUI.SetActive(false);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UiKind_ShopUi:
-                shopUi.SetActive(false);
+            case UiKind.UiKind_ShopUI:
+                shopUI.SetActive(false);
                 CameraManager.instance.PauseCamaraChangeOFF(PlayerManager.instance.transform.gameObject);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UiKind_OptionUi:
-                optionUi.SetActive(false);
+            case UiKind.UiKind_OptionUI:
+                optionUI.SetActive(false);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UIKind_ConversationUi:
-                conversationUi.SetActive(false);
-                UseUI(UiKind.UiKind_NormalUi);
+            case UiKind.UIKind_ConversationUI:
+                conversationUI.SetActive(false);
+                UseUI(UiKind.UiKind_NormalUI);
                 CameraManager.instance.PauseCamaraChangeOFF(PlayerManager.instance.transform.gameObject);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UIKind_SingleConversationUi:
-                singleConversationUi.SetActive(false);
+            case UiKind.UIKind_SingleConversationUI:
+                singleConversationUI.SetActive(false);
                 break;
-            case UiKind.UIKind_SingleConversationPauseUi:
-                singleConversationUi.SetActive(false);
+            case UiKind.UIKind_SingleConversationPauseUI:
+                singleConversationUI.SetActive(false);
                 if(CameraManager.instance.playMode)
-                    UseUI(UiKind.UiKind_NormalUi);
+                    UseUI(UiKind.UiKind_NormalUI);
                 GameManager.instance.PlayerControlPause = false;
                 break;
-            case UiKind.UiKind_GameUi:
-                gameUi.SetActive(false);
+            case UiKind.UiKind_GameUI:
+                gameUI.SetActive(false);
                 break;
             case UiKind.UiKind_LoginUI:
-                loginUi.SetActive(false);
+                loginUI.SetActive(false);
+                break;
+            case UiKind.UIKind_SignUpUI:
+                signUpUI.SetActive(false);
                 break;
             default:
                 break;
@@ -223,93 +235,93 @@ public class UIManager : MonoBehaviour
     {
         //UI를 키거나 꺼주는 함수입니다.
         //UI가 켜져있을시 꺼주고 꺼져있을시 켜주게 됩니다.
-        if (kind == UiKind.UiKind_NormalUi)
+        if (kind == UiKind.UiKind_NormalUI)
         {
             if (IsNormalUI)
-                DisableUI(UiKind.UiKind_NormalUi);
+                DisableUI(UiKind.UiKind_NormalUI);
             else
-                UseUI(UiKind.UiKind_NormalUi);
+                UseUI(UiKind.UiKind_NormalUI);
 
             IsNormalUI = !IsNormalUI;
         }
-        else if (kind == UiKind.UiKind_CustomUi)
+        else if (kind == UiKind.UiKind_CustomUI)
         {
             if (IsCustomUI)
-                DisableUI(UiKind.UiKind_CustomUi);
+                DisableUI(UiKind.UiKind_CustomUI);
             else
-                UseUI(UiKind.UiKind_CustomUi);
+                UseUI(UiKind.UiKind_CustomUI);
 
             IsCustomUI = !IsCustomUI;
         }
-        else if (kind == UiKind.UiKind_InventoryUi)
+        else if (kind == UiKind.UiKind_InventoryUI)
         {
             if (IsInventoryUI)
-                DisableUI(UiKind.UiKind_InventoryUi);
+                DisableUI(UiKind.UiKind_InventoryUI);
             else
-                UseUI(UiKind.UiKind_InventoryUi);
+                UseUI(UiKind.UiKind_InventoryUI);
 
             IsInventoryUI = !IsInventoryUI;
         }
-        else if (kind == UiKind.UIKind_EquipmentUi)
+        else if (kind == UiKind.UIKind_EquipmentUI)
         {
             if (IsEquipmentUI)
-                DisableUI(UiKind.UIKind_EquipmentUi);
+                DisableUI(UiKind.UIKind_EquipmentUI);
             else
-                UseUI(UiKind.UIKind_EquipmentUi);
+                UseUI(UiKind.UIKind_EquipmentUI);
 
             IsEquipmentUI = !IsEquipmentUI;
         }
-        else if (kind == UiKind.UiKind_ShopUi)
+        else if (kind == UiKind.UiKind_ShopUI)
         {
             if (IsShopUI)
-                DisableUI(UiKind.UiKind_ShopUi);
+                DisableUI(UiKind.UiKind_ShopUI);
             else
-                UseUI(UiKind.UiKind_ShopUi);
+                UseUI(UiKind.UiKind_ShopUI);
 
             IsShopUI = !IsShopUI;
         }
-        else if (kind == UiKind.UiKind_OptionUi)
+        else if (kind == UiKind.UiKind_OptionUI)
         {
             if (IsOptionUI)
-                DisableUI(UiKind.UiKind_OptionUi);
+                DisableUI(UiKind.UiKind_OptionUI);
             else
-                UseUI(UiKind.UiKind_OptionUi);
+                UseUI(UiKind.UiKind_OptionUI);
 
             IsOptionUI = !IsOptionUI;
         }
-        else if (kind == UiKind.UIKind_ConversationUi)
+        else if (kind == UiKind.UIKind_ConversationUI)
         {
             if (IsConversationUI)
-                DisableUI(UiKind.UIKind_ConversationUi);
+                DisableUI(UiKind.UIKind_ConversationUI);
             else
-                UseUI(UiKind.UIKind_ConversationUi);
+                UseUI(UiKind.UIKind_ConversationUI);
 
             IsConversationUI = !IsConversationUI;
         }
-        else if (kind == UiKind.UIKind_SingleConversationUi)
+        else if (kind == UiKind.UIKind_SingleConversationUI)
         {
             if (IsSingleConversationUI)
-                DisableUI(UiKind.UIKind_SingleConversationUi);
+                DisableUI(UiKind.UIKind_SingleConversationUI);
             else
-                UseUI(UiKind.UIKind_SingleConversationUi);
+                UseUI(UiKind.UIKind_SingleConversationUI);
 
             IsSingleConversationUI = !IsSingleConversationUI;
         }
-        else if (kind == UiKind.UIKind_SingleConversationPauseUi)
+        else if (kind == UiKind.UIKind_SingleConversationPauseUI)
         {
             if (IsSingleConversationUI)
-                DisableUI(UiKind.UIKind_SingleConversationPauseUi);
+                DisableUI(UiKind.UIKind_SingleConversationPauseUI);
             else
-                UseUI(UiKind.UIKind_SingleConversationPauseUi);
+                UseUI(UiKind.UIKind_SingleConversationPauseUI);
 
             IsSingleConversationUI = !IsSingleConversationUI;
         }
-        else if (kind == UiKind.UiKind_GameUi)
+        else if (kind == UiKind.UiKind_GameUI)
         {
             if (IsGameUI)
-                DisableUI(UiKind.UiKind_GameUi);
+                DisableUI(UiKind.UiKind_GameUI);
             else
-                UseUI(UiKind.UiKind_GameUi);
+                UseUI(UiKind.UiKind_GameUI);
 
             IsGameUI = !IsGameUI;
         }
@@ -322,22 +334,31 @@ public class UIManager : MonoBehaviour
 
             IsLoginUI = !IsLoginUI;
         }
+        else if (kind == UiKind.UIKind_SignUpUI)
+        {
+            if (IsSignUpUI)
+                DisableUI(UiKind.UIKind_SignUpUI);
+            else
+                UseUI(UiKind.UIKind_SignUpUI);
+
+            IsSignUpUI = !IsSignUpUI;
+        }
     }
 
     public bool IsUIActive(UiKind kind)
     {
         //해당 UI종류가 실행되어 있는 상태인지 여부를 판단합니다.
-
-        if (kind==UiKind.UiKind_NormalUi && IsNormalUI) return true;
-        if (kind == UiKind.UiKind_CustomUi && IsCustomUI) return true;
-        if (kind == UiKind.UiKind_InventoryUi && IsInventoryUI) return true;
-        if (kind == UiKind.UIKind_EquipmentUi && IsEquipmentUI) return true;
-        if (kind == UiKind.UiKind_ShopUi && IsShopUI) return true;
-        if (kind == UiKind.UiKind_OptionUi && IsOptionUI) return true;
-        if (kind == UiKind.UIKind_ConversationUi && IsConversationUI) return true;
-        if ((kind == UiKind.UIKind_SingleConversationPauseUi|| kind == UiKind.UIKind_SingleConversationPauseUi) && IsSingleConversationUI) return true;
-        if (kind == UiKind.UiKind_GameUi && IsGameUI) return true;
+        if (kind==UiKind.UiKind_NormalUI && IsNormalUI) return true;
+        if (kind == UiKind.UiKind_CustomUI && IsCustomUI) return true;
+        if (kind == UiKind.UiKind_InventoryUI && IsInventoryUI) return true;
+        if (kind == UiKind.UIKind_EquipmentUI && IsEquipmentUI) return true;
+        if (kind == UiKind.UiKind_ShopUI && IsShopUI) return true;
+        if (kind == UiKind.UiKind_OptionUI && IsOptionUI) return true;
+        if (kind == UiKind.UIKind_ConversationUI && IsConversationUI) return true;
+        if ((kind == UiKind.UIKind_SingleConversationPauseUI|| kind == UiKind.UIKind_SingleConversationPauseUI) && IsSingleConversationUI) return true;
+        if (kind == UiKind.UiKind_GameUI && IsGameUI) return true;
         if (kind == UiKind.UiKind_LoginUI && IsLoginUI) return true;
+        if (kind == UiKind.UIKind_SignUpUI && IsSignUpUI) return true;
 
         return false;
     }
@@ -345,14 +366,14 @@ public class UIManager : MonoBehaviour
     public void InventoryClickButton()
     {
         //인벤토리버튼을 클릭했을때 실행합니다.
-        UISetting(UiKind.UiKind_InventoryUi);
-        UISetting(UiKind.UIKind_EquipmentUi);
+        UISetting(UiKind.UiKind_InventoryUI);
+        UISetting(UiKind.UIKind_EquipmentUI);
     }
 
     public void OptionClickButton()
     {
         //옵션메뉴를 클릭했을때 실행합니다.
-        UISetting(UiKind.UiKind_OptionUi);
+        UISetting(UiKind.UiKind_OptionUI);
     }
 
 
@@ -404,5 +425,32 @@ public class UIManager : MonoBehaviour
         {
             UISetting((UiKind)saveActiveUIStack.Pop());
         }
+    }
+
+    public void FirstSetting()
+    {
+        IsNormalUI = false;
+        IsCustomUI = false;
+        IsInventoryUI = false;
+        IsEquipmentUI = false;
+        IsShopUI = false;
+        IsOptionUI = false;
+        IsConversationUI = false;
+        IsSingleConversationUI = false;
+        IsGameUI = false;
+        IsLoginUI = false;
+        IsSignUpUI = false;
+        IsBossUI = false;
+
+        normalUI.SetActive(false);
+        customUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        equipmentUI.SetActive(false);
+        shopUI.SetActive(false);
+        optionUI.SetActive(false);
+        conversationUI.SetActive(false);
+        singleConversationUI.SetActive(false);
+        loginUI.SetActive(false);
+        signUpUI.SetActive(false);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Networking;
+using System.Text;
 
 public class LoginUI : MonoBehaviour
 {
@@ -10,51 +11,30 @@ public class LoginUI : MonoBehaviour
     public TMP_InputField IDFelid;
     public TMP_InputField PasswardFelid;
 
-    [Header("SignupInputFelid")]
-    public TMP_InputField NewIDFelid;
-    public TMP_InputField NewPasswardFelid;
-
-    [Header("Server")]
-    public string url = "127.0.0.1:3306";
+    [Header("AlramText")]
+    public TextMeshProUGUI LoginAlramText;
+    
 
     void Awake()
     {
         IDFelid = transform.GetChild(0).GetChild(0).GetChild(2).GetComponent<TMP_InputField>();
         PasswardFelid = transform.GetChild(0).GetChild(0).GetChild(4).GetComponent<TMP_InputField>();
+        LoginAlramText = transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
-        
+        LoginAlramText.gameObject.SetActive(false);
     }
-    
+
     public void LoginButton()
     {
-        StartCoroutine(LoginCo());
+        ServerManager.instance.Login(IDFelid.text, PasswardFelid.text, LoginAlramText);
     }
 
-    public void SignupButton()
+    public void SignUpButton()
     {
-
-    }
-
-    IEnumerator LoginCo()
-    {
-        List<IMultipartFormSection> loginForm = new List<IMultipartFormSection>();
-
-        loginForm.Add(new MultipartFormDataSection("ID", IDFelid.text));
-        loginForm.Add(new MultipartFormDataSection("Passward", PasswardFelid.text));
-
-        UnityWebRequest WebRequest = UnityWebRequest.Post(url, loginForm);
-
-        yield return WebRequest.SendWebRequest();
-
-        if(WebRequest != null)
-        {
-            string result = WebRequest.downloadHandler.text;
-
-            Debug.Log(result);
-        }
+        UIManager.instance.UISetting(UiKind.UIKind_SignUpUI);
+        UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
     }
 }

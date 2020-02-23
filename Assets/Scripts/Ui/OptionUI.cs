@@ -35,6 +35,11 @@ public class OptionUI : MonoBehaviour
 
     public void ExitButton()
     {
-        UIManager.instance.UISetting(UiKind.UiKind_OptionUi);
+        UIManager.instance.UISetting(UiKind.UiKind_OptionUI);
+    }
+
+    public void SaveButton()
+    {
+        PlayerManager.instance.Save();
     }
 }

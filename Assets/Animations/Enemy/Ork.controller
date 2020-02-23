@@ -114,7 +114,7 @@ AnimatorStateMachine:
   m_AnyStatePosition: {x: 48, y: 24, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
   m_ExitPosition: {x: 48, y: 216, z: 0}
-  m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
+  m_ParentStateMachinePosition: {x: 336, y: 264, z: 0}
   m_DefaultState: {fileID: 110253054}
 --- !u!114 &114151977460571520
 MonoBehaviour:

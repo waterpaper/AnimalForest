@@ -113,9 +113,9 @@ public class ConversationUI : MonoBehaviour
     }
     public void ShopButton()
     {
-        UIManager.instance.UISetting(UiKind.UIKind_ConversationUi);
-        UIManager.instance.UISetting(UiKind.UiKind_ShopUi);
-        UIManager.instance.UISetting(UiKind.UiKind_InventoryUi);
+        UIManager.instance.UISetting(UiKind.UIKind_ConversationUI);
+        UIManager.instance.UISetting(UiKind.UiKind_ShopUI);
+        UIManager.instance.UISetting(UiKind.UiKind_InventoryUI);
     }
     public void ExitButton()
     {
@@ -126,14 +126,14 @@ public class ConversationUI : MonoBehaviour
         }
 
         UIManager.instance.nowNpcStatment = null;
-        UIManager.instance.UISetting(UiKind.UIKind_ConversationUi);
+        UIManager.instance.UISetting(UiKind.UIKind_ConversationUI);
     }
     public void QuestOkayButton()
     {
         QuestManager.instance.AddQuest(questIndex);
         PoolManager.instance.NpcQuestDelete(nowNpcStatment.ID, questIndex);
 
-        UIManager.instance.UISetting(UiKind.UIKind_ConversationUi);
+        UIManager.instance.UISetting(UiKind.UIKind_ConversationUI);
         UIManager.instance.nowNpcStatment = null;
     }
 

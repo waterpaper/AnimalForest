@@ -27,32 +27,6 @@ public struct BossLocationData
     public Vector3 Location;
 }
 
-
-[System.Serializable]
-public class PlayerData
-{
-    public int ID;
-    public string Name;
-    public int Kind;
-    public int Money;
-    public int Level;
-    public int Exp;
-    public int ExpMax;
-    public float Hp;
-    public float HpMax;
-    public float Mp;
-    public float MpMax;
-    public float Atk;
-    public float Def;
-
-    public float AddHp;
-    public float AddMp;
-    public float AddAtk;
-    public float AddDef;
-
-    public List<int> ClearEventList;
-}
-
 [System.Serializable]
 public class CharacterTable
 {
@@ -225,7 +199,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public string playerData_FileName = "Player";
     public string characterTable_FileName = "Character";
     public string enemyTable_FileName = "Enemy";
     public string bossTable_FileName = "Boss";
@@ -237,8 +210,7 @@ public class DataManager : MonoBehaviour
     public string EnemyDropItemTable_FileName = "EnemyDropItem";
     public string SingleConversationTable_FileName = "SingleConversationData";
     public string PlayerLevelTable_FileName = "PlayerLevel";
-
-    PlayerData playerInfoData;
+    
     Dictionary<int, CharacterTable> CharacterInfoTable;
     Dictionary<int, EnemyTable> EnemyInfoTable;
     Dictionary<int, BossTable> BossInfoTable;
@@ -260,8 +232,6 @@ public class DataManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-        playerInfoData = new PlayerData();
         CharacterInfoTable = new Dictionary<int, CharacterTable>();
         EnemyInfoTable = new Dictionary<int, EnemyTable>();
         BossInfoTable = new Dictionary<int, BossTable>();
@@ -279,10 +249,12 @@ public class DataManager : MonoBehaviour
     void LoadData()
     {
         //각 데이터를 딕셔너리에 먼저 저장시킨다.
+        /*
         TextAsset strings = Resources.Load<TextAsset>(playerData_FileName);
         playerInfoData = JsonUtility.FromJson<PlayerData>(strings.text);
+        */
 
-        strings = Resources.Load<TextAsset>(characterTable_FileName);
+        TextAsset strings = Resources.Load<TextAsset>(characterTable_FileName);
         CharacterTable[] characterData = JsonHelper.FromJson<CharacterTable>(strings.text);
 
         foreach (var info in characterData)
@@ -374,11 +346,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public PlayerData playerInfo()
-    {
-        return playerInfoData;
-    }
-
     public CharacterTable CharacterInfo(int id)
     {
         return CharacterInfoTable[id];
@@ -443,19 +410,6 @@ public class DataManager : MonoBehaviour
         return EnemyInfoTable.Count;
     }
 
-    //json을 저장하는 함수
-    void CreateJsonFile(string createPath, string fileName, string jsonData)
-    {
-        FileStream fileStream = new FileStream(string.Format("{0}/{1}.json", createPath, fileName), FileMode.Create);
-        byte[] data = Encoding.UTF8.GetBytes(jsonData);
-        fileStream.Write(data, 0, data.Length);
-        fileStream.Close();
-    }
-
-    string ObjectToJson(object obj)
-    {
-        return JsonUtility.ToJson(obj);
-    }
 }
 
 //json배열을 입력 받기 위해 한번 씌워주는 클래스

@@ -15,17 +15,17 @@ public class SingleConversationTrigger : MonoBehaviour
         {
             if (conversationList.Count > 0)
             {
-                UIManager.instance.singleConversationUi.GetComponent<SingleConversationUI>().Setting(conversationList, clearList);
+                UIManager.instance.singleConversationUI.GetComponent<SingleConversationUI>().Setting(conversationList, clearList);
 
                 //싱글 대화차이 열려 있을 경우 종료해준다.
                 if(UIManager.instance.IsSingleConversationUI == true)
-                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUi);
+                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);
 
 
                 if (DataManager.instance.SingleConversationInfo(conversationList[0]).Type == 0)
-                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationUi);
+                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationUI);
                 else
-                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUi);
+                    UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);
 
             }
 

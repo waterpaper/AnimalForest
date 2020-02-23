@@ -31,6 +31,7 @@ public class SettingMap : MonoBehaviour
     {
         //현재 맵과 정보를 불러옵니다.
         SceneKind kind = SceneLoader.instance.NowSceneKind();
+        
         MapTable nowMapTemp = GetMapTable(kind);
 
         //정보에 맞게 세팅해줍니다.
@@ -46,7 +47,9 @@ public class SettingMap : MonoBehaviour
         BGMSetting(kind);
 
         //세팅 값에 맞게 오브젝트 풀을 바꿔주고 객체를 파괴합니다.
-        PoolManager.instance.ChangeMap(spawnPointList, monsterKindList, npcLocationList, bossLocationList);
+        if (kind != SceneKind.Custom && kind != SceneKind.Title)
+            PoolManager.instance.ChangeMap(spawnPointList, monsterKindList, npcLocationList, bossLocationList);
+
         Destroy(this.gameObject);
     }
 
