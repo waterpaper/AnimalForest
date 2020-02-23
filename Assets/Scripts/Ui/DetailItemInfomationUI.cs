@@ -9,9 +9,9 @@ public class DetailItemInfomationUI : MonoBehaviour, IPointerClickHandler
 {
     public int inventoryNumber = 0;
     public GameObject detailItemInfomationUI;
-    public GameObject inventoryUI;
-    public bool isActive;
+    public InventoryUI inventoryUI;
     public RectTransform UIRectTransform;
+    public bool isActive;
 
     private void Awake()
     {
@@ -23,6 +23,12 @@ public class DetailItemInfomationUI : MonoBehaviour, IPointerClickHandler
     {
         detailItemInfomationUI.SetActive(false);
         isActive = false;    
+    }
+
+    public void FirstSetting(InventoryUI inventoryUITemp, int setNum)
+    {
+        inventoryUI = inventoryUITemp;
+        inventoryNumber = setNum;
     }
 
     public string ItemKindString(Item itemTemp)
@@ -128,28 +134,34 @@ public class DetailItemInfomationUI : MonoBehaviour, IPointerClickHandler
     {
         Item itemTemp = InventoryManager.instance.GetItem(inventoryNumber);
 
-        if (inventoryUI.GetComponent<InventoryUI>().selectNumber == inventoryNumber)
+        TextMeshProUGUI nameText = detailItemInfomationUI.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI kindText = detailItemInfomationUI.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI explanationText = detailItemInfomationUI.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI optionText = detailItemInfomationUI.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+
+
+        if (inventoryUI.selectNumber == inventoryNumber)
         {
             detailItemInfomationUI.SetActive(false);
             isActive = false;
-            inventoryUI.GetComponent<InventoryUI>().selectNumber = -1;
+            inventoryUI.selectNumber = -1;
         }
         else if (itemTemp != null)
         {
-            detailItemInfomationUI.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemTemp.itemInfomation.Name;
+            nameText.text = itemTemp.itemInfomation.Name;
 
             string itemKindStringTemp = ItemKindString(itemTemp);
 
             if (itemKindStringTemp != null)
-                detailItemInfomationUI.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = itemKindStringTemp;
+                kindText.text = itemKindStringTemp;
             else
-                detailItemInfomationUI.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "기타";
+                kindText.text = "기타";
 
-            detailItemInfomationUI.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = itemTemp.itemInfomation.Explanation;
-            detailItemInfomationUI.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = ItemOptionString(itemTemp);
+            explanationText.text = itemTemp.itemInfomation.Explanation;
+            optionText.text = ItemOptionString(itemTemp);
             detailItemInfomationUI.SetActive(true);
 
-            inventoryUI.GetComponent<InventoryUI>().selectNumber = inventoryNumber;
+            inventoryUI.selectNumber = inventoryNumber;
 
             isActive = true;
         }

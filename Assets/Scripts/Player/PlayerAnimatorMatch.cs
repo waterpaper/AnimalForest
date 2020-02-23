@@ -16,10 +16,10 @@ public class PlayerAnimatorMatch : MonoBehaviour
 
     private void OnAnimatorMove()   //It updates every frame when animator's animations in play.
     {
-        if (_playerController._isMove)
+        if (_playerController.IsMove)
             return;
 
-        if (!_playerController._isGround)
+        if (!_playerController.IsGround)
             return;
 
         _playerController._rigid.drag = 0;

@@ -65,6 +65,7 @@ public class BossDamage : MonoBehaviour
             damageUITemp.GetComponent<TextMessageUI>().Setting(other.gameObject.GetComponent<PlayerAttackRect>().Damage.ToString(), new Color(128, 128, 0), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
             
             StartCoroutine(IEHitParticle());
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Hit);
         }
     }
 

@@ -9,6 +9,7 @@ public class TitleToGameStart : MonoBehaviour
     public void Start()
     {
         sceneChange = GetComponent<SceneChange>();
+        SoundManager.instance.BGMPlay(BGMSoundKind.BGMSoundKind_Title);
     }
 
     private void Update()

@@ -23,6 +23,7 @@ public class QuickSlot : MonoBehaviour
 
             int hpPotionInventoryNumberTemp = InventoryManager.instance.GetEquipmentPotionItemInventoryNumber(UseItem.UseItemType.HpPotion);
             InventoryManager.instance.UseingItem(hpPotionInventoryNumberTemp);
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerPotion);
         }
 
         if (Kind == QuickSlot_Kind.QuickSlot_kind_MP)
@@ -33,6 +34,7 @@ public class QuickSlot : MonoBehaviour
 
             int mpPotionInventoryNumberTemp = InventoryManager.instance.GetEquipmentPotionItemInventoryNumber(UseItem.UseItemType.MpPotion);
             InventoryManager.instance.UseingItem(mpPotionInventoryNumberTemp);
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerPotion);
         }
     }
 }

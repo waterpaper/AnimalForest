@@ -6,17 +6,17 @@ public class Conversation_NpcQuestScrollbarUI : MonoBehaviour
 {
     public GameObject slotPrefab;
     public GameObject slotLocation;
-    public GameObject[] npcQuestSlot;
+    public ConversationUI_NpcQuestScrollbarUI_Contents[] npcQuestSlot;
     
     private void Awake()
     {
-        npcQuestSlot = new GameObject[10];
+        npcQuestSlot = new ConversationUI_NpcQuestScrollbarUI_Contents[10];
 
         for (int i=0;i<10;i++)
         {
-            npcQuestSlot[i] = Instantiate<GameObject>(slotPrefab, slotLocation.transform);
-            npcQuestSlot[i].GetComponent<ConversationUI_NpcQuestScrollbarUI_Contents>().index = i;
-            npcQuestSlot[i].SetActive(false);
+            npcQuestSlot[i] = Instantiate<GameObject>(slotPrefab, slotLocation.transform).GetComponent<ConversationUI_NpcQuestScrollbarUI_Contents>();
+            npcQuestSlot[i].index = i;
+            npcQuestSlot[i].gameObject.SetActive(false);
         }
     }
 
@@ -26,13 +26,13 @@ public class Conversation_NpcQuestScrollbarUI : MonoBehaviour
         {
             if (npcQuestList.Count > i)
             {
-                npcQuestSlot[i].GetComponent<ConversationUI_NpcQuestScrollbarUI_Contents>().questID = npcQuestList[i];
-                npcQuestSlot[i].GetComponent<ConversationUI_NpcQuestScrollbarUI_Contents>().Setting();
-                npcQuestSlot[i].SetActive(true);
+                npcQuestSlot[i].questID = npcQuestList[i];
+                npcQuestSlot[i].Setting();
+                npcQuestSlot[i].gameObject.SetActive(true);
             }
             else
             {
-                npcQuestSlot[i].SetActive(false);
+                npcQuestSlot[i].gameObject.SetActive(false);
             }
         }
     }

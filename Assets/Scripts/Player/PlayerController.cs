@@ -33,10 +33,10 @@ public class PlayerController : MonoBehaviour
     public PlayerInput _playerInput;
     [HideInInspector]
     public PlayerAttack _playerAttack;
-    public bool _isGround { get; private set; }
-    public bool _isMove { get; private set; }
-    public bool _isAttack { get; private set; }
-    public bool _isRoll { get; private set; }
+    public bool IsGround { get; private set; }
+    public bool IsMove { get; private set; }
+    public bool IsAttack { get; private set; }
+    public bool IsRoll { get; private set; }
 
     //트레일러를 그려주기 위한 무기위치
     public GameObject _weaponTrailer;
@@ -52,9 +52,9 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
         _playerAttack = GetComponent<PlayerAttack>();
         CameraManager.instance.Init(gameObject.transform);
-        _isGround = true;
-        _isAttack = false;
-        _isRoll = false;
+        IsGround = true;
+        IsAttack = false;
+        IsRoll = false;
         sprintSetting = false;
     }
 
@@ -64,16 +64,16 @@ public class PlayerController : MonoBehaviour
         // 게임오버상태에서 상태값을 초기화한다.
         if (GameManager.instance != null && GameManager.instance.Gameover)
         {
-            _isMove = false;
-            _isGround = false;
-            _isAttack = false;
+            IsMove = false;
+            IsGround = false;
+            IsAttack = false;
 
             return;
         }
 
         if (GameManager.instance.PlayerControlPause) return;
 
-            UpdateState();
+        UpdateState();
 
     }
 
@@ -104,13 +104,13 @@ public class PlayerController : MonoBehaviour
     {
         if (GameManager.instance.PlayerControlPause)
         {
-            _isAttack = false;
+            IsAttack = false;
             _anim.SetBool("sprint", false);
             _anim.SetFloat("vertical", 0.0f);
             return;
         }
 
-        if (_isMove && _isGround)
+        if (IsMove && IsGround)
         {
             Move();
         }
@@ -149,15 +149,26 @@ public class PlayerController : MonoBehaviour
         float m = Mathf.Abs(_playerInput.horizontal) + Mathf.Abs(_playerInput.vertical);
         moveAmount = Mathf.Clamp01(m);
 
-        if (_isMove)
+        if (IsMove)
         {
             //땅이고 움직일 수 있을시 앞으로 이동한다.
             _rigid.velocity = moveDir;
         }
 
+        /*
+        if (moveDir != Vector3.zero)
+        {
+            if (!SoundManager.instance.IsEffectSound(EffectSoundKind.EffectSoundKind_PlayerFootStep))
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerFootStep);
+        }
+        else
+        {
+            SoundManager.instance.EffectSoundStop(EffectSoundKind.EffectSoundKind_PlayerFootStep);
+        }
+        */
 
         //움직일 수 있을시 캐릭터를 돌려준다.
-        if (_isMove)
+        if (IsMove)
         {
             Vector3 targetDir = moveDir;
             targetDir.y = 0;
@@ -179,14 +190,15 @@ public class PlayerController : MonoBehaviour
          */
 
         //이동상태를 받아옵니다.
-        _isMove = _anim.GetBool("isMove");
+        IsMove = _anim.GetBool("isMove");
+        IsRoll = _anim.GetBool("isRoll");
 
         //공격이 끝낫다면 트레일러를 꺼줍니다.
-        if (_isAttack)
+        if (IsAttack)
         {
             if (_anim.GetBool("isNotAttack"))
             {
-                _isAttack = false;
+                IsAttack = false;
                 _weaponTrailer.SetActive(false);
                 _playerAttack.endAttack();
             }
@@ -195,10 +207,12 @@ public class PlayerController : MonoBehaviour
         //점프할때입니다.
         if (_playerInput.jump)
         {
-            if (_isGround && _isMove)//점프를 방금 눌렀을시
+            if (IsGround && IsMove)//점프를 방금 눌렀을시
             {
                 _anim.CrossFade("falling", 0.1f);
                 _rigid.AddForce(0, jumpForce, 0);//점프 에니메이션을 작동시킨다.
+
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerJumpUP);
             }
         }
         //콤보 공격입니다.
@@ -207,29 +221,44 @@ public class PlayerController : MonoBehaviour
             if (InventoryManager.instance.NowEquipmentWeaponItem() == false) return;
 
             //땅에서만 가능합니다.
-            if (_isGround)
+            if (IsGround)
             {
                 _anim.SetTrigger("combo");
-                _isAttack = true;
-                _weaponTrailer.SetActive(true);
-                _playerAttack.startAttack();
+
+                float timerTemp = _anim.GetFloat("timer");
+
+                if(!IsAttack)
+                {
+                    IsAttack = true;
+                    _weaponTrailer.SetActive(true);
+                    _playerAttack.startAttack();
+                }
+                else if (timerTemp >= 0.3f && timerTemp <= 0.6f)
+                {
+                    _playerAttack.startAttack();
+                }
             }
         }
         //회피입니다.
-        if (_playerInput.roll && _isGround)
+        if (_playerInput.roll && IsGround)
         {
-            _anim.SetTrigger("roll");
-            _isRoll = true;
+            //구르는 상태가 아닐시 
+            if (!IsRoll)
+            {
+                _anim.SetBool("isRoll", true);
+                IsRoll = true;
+                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerRoll);
+            }
         }
 
         //공격입니다
-        if (_playerInput.normalAttack && _isMove)
+        if (_playerInput.normalAttack && IsMove)
         {
             if (InventoryManager.instance.NowEquipmentWeaponItem() == false) return;
 
             string targetAnim;
 
-            _isAttack = true;
+            IsAttack = true;
             _weaponTrailer.SetActive(true);
 
             //chosing random attack from array.
@@ -238,7 +267,7 @@ public class PlayerController : MonoBehaviour
 
             _anim.CrossFade(targetAnim, 0.1f); //play the target animation in 0.1 second.                 
 
-            if (!_isGround)
+            if (!IsGround)
             {
                 _anim.CrossFade("JumpAttack", 0.1f); // When you are air born, you do this jump attack.
             }
@@ -260,12 +289,19 @@ public class PlayerController : MonoBehaviour
 
         _anim.SetFloat("vertical", moveAmount, 0.2f, Time.deltaTime);
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Ground")
+        {
+            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerJumpDowm);
+        }
+    }
 
     private void OnTriggerStay(Collider collision)
     {
         if (collision.gameObject.tag == "Ground")
         {
-            _isGround = true;
+            IsGround = true;
             _anim.SetBool("isGround", true);
         }
     }
@@ -274,7 +310,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag == "Ground")
         {
-            _isGround = false;
+            IsGround = false;
             _anim.SetBool("isGround", false);
         }
     }

@@ -20,6 +20,7 @@ public class EventTrigger : MonoBehaviour
 
     [Header("EvnetTrigger Infomation")]
     public int eventID;
+    public float triggerActiveDistance =3.0f;
     public EventKind NowEvnetkind;
     public EventAccess NowAccessKind;
     public GameObject targetObject;
@@ -80,7 +81,7 @@ public class EventTrigger : MonoBehaviour
             //거리를 계산해 근접할 경우만 true를 반환합니다.
             Vector3 offset = targetObject.transform.position - transform.position;
 
-            if (Vector3.SqrMagnitude(offset) < 3.0f * 3.0f)
+            if (Vector3.SqrMagnitude(offset) < triggerActiveDistance * triggerActiveDistance)
             {
                 return true;
             }

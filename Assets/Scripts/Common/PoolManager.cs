@@ -73,12 +73,11 @@ public class PoolManager : MonoBehaviour
         enemyPrefabDictionary = new Dictionary<int, GameObject>();
         enemyPool = new Dictionary<int, List<GameObject>>();
 
-        enemyPrefabList.ForEach((enemyPrefab) => 
+        enemyPrefabList.ForEach((enemyPrefab) =>
         {
             int idTemp = enemyPrefab.GetComponent<EnemyStatement>().id;
             enemyPrefabDictionary.Add(idTemp, enemyPrefab);
             enemyPool.Add(idTemp, new List<GameObject>());
-            CreateEnemyPooling(DataManager.instance.EnemyInfo(idTemp));
         });
 
         bossPrefabDictionary = new Dictionary<int, GameObject>();
@@ -112,22 +111,19 @@ public class PoolManager : MonoBehaviour
         });
     }
 
-
+    //enemy를 다시 acrive시켜주는 함수입니다.
     public void EnableEnemy(int id)
     {
         StartCoroutine(IEEnableEnemy(id));
     }
 
-    IEnumerator IEEnableEnemy(int id)
+    //적 캐릭터를 생성하는 코루틴함수
+    IEnumerator IEEnableEnemy(int id, bool isAllActive = false)
     {
-        //적 캐릭터의 생성 주기 시간만큼 대기
-        yield return new WaitForSeconds(createTime);
-        StartCoroutine(IECreateEnemy(id));
-    }
+        //적 캐릭터의 생성 주기 시간만큼 대기합니다.
+        if(!isAllActive)
+            yield return new WaitForSeconds(createTime);
 
-   //적 캐릭터를 생성하는 코루틴함수
-   IEnumerator IECreateEnemy(int id)
-    {
         for (int i = 0; i < maxEnemy; i++)
         {
             //비황성화 여부로 사용 가능한 오브젝트인지를 판단
@@ -139,7 +135,9 @@ public class PoolManager : MonoBehaviour
                 enemyPool[id][i].transform.position = new Vector3(spwanPointList[idx].x, 3.0f, spwanPointList[idx].z);
 
                 enemyPool[id][i].SetActive(true);
-                break;
+
+                if(!isAllActive)
+                    break;
             }
         }
         yield return null;
@@ -148,65 +146,74 @@ public class PoolManager : MonoBehaviour
     //오브젝트 풀에 적을 생성하는 함수
     public void CreateEnemyPooling(EnemyTable enemy)
     {
-        //리스트에 생성한 추가
-        enemyPool[enemy.ID] = new List<GameObject>();
-
-        if ((EnemyType)enemy.EnemyType == EnemyType.EnemyType_Boss)
+        //풀링개수만큼 미리 적을 생성합니다.
+        for (int i = 0; i < maxEnemy; i++)
         {
             var obj = Instantiate<GameObject>(enemyPrefabDictionary[enemy.ID], enemyPoolLocation.transform);
-            obj.name = enemy.Name;
+            obj.name = enemy.Name + i.ToString("00");
             //비활성화
             obj.SetActive(false);
 
             enemyPool[enemy.ID].Add(obj);
         }
-        else if((EnemyType)enemy.EnemyType == EnemyType.EnemyType_General)
-        {
-            //풀링개수만큼 미리 적을 생성
-            for (int i = 0; i < maxEnemy; i++)
-            {
-                var obj = Instantiate<GameObject>(enemyPrefabDictionary[enemy.ID], enemyPoolLocation.transform);
-                obj.name = enemy.Name + i.ToString("00");
-                //비활성화
-                obj.SetActive(false);
-
-                enemyPool[enemy.ID].Add(obj);
-            }
-        }
     }
 
-    //맵이 변하면 해당 맵을 맞춰 변화시켜주기 위한 함수
+    //맵이 이동시 현재 맵에 맞는 pool의 세팅을 도와주는 함수입니다.
     public void ChangeMap(List<Vector3> spwanListTemp, List<int> monsterListTemp, List<NpcLocationData> npcLocationListTemp, List<BossLocationData> bossLocationListTemp)
     {
-        EnableEnemy();
+        //전 맵의 유지 데이터를 지워줍니다.
+        DeleteEnemy();
         EnableNpc();
         EnableBoss();
 
+        //바꿔줄 맵의 유지 데이터를 저장합니다.
         ChangeMap_MonsterSpwanList(spwanListTemp);
         ChangeMap_MonsterKindList(monsterListTemp);
         ChangeMap_NpcActive(npcLocationListTemp);
         ChangeMap_BossActive(bossLocationListTemp);
 
-        for (int i = 0; i < nowEnemyIDList.Count; i++)
-        {
-            for (int j = 0; j < maxEnemy; j++)
-            {
-                StartCoroutine(IECreateEnemy(nowEnemyIDList[i]));
-            }
-        }
+        //바꿔줄 맵의 유지데이터를 바탕으로 pool의 세팅을 진행합니다.
+        SettingPool();
 
         UIManager.instance.BossUISetting();
     }
 
-    //오브젝트에 활성화되있는 객체를 맵 체인지시 비활성화 시키기 위한 함수
-    public void EnableEnemy()
+    //현재 조건에 맞게 오브젝트 풀을 세팅해줍니다. 
+    public void SettingPool()
     {
+        nowEnemyIDList.ForEach((monsterID) => { CreateEnemyPooling(DataManager.instance.EnemyInfo(monsterID)); });
+        ActivePool();
+    }
+
+    public void ActivePool()
+    {
+        ActiveEnemyPooling();
+    }
+
+    public void ActiveEnemyPooling()
+    {
+        nowEnemyIDList.ForEach((monsterID) => { StartCoroutine(IEEnableEnemy(monsterID, true)); });
+    }
+
+    //현재 생성되어 있는 enemy를 모두 제거하기 위한 함수입니다.
+    public void DeleteEnemy()
+    {
+        //맵이동시 사용됩니다.
+        //딕셔너리에서 선택된 enemy리스트입니다.
+        List<GameObject> selectEnemyList;
+
         for (int i = 0; i < nowEnemyIDList.Count; i++)
         {
-            for (int j = 0; j < maxEnemy; j++)
+            //딕셔너리에 저장된 현재 존재하는 enemy가 가진 list
+            selectEnemyList = enemyPool[nowEnemyIDList[i]];
+
+            //해당 enemy list의 객체를 모두 파괴합니다.
+            for (int j = 0; j < selectEnemyList.Count; j++)
             {
-                enemyPool[nowEnemyIDList[i]][j].SetActive(false);
+                Destroy(selectEnemyList[j]);
             }
+
+            enemyPool[nowEnemyIDList[i]].Clear();
         }
 
         nowEnemyIDList.Clear();
@@ -227,14 +234,12 @@ public class PoolManager : MonoBehaviour
         nowBossIDList.Clear();
     }
 
-    //해당하는 맵 몬스터 정보를 받아오는 함수
-    void ChangeMap_MonsterKindList(List<int> monsterList)
+    //해당하는 맵에 스폰시킬 몬스터들의 아이디를 저장하는 함수입니다.
+    void ChangeMap_MonsterKindList(List<int> monsterIDList)
     {
-        for (int i = 0; i < monsterList.Count; i++)
-        {
-            nowEnemyIDList.Add(monsterList[i]);
-        }
+        nowEnemyIDList.Clear();
 
+        monsterIDList.ForEach((monsterID) => { nowEnemyIDList.Add(monsterID); });
     }
 
     //해당하는 맵 몬스터 스폰 리스트를 변화시켜주는 함수
@@ -251,7 +256,8 @@ public class PoolManager : MonoBehaviour
     //해당하는 맵에 npc를 활성화해주는 함수입니다.
     void ChangeMap_NpcActive(List<NpcLocationData> npcLocationListTemp)
     {
-        npcLocationListTemp.ForEach((LocationData) => {
+        npcLocationListTemp.ForEach((LocationData) =>
+        {
             NowNpcIDList.Add(LocationData.NpcID);
             NpcDictionary[LocationData.NpcID].transform.position = LocationData.Location;
             NpcDictionary[LocationData.NpcID].transform.rotation = Quaternion.Euler(LocationData.Rotation);
@@ -262,7 +268,8 @@ public class PoolManager : MonoBehaviour
     //해당하는 맵에 boss를 활성화해주는 함수입니다.
     void ChangeMap_BossActive(List<BossLocationData> bossLocationListTemp)
     {
-        bossLocationListTemp.ForEach((LocationData) => {
+        bossLocationListTemp.ForEach((LocationData) =>
+        {
             nowBossIDList.Add(LocationData.BossID);
             BossDictionary[LocationData.BossID].transform.position = LocationData.Location;
             BossDictionary[LocationData.BossID].SetActive(true);
@@ -274,4 +281,6 @@ public class PoolManager : MonoBehaviour
     {
         NpcDictionary[npcID].GetComponent<NpcStatment>().deleteNpcQuest(questIndex);
     }
+
+
 }

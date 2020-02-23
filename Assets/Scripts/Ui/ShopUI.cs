@@ -8,7 +8,7 @@ public class ShopUI : MonoBehaviour
     public int createShopSlotCount = 30;
     public GameObject ShopSlotPrefab;
     public GameObject ShopSlotLocation;
-    public List<GameObject> shopSlotList;
+    public List<ShopSlotUI> shopSlotList;
 
     public void Awake()
     {
@@ -16,8 +16,8 @@ public class ShopUI : MonoBehaviour
 
         for (int i = 0; i < createShopSlotCount; i++)
         {
-            var slotTemp = Instantiate(ShopSlotPrefab, ShopSlotLocation.transform);
-            slotTemp.SetActive(false);
+            var slotTemp = Instantiate(ShopSlotPrefab, ShopSlotLocation.transform).GetComponent<ShopSlotUI>();
+            slotTemp.gameObject.SetActive(false);
             shopSlotList.Add(slotTemp);
         }
     }
@@ -49,8 +49,8 @@ public class ShopUI : MonoBehaviour
 
             if (itemIndexTemp == -1) break;
 
-            shopSlotList[i].GetComponent<ShopSlotUI>().Setting(itemIndexTemp);
-            shopSlotList[i].SetActive(true);
+            shopSlotList[i].Setting(itemIndexTemp);
+            shopSlotList[i].gameObject.SetActive(true);
         }
     }
 
@@ -60,7 +60,7 @@ public class ShopUI : MonoBehaviour
 
         for (int i = 0; i < maxCount; i++)
         {
-            shopSlotList[i].SetActive(false);
+            shopSlotList[i].gameObject.SetActive(false);
         }
     }
 }
