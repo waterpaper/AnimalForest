@@ -89,6 +89,8 @@ public class DropItemManager : MonoBehaviour
 
     public Item ItemSetting(int itemID)
     {
+        if (itemID < 0) return null;
+
         ItemTable itemTableTemp = DataManager.instance.ItemInfo(itemID);
 
         switch ((Item.ItemType)itemTableTemp.ItemKind)

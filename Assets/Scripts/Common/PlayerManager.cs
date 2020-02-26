@@ -7,6 +7,14 @@ public struct SaveItemData
 {
     public int ItemID;
     public int ItemCount;
+    public int InventoryNum;
+}
+
+[System.Serializable]
+public struct SaveQuestData
+{
+    public int QuestID;
+    public int TargetNowCount;
 }
 
 [System.Serializable]
@@ -26,9 +34,7 @@ public class PlayerSaveData
     public float Def;
 
     public int MapNumber;
-    public float MapPositionX;
-    public float MapPositionY;
-    public float MapPositionZ;
+    public Vector3 MapPosition;
 
     public int EquipWeaponItem;
     public int EquipArmorItem;
@@ -36,8 +42,10 @@ public class PlayerSaveData
     public int EquipHpPotion;
     public int EquipMpPotion;
 
-    public List<int> ClearEventList;
+    public string ClearQuest;
+    public string ClearEvent;
     public List<SaveItemData> ItemList;
+    public List<SaveQuestData> QuestList;
 }
 
 public class PlayerManager : MonoBehaviour
@@ -55,7 +63,12 @@ public class PlayerManager : MonoBehaviour
     private PlayerCustom _playerCustom = null;
     private Rigidbody _rigidbody;
 
-    private Save _playerDataSave;
+    private Save _savePlayerData;
+    private Load _loadPlayerData;
+    
+    //로드 아이템 정보 세팅시 statement의 기본 값을 건들이지 않기 위한 변수입니다.(데이터베이스에 저장되어 있음)
+    private bool _isLoad = false;
+
     private static PlayerManager m_instance;
 
     [Header("PlayerSaveFile")]
@@ -91,9 +104,10 @@ public class PlayerManager : MonoBehaviour
         _playerCustom = GetComponent<PlayerCustom>();
         _rigidbody = GetComponent<Rigidbody>();
 
-        _playerDataSave = new Save();
+        _savePlayerData = new Save();
+        _loadPlayerData = new Load(); 
 
-        _playerState.PlayerSetting();
+        _playerState.StartPlayerSetting();
         transform.position = new Vector3(0.0f, 5.0f, 0.0f);
     }
 
@@ -185,8 +199,12 @@ public class PlayerManager : MonoBehaviour
             float temp = value - _playerState.addHp;
 
             _playerState.addHp = value;
-            _playerState.hpMax += temp;
-            _playerState.hp += temp;
+
+            if (_isLoad)
+            {
+                _playerState.hpMax += temp;
+                _playerState.hp += temp;
+            }
         }
     }
     public float AddMp
@@ -197,8 +215,12 @@ public class PlayerManager : MonoBehaviour
             float temp = value - _playerState.addMp;
 
             _playerState.addMp = value;
-            _playerState.mpMax += temp;
-            _playerState.mp += temp;
+
+            if (_isLoad)
+            {
+                _playerState.mpMax += temp;
+                _playerState.mp += temp;
+            }
         }
     }
     public float AddAtk
@@ -209,7 +231,11 @@ public class PlayerManager : MonoBehaviour
             float temp = value - _playerState.addAtk;
 
             _playerState.addAtk = value;
-            _playerState.atk += temp;
+
+            if (_isLoad)
+            {
+                _playerState.atk += temp;
+            }
         }
     }
     public float AddDef
@@ -220,7 +246,11 @@ public class PlayerManager : MonoBehaviour
             float temp = value - _playerState.addDef;
 
             _playerState.addDef = value;
-            _playerState.def += temp;
+
+            if (_isLoad)
+            {
+                _playerState.def += temp;
+            }
         }
     }
 
@@ -269,6 +299,29 @@ public class PlayerManager : MonoBehaviour
         }
         return false;
     }
+    public bool IsClearQuestList(int id)
+    {
+        for (int i = 0; i < _playerState.clearQuestList.Count; i++)
+        {
+            if (id == _playerState.clearQuestList[i])
+                return true;
+        }
+        return false;
+    }
+
+    public void Load(string id)
+    {
+        _loadPlayerData.LoadConnection(id);
+    }
+
+    public void LoadPlayerSetting(PlayerSaveData loadData)
+    {
+        //데이터를 로드하면서 캐릭터 설정을 합니다.
+        _playerState.LoadPlayerSetting(loadData);
+
+        //캐릭터 외형을 변경시키는 세팅을합니다.
+        CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalKind, loadData.Kind);
+    }
 
     public PlayerState GetPlayerState()
     {
@@ -278,6 +331,11 @@ public class PlayerManager : MonoBehaviour
     public void AddClearEventList(int id)
     {
         _playerState.clearEventList.Add(id);
+    }
+
+    public void AddClearQuestList(int id)
+    {
+        _playerState.clearQuestList.Add(id);
     }
 
     private void LevelUp()
@@ -363,6 +421,12 @@ public class PlayerManager : MonoBehaviour
 
     public void Save()
     {
-        _playerDataSave.SaveData();
+        _savePlayerData.SaveData();
+    }
+
+    public void LoadEnd()
+    {
+        //로드가 끝나면 세팅변수를 true로 바꿔줍니다
+        _isLoad = true;
     }
 }

@@ -36,7 +36,7 @@ abstract public class Quest
     public int QuestRewardMoney { get; protected set; }
     public List<int> QuestItem { get; protected set; }
 
-    public void Setting(QuestTable QuestInfo)
+    public void Setting(QuestTable QuestInfo, int targetCount = 0)
     {
         QuestID = QuestInfo.ID;
         MinLevel = QuestInfo.MinLevel;
@@ -46,8 +46,8 @@ abstract public class Quest
         OrderNpcConversation = QuestInfo.OrderNpcConversation;
         TargetNpcConversation = QuestInfo.TargetNpcConversation;
         QuestKind = (EQuestKind)QuestInfo.Kind;
-        QuestProgress = EQuestProgress.EQuestProgress_Proceeding;
         TargetObject = QuestInfo.TargetObject;
+        TargetObject_NowCount = targetCount;
         TargetObject_TargetCount = QuestInfo.TargetCount;
         QuestRewardExp = QuestInfo.RewardExp;
         QuestRewardMoney = QuestInfo.RewardMoney;
@@ -55,7 +55,10 @@ abstract public class Quest
         QuestItem = new List<int>(0);
         QuestInfo.RewardItem.ForEach(itemID => { QuestItem.Add(itemID); });
 
-        TargetObject_NowCount = 0;
+        if(TargetObject_TargetCount <= TargetObject_NowCount)
+            QuestProgress = EQuestProgress.EQuestProgress_Completed;
+        else
+            QuestProgress = EQuestProgress.EQuestProgress_Proceeding;
 
         TextSetting();
     }
@@ -116,13 +119,14 @@ public class CollectionQuest : Quest
             return;
         }
 
+        TargetObject_NowCount = temp.count;
+
         if (TargetObject_NowCount >= TargetObject_TargetCount)
         {
             if (QuestProgress == EQuestProgress.EQuestProgress_Completed) return;
             
                 QuestProgress = EQuestProgress.EQuestProgress_Completed;
-                TextSetting();
-            
+                TextSetting();      
         }
         else
         {

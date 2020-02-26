@@ -253,7 +253,7 @@ public class BossAI : MonoBehaviour
         Ani_Initialize();
         _bossAni.SetBool(hashDeath, true);
 
-        QuestManager.instance.updateQuest(EQuestKind.EQuestKind_BossHunting, _bossState.ID);
+        QuestManager.instance.UpdateQuest(EQuestKind.EQuestKind_BossHunting, _bossState.ID);
         GameObject.FindGameObjectWithTag("EventTrigger_Light").GetComponent<EventTrigger>().EventStart();
         yield return new WaitForSeconds(5.0f);
         this.gameObject.SetActive(false);
