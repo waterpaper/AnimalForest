@@ -65,7 +65,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: "\uD310 \uB9E4"
+  m_text: "\uAD6C \uB9E4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 168a6d3f907147c4a9e9a6aeddbe0dfb, type: 2}
   m_sharedMaterial: {fileID: 21779378427697668, guid: 168a6d3f907147c4a9e9a6aeddbe0dfb,
@@ -94,8 +94,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 11
+  m_fontSizeBase: 11
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

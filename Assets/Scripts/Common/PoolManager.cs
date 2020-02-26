@@ -279,7 +279,7 @@ public class PoolManager : MonoBehaviour
     //npc에 퀘스트 데이터를 삭제해주는 함수입니다.
     public void NpcQuestDelete(int npcID, int questIndex)
     {
-        NpcDictionary[npcID].GetComponent<NpcStatment>().deleteNpcQuest(questIndex);
+        NpcDictionary[npcID].GetComponent<NpcStatment>().DeleteNpcQuest(questIndex);
     }
 
 

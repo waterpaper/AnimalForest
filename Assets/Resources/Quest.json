@@ -10,7 +10,7 @@
       "OrderNpc": 1,
       "TargetNpc": 1,
       "TargetObject": 3,
-      "TargetCount": 10,
+      "TargetCount": 3,
       "RewardExp": 100,
       "RewardMoney": 1000,
       "RewardItem": [
@@ -27,7 +27,7 @@
       "OrderNpc": 2,
       "TargetNpc": 2,
       "TargetObject": 29,
-      "TargetCount": 10,
+      "TargetCount": 3,
       "RewardExp": 50,
       "RewardMoney": 1500,
       "RewardItem": [
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "ID": 101,
+      "ID": 50,
       "Name": "응급치료",
       "OrderNpcConversation": "치료하자",
       "TargetNpcConversation": "나는 이미 틀렸어. 저건 저주의 빛이야.",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "ID": 102,
+      "ID": 51,
       "Name": "숲 탈출",
       "OrderNpcConversation": "나는 이미 틀렸어. 저 빛은 몬스터가 나오는 저주의 빛이야. 하지만 빛이 있는 곳 아래로 내려가면 마을로 가는 길이 있지. 너라도 어떻게 살아가도록 해. 남은 동물들은 많지 않으니깐.",
       "TargetNpcConversation": "이제 정신 차렸어? 정신차렸으면 일해야지.",

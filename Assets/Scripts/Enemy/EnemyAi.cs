@@ -299,7 +299,7 @@ public class EnemyAi : MonoBehaviour
     {
         DropItemManager.instance.DropItemSetting(_enemyState.id, _enemyTrans);
         PlayerManager.instance.Exp+=_enemyState.exp;
-        QuestManager.instance.updateQuest(EQuestKind.EQuestKind_Hunting, _enemyState.id);
+        QuestManager.instance.UpdateQuest(EQuestKind.EQuestKind_Hunting, _enemyState.id);
         yield return new WaitForSeconds(3.0f);
         this.gameObject.SetActive(false);
         _enemyAni.SetBool(hashDeath, false);

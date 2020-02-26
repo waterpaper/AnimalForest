@@ -76,11 +76,11 @@ public class Equipment : MonoBehaviour
 
         if (item.itemInfomation.AddHp > 0.0f)
             PlayerManager.instance.AddHp += (item.itemInfomation.AddHp * value);
-        else if (item.itemInfomation.AddMp > 0.0f)
+        if (item.itemInfomation.AddMp > 0.0f)
             PlayerManager.instance.AddMp += (item.itemInfomation.AddMp * value);
-        else if (item.itemInfomation.AddAtk > 0.0f)
+        if (item.itemInfomation.AddAtk > 0.0f)
             PlayerManager.instance.AddAtk += (item.itemInfomation.AddAtk * value);
-        else if (item.itemInfomation.AddDef > 0.0f)
+        if (item.itemInfomation.AddDef > 0.0f)
             PlayerManager.instance.AddDef += (item.itemInfomation.AddDef * value);
     }
 }
