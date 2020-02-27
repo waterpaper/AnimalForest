@@ -102,7 +102,7 @@ public class Save
         //string으로 각 퀘스트를 0,1로 구분해 데이터를 만들어줍니다.
         saveDataTemp.ClearQuest = "";
         
-        for (int i = 0, clearQuestCountTemp = 0; i < 101; i++)
+        for (int i = 0, clearQuestCountTemp = 0; i < 100; i++)
         {
             if (clearQuestCountTemp < playerStateTemp.clearQuestList.Count)
             {
@@ -119,7 +119,7 @@ public class Save
         //string으로 각 이벤트를 0,1로 구분해 데이터를 만들어줍니다.
         saveDataTemp.ClearEvent = "";
 
-        for (int i = 0, clearEventCountTemp = 0; i < 101; i++)
+        for (int i = 0, clearEventCountTemp = 0; i < 100; i++)
         {
             if (clearEventCountTemp < playerStateTemp.clearEventList.Count)
             {

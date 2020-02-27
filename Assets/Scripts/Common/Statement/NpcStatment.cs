@@ -27,23 +27,10 @@ public class NpcStatment : MonoBehaviour
     public List<string> Conversations;
     public List<int> NpcQuestData;
 
-    public void Setting(NpcTable info)
+    //npc정보를 세팅합니다.
+    public void Awake()
     {
-        ID = info.ID;
-        type = (NPCTYPE)info.Type;
-        name = info.Name;
-        level = info.Level;
-        hp = info.Hp;
-        hpMax = info.HpMax;
-        mp = info.Mp;
-        mpMax = info.MpMax;
-        atk = info.Atk;
-        def = info.Def;
-        shopKind = info.ShopKind;
-        Conversations = new List<string>();
-        info.Conversations.ForEach((str) => { Conversations.Add(str); });
-        NpcQuestData = new List<int>();
-        info.NpcQuests.ForEach((questData) => { NpcQuestData.Add(questData); });
+        Setting(DataManager.instance.NpcInfo(ID));
     }
 
     //키고 끌때 제거되지 않은 완료 퀘스트목록을 지워줍니다.
@@ -69,6 +56,29 @@ public class NpcStatment : MonoBehaviour
             }
         }
     }
+
+    //정보를 세팅합니다.
+    public void Setting(NpcTable info)
+    {
+        ID = info.ID;
+        type = (NPCTYPE)info.Type;
+        name = info.Name;
+        level = info.Level;
+        hp = info.Hp;
+        hpMax = info.HpMax;
+        mp = info.Mp;
+        mpMax = info.MpMax;
+        atk = info.Atk;
+        def = info.Def;
+        shopKind = info.ShopKind;
+        Conversations = new List<string>();
+        info.Conversations.ForEach((str) => { Conversations.Add(str); });
+        NpcQuestData = new List<int>();
+        info.NpcQuests.ForEach((questData) => { NpcQuestData.Add(questData); });
+
+        gameObject.name = name;
+    }
+
 
     //퀘스트목록을 추가합니다
     public void AddNpcQuest(int questIndex)

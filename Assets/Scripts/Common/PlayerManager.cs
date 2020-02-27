@@ -331,11 +331,13 @@ public class PlayerManager : MonoBehaviour
     public void AddClearEventList(int id)
     {
         _playerState.clearEventList.Add(id);
+        _playerState.clearEventList.Sort();
     }
 
     public void AddClearQuestList(int id)
     {
         _playerState.clearQuestList.Add(id);
+        _playerState.clearQuestList.Sort();
     }
 
     private void LevelUp()
