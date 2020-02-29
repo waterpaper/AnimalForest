@@ -38,19 +38,24 @@ else
 		"Atk" => (float)$row['Atk'],
 		"Def" => (float)$row['Def'],
 		"MapNumber" =>(int)$row['MapNumber'],
-		"MapPositionX" =>(float)$row['MapPositionX'],
-		"MapPositionY" =>(float)$row['MapPositionY'],
-		"MapPositionZ" =>(float)$row['MapPositionZ'],
 		"EquipWeaponItem" =>(int)$row['EquipWeaponItem'],
 		"EquipArmorItem" =>(int)$row['EquipArmorItem'],
 		"EquipShieldItem" =>(int)$row['EquipShieldItem'],
 		"EquipHpPotion" =>(int)$row['EquipHpPotion'],
 		"EquipMpPotion" =>(int)$row['EquipMpPotion'],
-		"ClearQuest" =>(string)$row['ClearQuest'],
-		"ClearEvent" =>(string)$row['ClearEvent'],
-		"ItemList",
-		"QuestList"
+		"ClearQuest" =>$row['ClearQuest'],
+		"ClearEvent" =>$row['ClearEvent']
 	);
+	
+	$positionArray = array(
+		"x" =>(float)$row['MapPositionX'],
+		"y" =>(float)$row['MapPositionY'],
+		"z" =>(float)$row['MapPositionZ'],
+		
+	);
+	
+	$dataArray['MapPosition'] = $positionArray;
+	
 		
 	//아이템 추가 구문입니다.
 	$itemCheck = mysqli_query($master,$sqlItemCheckQuery) or Die("error");
@@ -58,7 +63,7 @@ else
 		
 	if(mysqli_num_rows($itemCheck)==0)
 	{
-		$dataArray['ItemList'] = "";
+		$dataArray['ItemList'] = $itemArray;
 	}
 	else
 	{
@@ -80,7 +85,7 @@ else
 		
 	if(mysqli_num_rows($questCheck)==0)
 	{
-		$dataArray['QuestList'] = "";
+		$dataArray['QuestList'] = $questArray;
 	}
 	else
 	{

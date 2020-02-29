@@ -124,7 +124,9 @@ public class InventoryUI : MonoBehaviour
 
         Item itemTemp = InventoryManager.instance.GetItem(selectNumber);
 
-        int sellMoney = itemTemp.count * itemTemp.itemInfomation.Value;
+        int sellMoney =itemTemp.count * (int)(itemTemp.itemInfomation.Value * 0.5f);
+
+        InventoryManager.instance.DeleteItem(selectNumber, itemTemp.count);
 
         PlayerManager.instance.Money += sellMoney;
     }
