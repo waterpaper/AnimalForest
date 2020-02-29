@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using System.Text;
 using System;
 
 
@@ -146,7 +144,6 @@ public class EnemyDropItemTable
 [System.Serializable]
 public class NpcTable
 {
-    
     public int ID;
     public int Type;
     public string Name;
@@ -248,12 +245,6 @@ public class DataManager : MonoBehaviour
     }
     void LoadData()
     {
-        //각 데이터를 딕셔너리에 먼저 저장시킨다.
-        /*
-        TextAsset strings = Resources.Load<TextAsset>(playerData_FileName);
-        playerInfoData = JsonUtility.FromJson<PlayerData>(strings.text);
-        */
-
         TextAsset strings = Resources.Load<TextAsset>(characterTable_FileName);
         CharacterTable[] characterData = JsonHelper.FromJson<CharacterTable>(strings.text);
 

@@ -80,6 +80,18 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    //인벤토리 해당 위치에 아이템을 추가합니다.
+    public bool AddInventroyItem(Item itemTemp, int inventoryNumber)
+    {
+        //해당 인벤토리에 아이템이 존재하면 추가하지 않습니다.
+        if (myInventory[inventoryNumber] != null) return false;
+
+        myInventory[inventoryNumber] = itemTemp;
+
+
+        return true;
+    }
+
     public bool DeleteInventoryItem(int num)
     {
         if (myInventory[num] == null)

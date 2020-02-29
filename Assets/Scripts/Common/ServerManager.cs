@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 
+public delegate void ServerDelegate<T> (T id,T data);
+
 enum ServerConnectionKind
 {
     ServerConnectionKind_Login,
@@ -18,6 +20,7 @@ public class ServerManager : MonoBehaviour
     public string loginConnectionName = "login";
     public string signupConnectionName = "SignUp";
     public string saveConnectionName = "Save";
+    public string loadConnectionName = "Load";
     public TextMeshProUGUI resultTextUI;
 
     private static ServerManager m_instance;
@@ -36,6 +39,11 @@ public class ServerManager : MonoBehaviour
         }
     }
 
+    public static void Function<T>(T id, T data, ServerDelegate<T> dele)
+    {
+        dele(id, data);
+    }
+
     private void Awake()
     {
         if (instance != this)
@@ -43,12 +51,7 @@ public class ServerManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    void serverPostConnection()
-    {
-
-    }
-
+    
     public void Login(string id, string passward, TextMeshProUGUI textUI = null)
     {
         if (textUI != null)
@@ -77,6 +80,28 @@ public class ServerManager : MonoBehaviour
         StartCoroutine(PostSaveConnection(id, saveData));
     }
 
+    public void Load(string id, ServerDelegate<string> dele)
+    {
+        StartCoroutine(PostLoadConnection(id, dele));
+        StartCoroutine(SaveCycle());
+    }
+
+    IEnumerator SaveCycle()
+    {
+        while (true)
+        {
+            if ((int)SceneLoader.instance.NowSceneKind() > (int)SceneKind.Start)
+            {
+                PlayerManager.instance.Save();
+            }
+
+            yield return new WaitForSeconds(3.0f);
+
+            if (GameManager.instance == null)
+                break;
+        }
+    }
+
     IEnumerator PostLoginConnection(string id, string passward)
     {
         List<IMultipartFormSection> loginForm = new List<IMultipartFormSection>();
@@ -102,8 +127,7 @@ public class ServerManager : MonoBehaviour
 
                     PlayerManager.instance.Id = id;
                     yield return new WaitForSeconds(2.0f);
-                    UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
-                    UIManager.instance.UISetting(UiKind.UiKind_CustomUI);
+                    PlayerManager.instance.Load(id);
                 }
             }
             else if (string.Equals(result, "ID") || string.Equals(result, "Passward"))
@@ -192,5 +216,40 @@ public class ServerManager : MonoBehaviour
             Debug.Log(result);
 
         }
+    }
+
+    IEnumerator PostLoadConnection(string id, ServerDelegate<string> dele)
+    {
+        List<IMultipartFormSection> loadForm = new List<IMultipartFormSection>();
+
+        loadForm.Add(new MultipartFormDataSection("ID", id));
+
+        UnityWebRequest WebRequest = UnityWebRequest.Post(string.Format("{00}{01}.php", url, loadConnectionName), loadForm);
+        yield return WebRequest.SendWebRequest();
+
+        if(WebRequest != null)
+        {
+            string result =  WebRequest.downloadHandler.text;
+
+            if (string.Equals(result, "Error"))
+            {
+                if (resultTextUI != null)
+                {
+                    resultTextUI.text = "서버 오류입니다.";
+                    resultTextUI.gameObject.SetActive(true);
+                }
+            }
+            else if(string.Equals(result, "NotExisted"))
+            {
+                UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
+                UIManager.instance.UISetting(UiKind.UiKind_CustomUI);
+            }
+            else
+            {
+                Function(id, result, dele);
+            }
+
+        }
+
     }
 }

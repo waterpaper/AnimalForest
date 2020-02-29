@@ -15,6 +15,7 @@ public class PlayerState : MonoBehaviour
     public int exp;
     public int money;
 
+    public List<int> clearQuestList;
     public List<int> clearEventList;
 
     public int expMax;
@@ -26,7 +27,7 @@ public class PlayerState : MonoBehaviour
     public float addAtk;
     public float addDef;
 
-    public void PlayerSetting()
+    public void StartPlayerSetting()
     {
         id = "empty";
         name = "empty";
@@ -47,15 +48,18 @@ public class PlayerState : MonoBehaviour
         addDef = 0;
 
         clearEventList = new List<int>();
+        clearQuestList = new List<int>();
     }
    
-    public void loadCharacterStatement(PlayerSaveData info)
+    public void LoadPlayerSetting(PlayerSaveData info)
     {
         id = info.ID;
         name = info.Name;
         kind = info.Kind;
         hp = info.Hp;
+        hpMax = info.HpMax;
         mp = info.Mp;
+        mpMax = info.MpMax;
         atk = info.Atk;
         def = info.Def;
         level = info.Level;
@@ -63,6 +67,20 @@ public class PlayerState : MonoBehaviour
         money = info.Money;
         expMax = DataManager.instance.PlayerLevelInfo(level).ExpMax;
 
-        clearEventList = info.ClearEventList;
+        for(int i=0;i < info.ClearEvent.Length;i++)
+        {
+            if(info.ClearEvent[i] == '1')
+            {
+                clearEventList.Add(i);
+            }
+        }
+
+        for (int i = 0; i < info.ClearQuest.Length; i++)
+        {
+            if (info.ClearQuest[i] == '1')
+            {
+                clearQuestList.Add(i);
+            }
+        }
     }
 }

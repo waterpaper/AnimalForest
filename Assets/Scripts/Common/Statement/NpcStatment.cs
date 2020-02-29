@@ -13,7 +13,7 @@ public class NpcStatment : MonoBehaviour
         NPCTYPE_End
     }
 
-    public int ID;
+    public int ID = -1;
     public NPCTYPE type;
     public string name;
     public int level;
@@ -27,6 +27,37 @@ public class NpcStatment : MonoBehaviour
     public List<string> Conversations;
     public List<int> NpcQuestData;
 
+    //npc정보를 세팅합니다.
+    public void Awake()
+    {
+        Setting(DataManager.instance.NpcInfo(ID));
+    }
+
+    //키고 끌때 제거되지 않은 완료 퀘스트목록을 지워줍니다.
+    public void OnEnable()
+    {
+        if(ID != -1)
+        {
+            if (NpcQuestData.Count == 0) return;
+
+            List<int> deleteTemp = new List<int>();
+
+            for (int i=0;i< NpcQuestData.Count; i++)
+            {
+                if (PlayerManager.instance.IsClearQuestList(NpcQuestData[i]))
+                {
+                    deleteTemp.Add(i);
+                }
+            }
+
+            for (int i = deleteTemp.Count-1; i >= 0; i--)
+            {
+                NpcQuestData.RemoveAt(deleteTemp[i]);
+            }
+        }
+    }
+
+    //정보를 세팅합니다.
     public void Setting(NpcTable info)
     {
         ID = info.ID;
@@ -44,15 +75,20 @@ public class NpcStatment : MonoBehaviour
         info.Conversations.ForEach((str) => { Conversations.Add(str); });
         NpcQuestData = new List<int>();
         info.NpcQuests.ForEach((questData) => { NpcQuestData.Add(questData); });
+
+        gameObject.name = name;
     }
 
-    public void addNpcQuest(int questIndex)
+
+    //퀘스트목록을 추가합니다
+    public void AddNpcQuest(int questIndex)
     {
         NpcQuestData.Add(questIndex);
         NpcQuestData.Sort();
     }
 
-    public void deleteNpcQuest(int questIndex)
+    //퀘스트 목록에 인덱스를 제거합니다.
+    public void DeleteNpcQuest(int questIndex)
     {
         for(int i =0;i< NpcQuestData.Count;i++)
         {

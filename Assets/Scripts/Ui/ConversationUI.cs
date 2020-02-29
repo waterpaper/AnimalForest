@@ -131,7 +131,6 @@ public class ConversationUI : MonoBehaviour
     public void QuestOkayButton()
     {
         QuestManager.instance.AddQuest(questIndex);
-        PoolManager.instance.NpcQuestDelete(nowNpcStatment.ID, questIndex);
 
         UIManager.instance.UISetting(UiKind.UIKind_ConversationUI);
         UIManager.instance.nowNpcStatment = null;
