@@ -14,21 +14,21 @@
       "TraceDist": 40.0,
       "PatrolMoveSpeed": 5.0,
       "TraceMoveSpeed": 10.0,
-      "Skill_1": {
+      "BossAttack": {
         "Name": "내려치기",
         "Mp": 0,
         "Factor": 1.0,
         "Range": 10,
         "Time" : 0.0
       },
-      "Skill_2": {
+      "Skill_1": {
         "Name": "지진",
         "Mp": 50,
         "Factor": 1.5,
         "Range": 15,
         "Time":  7.0
       },
-      "Skill_3": {
+      "Skill_2": {
         "Name": "원혼 발사",
         "Mp": 100,
         "Factor": 2.0,

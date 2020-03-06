@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1547299013756854914}
   - component: {fileID: 7106713187822849330}
   m_Layer: 12
-  m_Name: EnemyAttackRect
+  m_Name: EnemyAttackCollider
   m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,8 +54,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9023645030500802410}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b11fcfe273873af4d98f2b77780974a1, type: 3}
+  m_Script: {fileID: 11500000, guid: 98245e129530ce143828d3c99351f596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyStatement: {fileID: 0}
-  damage: 0
+  attackCollider: {fileID: 0}

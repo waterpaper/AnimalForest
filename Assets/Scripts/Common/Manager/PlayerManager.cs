@@ -311,6 +311,7 @@ public class PlayerManager : MonoBehaviour
 
     public void Load(string id)
     {
+        //플레이더 아이디에 맞는 데이터 연결을 시도합니다.
         _loadPlayerData.LoadConnection(id);
     }
 

@@ -12,7 +12,7 @@
       "TargetObject": 3,
       "TargetCount": 3,
       "RewardExp": 100,
-      "RewardMoney": 1000,
+      "RewardMoney": 1000000,
       "RewardItem": [
         2
       ]
@@ -29,7 +29,7 @@
       "TargetObject": 29,
       "TargetCount": 3,
       "RewardExp": 50,
-      "RewardMoney": 1500,
+      "RewardMoney": 1000000,
       "RewardItem": [
         19
       ]

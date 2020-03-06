@@ -6,7 +6,7 @@ using TMPro;
 
 public class BossBarUI : MonoBehaviour
 {
-    private BossStatment _bossstatement = null;
+    private BossStatement _bossstatement = null;
     private TextMeshProUGUI _bossName;
     private TextMeshProUGUI _bossLevel;
     private Image _bossHpImage;
@@ -37,7 +37,7 @@ public class BossBarUI : MonoBehaviour
         _bossHpImage.fillAmount = (float)_bossstatement.hp / _bossstatement.hpMax;
     }
 
-    public void BossStatementSetting(BossStatment bossState)
+    public void BossStatementSetting(BossStatement bossState)
     {
         _bossstatement = bossState;
     }

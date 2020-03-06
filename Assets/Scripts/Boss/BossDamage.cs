@@ -5,10 +5,13 @@ using TMPro;
 
 public class BossDamage : MonoBehaviour
 {
-    private int beforDamageNumber = -1;
-    //생명 게이지 프리팹을 저장할 변수
-    public BossStatment _bossStatement;
+    //컴포넌트를 지정합니다.
+    public BossStatement _bossStatement;
+    public BossAI _bossAI;
+    public CapsuleCollider _bossHitCollider;
 
+    //플레이어 저장번호입니다.
+    private int beforDamageNumber;
     //부모가 될 canvas 객체
     private Canvas uiCanvas;
     //데미지를 입엇을시 띄우는 ui를 저정합니다.
@@ -18,17 +21,22 @@ public class BossDamage : MonoBehaviour
 
     private void Awake()
     {
-        _bossStatement = GetComponentInParent<BossStatment>();
+        _bossStatement = GetComponentInParent<BossStatement>();
+        _bossAI = GetComponentInParent<BossAI>();
+        _bossHitCollider = GetComponent<CapsuleCollider>();
+
+        uiCanvas = GameObject.Find("GameUI").GetComponent<Canvas>();
     }
 
     private void OnEnable()
     {
-        GetComponent<CapsuleCollider>().enabled = true;
-        uiCanvas = GameObject.Find("GameUI").GetComponent<Canvas>();
+        Init();
     }
 
-    private void OnDisable()
+    private void Init()
     {
+        //변수들을 초기화합니다.
+        _bossHitCollider.enabled = true;
         beforDamageNumber = -1;
     }
 
@@ -36,22 +44,23 @@ public class BossDamage : MonoBehaviour
     {
         if (other.gameObject.tag == "PlayerAttack")
         {
-            if (beforDamageNumber == other.gameObject.GetComponent<PlayerAttackRect>().attackNumber)
+            PlayerAttackCollider playerAttackColliderTemp = other.gameObject.GetComponent<PlayerAttackCollider>();
+
+            //같은 공격 상태이면 데미지 처리를 하지 않습니다.
+            if (beforDamageNumber == playerAttackColliderTemp.attackNumber)
                 return;
 
-            beforDamageNumber = other.gameObject.GetComponent<PlayerAttackRect>().attackNumber;
+            beforDamageNumber = playerAttackColliderTemp.attackNumber;
 
-            //생명 게이지 차감
-            _bossStatement.hp -= (int)other.gameObject.GetComponent<PlayerAttackRect>().Damage;
-          
+            //공격력에 맞는 데미지를 감소시킵니다.
+            _bossStatement.hp -= (int)playerAttackColliderTemp.Damage;
+
             if (_bossStatement.hp <= 0.0f)
             {
-                //적 캐릭터의 상태를 DIE로 변경
-                GetComponentInParent<BossAI>().isDeath = true;
-                GetComponentInParent<BossAI>().action = BossAI.BossAction.Die;
-
+                //boss 사망을 처리합니다.
+                _bossAI.isDeath = true;
                 //capsule Collider컴포넌트를 비활성화
-                GetComponent<CapsuleCollider>().enabled = false;
+                _bossHitCollider.enabled = false;
 
                 //데미지 ui를 출력합니다
                 var ExpUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
@@ -62,15 +71,15 @@ public class BossDamage : MonoBehaviour
             //데미지 ui를 출력합니다
             var damageUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
             damageUITemp.name = "Damage";
-            damageUITemp.GetComponent<TextMessageUI>().Setting(other.gameObject.GetComponent<PlayerAttackRect>().Damage.ToString(), new Color(128, 128, 0), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
-            
+            damageUITemp.GetComponent<TextMessageUI>().Setting(playerAttackColliderTemp.Damage.ToString(), new Color(128, 128, 0), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
+
             StartCoroutine(IEHitParticle());
-            SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Hit);
         }
     }
 
     IEnumerator IEHitParticle()
     {
+        SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Hit);
         ParticleManager.instance.Play(ParticleName.ParticleName_Battle_Boss1Hit, transform, hitEffectOffset);
         yield return new WaitForSeconds(2.0f);
     }

@@ -70,12 +70,12 @@ public class PoolManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
+
         //오브젝트 풀을 구현하기 위해 리스트에 입력받은 프리팹들을 딕셔너리로 바꿔 저장해 줍니다.
         nowEnemyIDList = new List<int>();
         nowBossIDList = new List<int>();
         nowNpcIDList = new List<int>();
-     
+
         enemyPrefabDictionary = new Dictionary<int, GameObject>();
         enemyPool = new Dictionary<int, List<GameObject>>();
 
@@ -91,7 +91,7 @@ public class PoolManager : MonoBehaviour
 
         bossPrefabList.ForEach((bossPrefab) =>
         {
-            int bossIDTemp = bossPrefab.GetComponent<BossStatment>().ID;
+            int bossIDTemp = bossPrefab.GetComponent<BossStatement>().ID;
             bossPrefabDictionary.Add(bossIDTemp, bossPrefab);
             BossDictionary.Add(bossIDTemp, null);
         });
@@ -136,8 +136,19 @@ public class PoolManager : MonoBehaviour
     IEnumerator IEEnableEnemy(int id, bool isAllActive = false)
     {
         //적 캐릭터의 생성 주기 시간만큼 대기합니다.
-        if(!isAllActive)
+        if (!isAllActive)
             yield return new WaitForSeconds(createTime);
+
+        for (int i = 0; i < maxEnemy; i++)
+        {
+            //적이 현재 맵에 있는 몬스터면 리스폰을 합니다.
+            if (nowEnemyIDList[i] == id)
+                break;
+
+            //만약 적이 현재 맵에 없는 몬스터면 리스폰 하지 않고 넘어갑니다.
+            if (nowEnemyIDList.Count - 1 == i)
+                yield return null;
+        }
 
         for (int i = 0; i < maxEnemy; i++)
         {
@@ -151,7 +162,7 @@ public class PoolManager : MonoBehaviour
 
                 enemyPool[id][i].SetActive(true);
 
-                if(!isAllActive)
+                if (!isAllActive)
                     break;
             }
         }
@@ -190,7 +201,8 @@ public class PoolManager : MonoBehaviour
     //현재 생성되있는 npc객체를 모두 제거하기 위한 함수입니다.
     public void DeleteNpc()
     {
-        nowNpcIDList.ForEach((i) => {
+        nowNpcIDList.ForEach((i) =>
+        {
             Destroy(npcDictionary[i]);
             npcDictionary[i] = null;
         });
@@ -207,7 +219,8 @@ public class PoolManager : MonoBehaviour
         }
         else
         {
-            nowNpcIDList.ForEach((npcID) => {
+            nowNpcIDList.ForEach((npcID) =>
+            {
                 npcDictionary[npcID].SetActive(isActive);
             });
         }
@@ -216,7 +229,8 @@ public class PoolManager : MonoBehaviour
     //현재 생성되있는 boss객체를 모두 제거하기 위한 함수입니다.
     public void DeleteBoss()
     {
-        nowBossIDList.ForEach((i) => {
+        nowBossIDList.ForEach((i) =>
+        {
             Destroy(BossDictionary[i]);
             BossDictionary[i] = null;
         });
@@ -233,7 +247,8 @@ public class PoolManager : MonoBehaviour
         }
         else
         {
-            nowBossIDList.ForEach((BossID) => {
+            nowBossIDList.ForEach((BossID) =>
+            {
                 BossDictionary[BossID].SetActive(isActive);
             });
         }
@@ -256,8 +271,6 @@ public class PoolManager : MonoBehaviour
 
         //바꿔줄 맵의 유지데이터를 바탕으로 pool의 활성화를 진행합니다.
         ActivePool();
-
-        UIManager.instance.BossUISetting();
     }
 
     //현재 조건에 맞는 오브젝트 풀을 활성화해줍니다. 
@@ -274,7 +287,8 @@ public class PoolManager : MonoBehaviour
     {
         nowEnemyIDList.Clear();
 
-        monsterIDList.ForEach((monsterID) => {
+        monsterIDList.ForEach((monsterID) =>
+        {
             nowEnemyIDList.Add(monsterID);
             CreateEnemyPooling(DataManager.instance.EnemyInfo(monsterID));
         });
