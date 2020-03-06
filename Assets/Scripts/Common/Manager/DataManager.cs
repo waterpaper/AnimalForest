@@ -74,9 +74,9 @@ public class BossTable
     public float TraceDist;
     public float PatrolMoveSpeed;
     public float TraceMoveSpeed;
+    public BossSkill BossAttack;
     public BossSkill Skill_1;
     public BossSkill Skill_2;
-    public BossSkill Skill_3;
 }
 
 [System.Serializable]
@@ -396,9 +396,32 @@ public class DataManager : MonoBehaviour
     {
         return PlayerLevelInfoTable[level];
     }
+
     public int EnemyDictionaryCount()
     {
         return EnemyInfoTable.Count;
+    }
+    //아이템을 세팅해서 리턴합니다.
+    public Item ItemSetting(int itemID)
+    {
+        if (itemID < 0) return null;
+
+        ItemTable itemTableTemp = ItemInfo(itemID);
+
+        switch ((Item.ItemType)itemTableTemp.ItemKind)
+        {
+            case Item.ItemType.EquipItem:
+                EquipItem equipItemTemp = new EquipItem(itemID, 1, itemTableTemp.DetailKind);
+                return equipItemTemp;
+            case Item.ItemType.UseItem:
+                UseItem useItemTemp = new UseItem(itemID, 1, itemTableTemp.DetailKind);
+                return useItemTemp;
+            case Item.ItemType.EtcItem:
+                EtcItem EtcitemTemp = new EtcItem(itemID, 1, itemTableTemp.DetailKind);
+                return EtcitemTemp;
+            default:
+                return null;
+        }
     }
 
 }

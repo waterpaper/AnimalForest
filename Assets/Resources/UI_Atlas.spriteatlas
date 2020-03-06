@@ -125,15 +125,10 @@ SpriteAtlas:
     - {fileID: 21300184, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
     - {fileID: 21300186, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
     - {fileID: 21300188, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
-    - {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-    - {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
-    - {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     totalSpriteSurfaceArea: 2787021
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 21300146, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
   - {fileID: 21300144, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
   - {fileID: 21300150, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
@@ -230,8 +225,6 @@ SpriteAtlas:
   - {fileID: 21300142, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
   - {fileID: 21300140, guid: 07c3de7fedfd95242860c5fa9a81cc00, type: 3}
   m_PackedSpriteNamesToIndex:
-  - UISprite
-  - Background
   - AnimalForest_UI_73
   - AnimalForest_UI_72
   - AnimalForest_UI_75

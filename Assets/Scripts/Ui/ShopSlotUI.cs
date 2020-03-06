@@ -29,6 +29,7 @@ public class ShopSlotUI : MonoBehaviour
 
     public void Setting(int number)
     {
+        //상점 데이터의 아이템 정보를 가지고 아이템들을 세팅합니다.
         itemID = number;
 
         ItemTable itemTemp = DataManager.instance.ItemInfo(itemID);
@@ -45,6 +46,7 @@ public class ShopSlotUI : MonoBehaviour
 
     public void BuyButton()
     {
+        //구매버튼 클릿기 아이템을 생성해 인벤토리에 추가합니다.
         int afterMoney = PlayerManager.instance.Money-itemMoney;
 
         if(afterMoney<0)
@@ -53,7 +55,7 @@ public class ShopSlotUI : MonoBehaviour
         }
 
         PlayerManager.instance.Money = afterMoney;
-        Item itemTemp = DropItemManager.instance.ItemSetting(itemID);
+        Item itemTemp = DataManager.instance.ItemSetting(itemID);
   
         InventoryManager.instance.AddItem(itemTemp);
     }

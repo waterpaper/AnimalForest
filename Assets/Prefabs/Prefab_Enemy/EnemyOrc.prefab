@@ -1023,7 +1023,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f562250a4ea7f34f80338bf1a4c5d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRect: {fileID: 2646830018118236919}
+  attackColliderObject: {fileID: 0}
+  attackCollider: {fileID: 0}
 --- !u!1 &2048760584003028269
 GameObject:
   m_ObjectHideFlags: 0
@@ -2811,7 +2812,7 @@ PrefabInstance:
     - target: {fileID: 9023645030500802410, guid: a9f2940a67e5b154f9f396cf4d325d92,
         type: 3}
       propertyPath: m_Name
-      value: EnemyAttackRect
+      value: EnemyAttackCollider
       objectReference: {fileID: 0}
     - target: {fileID: 9023645030500802410, guid: a9f2940a67e5b154f9f396cf4d325d92,
         type: 3}
@@ -2900,12 +2901,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9f2940a67e5b154f9f396cf4d325d92, type: 3}
---- !u!1 &2646830018118236919 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9023645030500802410, guid: a9f2940a67e5b154f9f396cf4d325d92,
-    type: 3}
-  m_PrefabInstance: {fileID: 6449436932937033117}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4059895821096206344 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7050003709693486485, guid: a9f2940a67e5b154f9f396cf4d325d92,

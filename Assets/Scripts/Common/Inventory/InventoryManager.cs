@@ -304,7 +304,7 @@ public class InventoryManager : MonoBehaviour
 
         if (itemTemp != null)
         {
-            var setTemp = DropItemManager.instance.ItemSetting(itemTemp.itemInfomation.ID);
+            var setTemp = DataManager.instance.ItemSetting(itemTemp.itemInfomation.ID);
             InventoryManager.instance.AddItem(setTemp);
             itemTemp = null;
         }
@@ -323,13 +323,13 @@ public class InventoryManager : MonoBehaviour
     {
         //로드한 데이터를 기준으로 인벤토리와 장비를 세팅해줍니다.
         //장비를 세팅합니다.
-        EquipmentingItem(Item.ItemType.EquipItem, DropItemManager.instance.ItemSetting(loadData.EquipWeaponItem));
-        EquipmentingItem(Item.ItemType.EquipItem, DropItemManager.instance.ItemSetting(loadData.EquipArmorItem));
-        EquipmentingItem(Item.ItemType.EquipItem, DropItemManager.instance.ItemSetting(loadData.EquipShieldItem));
+        EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipWeaponItem));
+        EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipArmorItem));
+        EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipShieldItem));
         
         //인벤토리를 세팅합니다
         loadData.ItemList.ForEach((saveItemTemp) => {
-            Item itemTemp = DropItemManager.instance.ItemSetting(saveItemTemp.ItemID);
+            Item itemTemp = DataManager.instance.ItemSetting(saveItemTemp.ItemID);
             itemTemp.count = saveItemTemp.ItemCount;
             AddItem(itemTemp, saveItemTemp.InventoryNum, true);
         });

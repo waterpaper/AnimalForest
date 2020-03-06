@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAttackRect : MonoBehaviour
+public class PlayerAttackCollider : MonoBehaviour
 {
     public float Damage;
     public int attackNumber = 0;

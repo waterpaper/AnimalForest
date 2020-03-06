@@ -56,6 +56,7 @@ public class CustomUI : MonoBehaviour
     {
         PlayerManager.instance.Name = nameTextUI.text;
         PlayerManager.instance.Kind = kindIndex;
+        PlayerManager.instance.LoadEnd();
         SceneLoader.instance.playerLocationTemp = new Vector3(88.0f, 2.0f, 42.0f);
         SceneLoader.instance.SceneLoaderStart(SceneKind.Start);
 

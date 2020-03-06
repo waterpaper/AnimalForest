@@ -1,10 +1,10 @@
 {
     "name": "UI",
     "references": [
-        "CommonAD",
         "PlayerAD",
         "MapAD",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "CommonAD"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

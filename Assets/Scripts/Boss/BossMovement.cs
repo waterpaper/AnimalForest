@@ -85,16 +85,8 @@ public class BossMovement : MonoBehaviour
         agent.autoBraking = false;
         //자동으로 회전하는 기능을 비활성화
         agent.updateRotation = false;
-    }
 
-    private void OnEnable()
-    {
-        if (agent != null && _isSetting == true)
-        {
-            agent.enabled = true;
-            agent.isStopped = true;
-        }
-
+        //맵의 순찰 포인트를 저장합니다.
         var t = GameObject.FindGameObjectsWithTag("WayPoint");
 
         for (int i = 0; i < t.Length; i++)
@@ -103,16 +95,18 @@ public class BossMovement : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (agent != null && _isSetting == true)
+        {
+            agent.enabled = true;
+            Stop();
+            agent.isStopped = true;
+        }
+    }
+
     private void OnDisable()
     {
-        wayPoints.Clear();
-
-        if (agent != null)
-        {
-            Stop();
-            agent.enabled = false;
-        }
-
         //초기 생성이 끝낫으면 변수를 다시 false해줍니다.
         if (_isSetting == false)
         {
@@ -122,6 +116,7 @@ public class BossMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //보스를 회전합니다.
         BossRotation();
 
         agent.speed = _speed;
@@ -173,7 +168,7 @@ public class BossMovement : MonoBehaviour
     {
         if (agent.isStopped == true)
         {
-            //내비게이션 기능을 활성화 해서 이동을 시작함
+            //내비게이션 기능을 활성화 해서 이동을 시작합니다.
             _idle = false;
             agent.isStopped = false;
             StartCoroutine("IENextMovePositionSetting");
@@ -192,6 +187,8 @@ public class BossMovement : MonoBehaviour
 
     IEnumerator IENextMovePositionSetting()
     {
+        //다음 순찰 위치를 설정해주는 함수입니다.
+
         if (gameObject.activeSelf == true)
         {
             //최단거리 경로 계산이 끝나지 않았다면 다음을 수행하지 않음

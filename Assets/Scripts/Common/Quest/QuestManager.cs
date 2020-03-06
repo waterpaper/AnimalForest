@@ -154,7 +154,7 @@ public class QuestManager : MonoBehaviour
             {
                 PlayerManager.instance.Exp += QuestList[i].QuestRewardExp;
                 PlayerManager.instance.Money += QuestList[i].QuestRewardMoney;
-                QuestList[i].QuestItem.ForEach((rewardItemTemp) => {  InventoryManager.instance.AddItem(DropItemManager.instance.ItemSetting(rewardItemTemp)); });
+                QuestList[i].QuestItem.ForEach((rewardItemTemp) => {  InventoryManager.instance.AddItem(DataManager.instance.ItemSetting(rewardItemTemp)); });
 
                 PlayerManager.instance.AddClearQuestList(questID);
                 break;

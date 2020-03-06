@@ -13,7 +13,7 @@ public struct BossSkill
 }
 
 
-public class BossStatment : MonoBehaviour
+public class BossStatement : MonoBehaviour
 {
     public int ID;
     public string bossName;
@@ -33,9 +33,9 @@ public class BossStatment : MonoBehaviour
     //추적 스피드
     public float traceMoveSpeed;
     //기본 공격을 포함한 보스의 스킬 정보
+    public BossSkill bossAttack;
     public BossSkill skill_1;
     public BossSkill skill_2;
-    public BossSkill skill_3;
 
 
     public void Awake()
@@ -46,12 +46,14 @@ public class BossStatment : MonoBehaviour
 
     private void OnEnable()
     {
+        //생성시 hp, mp를 최고치로 설정합니다.
         hp = hpMax;
         mp = mpMax;
     }
 
     void Setting(BossTable temp)
     {
+        //테이블 정보를 받아와 스텟을 저장합니다.
         bossName = temp.BossName;
         level = temp.Level;
         exp = temp.Exp;
@@ -64,8 +66,8 @@ public class BossStatment : MonoBehaviour
         traceDist = temp.TraceDist;
         patrolMoveSpeed = temp.PatrolMoveSpeed;
         traceMoveSpeed = temp.TraceMoveSpeed;
+        bossAttack = temp.BossAttack;
         skill_1 = temp.Skill_1;
         skill_2 = temp.Skill_2;
-        skill_3 = temp.Skill_3;
     }
 }

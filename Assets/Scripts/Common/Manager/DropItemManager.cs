@@ -27,8 +27,7 @@ public class DropItemManager : MonoBehaviour
             return m_instance;
         }
     }
-
-    // Start is called before the first frame update
+    
     void Awake()
     {
         if (instance != this)
@@ -36,6 +35,7 @@ public class DropItemManager : MonoBehaviour
             Destroy(gameObject);
         }
 
+        //상자를 on, off하지 않기 위해 미리 세팅합니다
         for (int i = 0; i < maxDropItem; i++)
         {
             var obj = Instantiate<GameObject>(dropItemBoxPrefab, dropItemBoxPoolListLocation.transform);
@@ -49,6 +49,7 @@ public class DropItemManager : MonoBehaviour
 
     public void DropItemSetting(int enemyID, Transform enemyTransform)
     {
+        //몬스터가 드랍하는 상자를 세팅하는 함수입니다.
         EnemyDropItemTable dropItemTableTemp;
         List<Item> dropItemListTemp = new List<Item>();
         int dropMoney = 0;
@@ -69,7 +70,7 @@ public class DropItemManager : MonoBehaviour
                     
                     if (randIdx < dropItemTableTemp.EnemyDropItemDataList[j].dropItemPercent)
                     {
-                        Item itemTemp = ItemSetting(dropItemTableTemp.EnemyDropItemDataList[j].dropItemId);
+                        Item itemTemp = DataManager.instance.ItemSetting(dropItemTableTemp.EnemyDropItemDataList[j].dropItemId);
 
                         if (itemTemp == null) continue;
                             dropItemListTemp.Add(itemTemp);
@@ -86,27 +87,4 @@ public class DropItemManager : MonoBehaviour
             }
         }
     }
-
-    public Item ItemSetting(int itemID)
-    {
-        if (itemID < 0) return null;
-
-        ItemTable itemTableTemp = DataManager.instance.ItemInfo(itemID);
-
-        switch ((Item.ItemType)itemTableTemp.ItemKind)
-        {
-            case Item.ItemType.EquipItem:
-                EquipItem equipItemTemp= new EquipItem(itemID, 1, itemTableTemp.DetailKind);
-                return equipItemTemp;
-            case Item.ItemType.UseItem:
-                UseItem useItemTemp = new UseItem(itemID, 1, itemTableTemp.DetailKind);
-                return useItemTemp;
-            case Item.ItemType.EtcItem:
-                EtcItem EtcitemTemp = new EtcItem(itemID, 1, itemTableTemp.DetailKind);
-                return EtcitemTemp;
-            default:
-                return null;
-        }
-    }
-
 }

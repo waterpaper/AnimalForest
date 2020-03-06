@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4145606562847818746}
   - component: {fileID: 5225674354155831072}
   m_Layer: 15
-  m_Name: Skill_1
+  m_Name: Attack
   m_TagString: BossAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43de0c2c41dd3b84b9e529f5ed1a4a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackColliderObject: {fileID: 0}
+  attackCollider: {fileID: 0}
 --- !u!1 &2927229092927017716
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +155,7 @@ GameObject:
   - component: {fileID: 3251860330079843569}
   - component: {fileID: 5527200114790157271}
   m_Layer: 15
-  m_Name: Skill_3
+  m_Name: Skill_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -881,7 +881,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98245e129530ce143828d3c99351f596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: 0}
+  attackCollider: {fileID: 0}
   particle: {fileID: 100008, guid: 09e25258800096f4c972f10564686f79, type: 3}
 --- !u!1 &6396297708155543408
 GameObject:
@@ -1060,6 +1060,12 @@ MonoBehaviour:
   traceDist: 0
   patrolMoveSpeed: 0
   traceMoveSpeed: 0
+  bossAttack:
+    Name: 
+    Mp: 0
+    Factor: 0
+    Range: 0
+    Time: 0
   skill_1:
     Name: 
     Mp: 0
@@ -1067,12 +1073,6 @@ MonoBehaviour:
     Range: 0
     Time: 0
   skill_2:
-    Name: 
-    Mp: 0
-    Factor: 0
-    Range: 0
-    Time: 0
-  skill_3:
     Name: 
     Mp: 0
     Factor: 0
@@ -1109,12 +1109,12 @@ MonoBehaviour:
   IsAttacking: 0
   statement: {fileID: 0}
   movement: {fileID: 0}
-  Skill_1_Object: {fileID: 0}
-  Skill_2_Object: {fileID: 0}
-  Skill_3_Object: {fileID: 0}
+  Attack: {fileID: 0}
+  Skill_1: {fileID: 0}
+  Skill_2: {fileID: 0}
+  Attack_Time: 0
   skill_1_Time: 0
   skill_2_Time: 0
-  skill_3_Time: 0
 --- !u!114 &5508145760349605194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1213,7 +1213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98245e129530ce143828d3c99351f596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collider: {fileID: 0}
+  attackCollider: {fileID: 0}
   particle: {fileID: 0}
 --- !u!1 &7988135034456410160
 GameObject:
@@ -1227,7 +1227,7 @@ GameObject:
   - component: {fileID: 56205596119174158}
   - component: {fileID: 3749565102754546098}
   m_Layer: 15
-  m_Name: Skill_2
+  m_Name: Skill_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1261,9 +1261,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef46baff741d664f8f7e12fc89c21e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackColliderObject: {fileID: 0}
   attackRectProjector: {fileID: 0}
   navAgent: {fileID: 0}
+  attackCollider: {fileID: 0}
 --- !u!135 &3749565102754546098
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1416,14 +1416,6 @@ PrefabInstance:
       propertyPath: InitialModule.startSize.scalar
       value: 0.7
       objectReference: {fileID: 0}
-    - target: {fileID: 19800004, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
-      propertyPath: InitialModule.startSize.minScalar
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 19800004, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 19800006, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
       propertyPath: InitialModule.maxNumParticles
       value: 50
@@ -1431,6 +1423,14 @@ PrefabInstance:
     - target: {fileID: 19800006, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800004, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800004, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}

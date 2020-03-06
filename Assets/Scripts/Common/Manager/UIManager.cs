@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
     public GameObject signUpUI;
 
     [Header("TempStatment")]
-    public BossStatment nowBossStatement;
+    public BossStatement nowBossStatement;
     public NpcStatment nowNpcStatment = null;
 
     [Header("GetItem")]
@@ -377,20 +377,18 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void BossUISetting()
+    public void BossUISetting(BossStatement bossStatementTemp)
     {
         //맵에 보스를 찾습니다.
-        var BossObject = GameObject.FindGameObjectWithTag("Boss");
-
-        if (BossObject != null)
+        if (bossStatementTemp != null)
         {
+            nowBossStatement = bossStatementTemp;
             IsBossUI = true;
-            nowBossStatement = BossObject.GetComponent<BossStatment>();
         }
         else
         {
-            IsBossUI = false;
             nowBossStatement = null;
+            IsBossUI = false;
         }
     }
 
