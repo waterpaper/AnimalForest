@@ -38,6 +38,19 @@ namespace Aura2API
         /// </summary>
         public float strength = 1.0f; // See Reset() for default value
         /// <summary>
+        /// Allows to ignore the scattering of the light
+        /// </summary>
+        public BooleanChoice useScattering = BooleanChoice.Default;
+        /// <summary>
+        /// Allows to ignore local scattering and refers to the "overridingScattering" property instead
+        /// </summary>
+        public bool overrideScattering;
+        /// <summary>
+        /// Overriding scattering if "overrideScattering" is checked
+        /// </summary>
+        [Range(0.0f,1.0f)]
+        public float overridingScattering = 0.5f;
+        /// <summary>
         /// Biases the scattering factor in order to have more control for each light
         /// </summary>
         public float scatteringBias = 0.0f;
@@ -557,13 +570,16 @@ namespace Aura2API
         {
             Vector4 colorTemperature = (LightHelpers.IsColorTemperatureAvailable && useColorTemperatureTint) ? (Vector4)Mathf.CorrelatedColorTemperatureToRGB(LightComponent.colorTemperature) : Vector4.one;
             Vector4 color = (overrideColor ? overridingColor : LightComponent.color * colorTemperature) * LightComponent.intensity * strength;
+            int useDefaultScattering = useScattering == BooleanChoice.Default ? 1 : 0;
+            float scatteringOverride = useScattering == BooleanChoice.False ? -2 : (overrideScattering ? 1.0f - overridingScattering : -1);
 
             switch(Type)
             {
                 case LightType.Directional :
                     {
                         _directionalLightParameters.color = color;
-                        _directionalLightParameters.scatteringBias = -scatteringBias;
+                        _directionalLightParameters.useDefaultScattering = useDefaultScattering;
+                        _directionalLightParameters.scatteringOverride = scatteringOverride;
                         _directionalLightParameters.lightPosition = LightComponent.transform.position;
                         _directionalLightParameters.lightDirection = LightComponent.transform.forward;
                         Matrix4x4 lightToWorldMatrix = Matrix4x4.TRS(LightComponent.transform.position, LightComponent.transform.rotation, Vector3.one);
@@ -587,7 +603,8 @@ namespace Aura2API
                 case LightType.Spot :
                     {
                         _spotLightParameters.color = color;
-                        _spotLightParameters.scatteringBias = -scatteringBias;
+                        _spotLightParameters.useDefaultScattering = useDefaultScattering;
+                        _spotLightParameters.scatteringOverride = scatteringOverride;
                         _spotLightParameters.lightPosition = LightComponent.transform.position;
                         _spotLightParameters.lightDirection = LightComponent.transform.forward;
                         _spotLightParameters.lightRange = LightComponent.range;
@@ -627,7 +644,8 @@ namespace Aura2API
                 case LightType.Point :
                     {
                         _pointLightParameters.color = color;
-                        _pointLightParameters.scatteringBias = -scatteringBias;
+                        _pointLightParameters.useDefaultScattering = useDefaultScattering;
+                        _pointLightParameters.scatteringOverride = scatteringOverride;
                         _pointLightParameters.lightPosition = LightComponent.transform.position;
                         _pointLightParameters.lightRange = LightComponent.range;
                         _pointLightParameters.distanceFalloffParameters = new Vector2(Mathf.Min(customDistanceFalloffThreshold, 0.999999f), customDistanceFalloffPower);

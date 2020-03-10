@@ -224,12 +224,14 @@ public class BlueLightMove : MonoBehaviour
         {
             //카메라와 UI를 따로 설정해 세팅해줍니다.
             _isSoloMove = true;
-
+            
             _mainCamera.SetActive(false);
             _soloCamera.SetActive(true);
+            
 
             _lightSpeed += 10.0f;
 
+            GameManager.instance.PlayerControlPause = true;
             CameraManager.instance.playMode = false;
             UIManager.instance.SaveToDisable_ActiveUI();
         }
@@ -238,8 +240,12 @@ public class BlueLightMove : MonoBehaviour
             //카메라와 UI를 원래대로 돌려줍니다.
             _soloCamera.SetActive(false);
             _mainCamera.SetActive(true);
+            
+
             _lightSpeed = 10.0f;
             _isSoloMove = false;
+
+            GameManager.instance.PlayerControlPause = false;
 
             CameraManager.instance.playMode = true;
             UIManager.instance.Load_ActiveUI();

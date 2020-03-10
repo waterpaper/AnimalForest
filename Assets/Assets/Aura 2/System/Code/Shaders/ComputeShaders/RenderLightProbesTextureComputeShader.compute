@@ -18,9 +18,9 @@
 
 #include "../Includes/Common.cginc"
 
-uniform RWTexture3D<half4> lightProbesCoefficientsTexture;
+uniform RWTexture3D<FP4> lightProbesCoefficientsTexture;
 uniform StructuredBuffer<SphericalHarmonicsFirstBandCoefficients> lightProbesCoefficientsBuffer;
-uniform float4 lightProbesCoefficientsTextureSize;
+uniform FP4 lightProbesCoefficientsTextureSize;
 
 #pragma kernel RenderlightProbesCoefficientsTexture
 

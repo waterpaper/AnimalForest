@@ -1,10 +1,11 @@
 {
   "saveInfos": [
     {
-      "MapName": "Town",
-      "spawnNum": 0,
-      "spwanLocation": [],
-      "spwanMonster": [],
+      "ID": 4, 
+      "Name": "Town",
+      "SpawnNum": 0,
+      "SpwanLocation": [],
+      "SpwanMonster": [],
       "NpcLocation": [
         {
           "NpcID": 1,
@@ -36,16 +37,17 @@
       "BossLocation": []
     },
     {
-      "MapName": "Start",
-      "spawnNum": 1,
-      "spwanLocation": [
+      "ID": 3,
+      "Name": "Start",
+      "SpawnNum": 1,
+      "SpwanLocation": [
         {
           "x": 50.0,
           "y": 2.0,
           "z": 76.0
         }
       ],
-      "spwanMonster": [
+      "SpwanMonster": [
         1
       ],
       "NpcLocation": [
@@ -66,9 +68,10 @@
       "BossLocation": []
     },
     {
-      "MapName": "Field1",
-      "spawnNum": 5,
-      "spwanLocation": [
+      "ID": 5,
+      "Name": "Field1",
+      "SpawnNum": 5,
+      "SpwanLocation": [
         {
           "x": 129.0,
           "y": 2.0,
@@ -95,7 +98,7 @@
           "z": 62.0
         }
       ],
-      "spwanMonster": [
+      "SpwanMonster": [
         1,
         2,
         3
@@ -105,11 +108,12 @@
       ]
     },
     {
-      "MapName": "Field1_Boss",
-      "spawnNum": 0,
-      "spwanLocation": [
+      "ID": 6,
+      "Name": "Field1_Boss",
+      "SpawnNum": 0,
+      "SpwanLocation": [
       ],
-      "spwanMonster": [
+      "SpwanMonster": [
 
       ],
       "NpcLocation": [],

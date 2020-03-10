@@ -115,7 +115,7 @@ public class PlayerController : MonoBehaviour
             Move();
         }
 
-        CameraManager.instance.FixedTick(Time.fixedDeltaTime);
+        //CameraManager.instance.FixedTick(Time.fixedDeltaTime);
     }
 
     void Move()
@@ -155,19 +155,8 @@ public class PlayerController : MonoBehaviour
             _rigid.velocity = moveDir;
         }
 
-        /*
-        if (moveDir != Vector3.zero)
-        {
-            if (!SoundManager.instance.IsEffectSound(EffectSoundKind.EffectSoundKind_PlayerFootStep))
-                SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_PlayerFootStep);
-        }
-        else
-        {
-            SoundManager.instance.EffectSoundStop(EffectSoundKind.EffectSoundKind_PlayerFootStep);
-        }
-        */
-
         //움직일 수 있을시 캐릭터를 돌려준다.
+        
         if (IsMove)
         {
             Vector3 targetDir = moveDir;
@@ -177,8 +166,11 @@ public class PlayerController : MonoBehaviour
 
             Quaternion tr = Quaternion.LookRotation(targetDir);
             Quaternion targetRotation = Quaternion.Slerp(transform.rotation, tr, Time.deltaTime * moveAmount * rotateSpeed);
+
             transform.rotation = targetRotation;
+            CameraManager.instance.FixedTick(Time.deltaTime, 0.0f, 0.0f);
         }
+        
 
         HandleMovementAnimations(); //update character's animations.
     }

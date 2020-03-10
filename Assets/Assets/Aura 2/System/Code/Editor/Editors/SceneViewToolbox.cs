@@ -32,8 +32,13 @@ namespace Aura2API
         /// </summary>
         static SceneViewToolbox()
         {
+#if UNITY_2019_1_OR_NEWER
+            SceneView.duringSceneGui -= OnSceneViewGUI;
+            SceneView.duringSceneGui += OnSceneViewGUI;
+#else
             SceneView.onSceneGUIDelegate -= OnSceneViewGUI;
             SceneView.onSceneGUIDelegate += OnSceneViewGUI;
+#endif
         }
         #endregion
 
@@ -61,11 +66,11 @@ namespace Aura2API
         /// <summary>
         /// The current weight of the toolbox apparition effect
         /// </summary>
-        private static float _toolboxApparitionWeight = 0.0f;
+        private static float _toolboxApparitionWeight = IsVisible ? 1.0f : 0.0f;
         /// <summary>
         /// The current weight of the toolbox expansion effect
         /// </summary>
-        private static float _toolboxExpansionWeight = 0.0f;
+        private static float _toolboxExpansionWeight = IsExpanded ? 1.0f : 0.0f;
         /// <summary>
         /// The width of the presets window
         /// </summary>
@@ -101,7 +106,11 @@ namespace Aura2API
         /// <summary>
         /// Height of the activation toggle button;
         /// </summary>
+#if UNITY_2019_3_OR_NEWER
+        private const int _activationToggleButtonHeight = 20;
+#else
         private const int _activationToggleButtonHeight = 17;
+#endif
         /// <summary>
         /// The current sceneView
         /// </summary>
@@ -272,9 +281,13 @@ namespace Aura2API
         /// </summary>
         private static GUIContent _debugVolumetricLightingButtonContent;
         /// <summary>
+        /// Content of the debug occlusion culling button
+        /// </summary>
+        private static GUIContent _debugOcclusionCullingButtonContent;
+        /// <summary>
         /// Custom control ID for each window;
         /// </summary>
-        private static int _controlID;
+        private static int _controlID = 131071; // random start id to avoid conflicts with other windows
         #endregion
 
         #region Properties
@@ -402,7 +415,7 @@ namespace Aura2API
         {
             get
             {
-                return _toolboxHeight + (AuraEditorPrefs.DisplayDebugPanelInToolbox ? 61 : 0);
+                return _toolboxHeight + (AuraEditorPrefs.DisplayDebugPanelInToolbox ? 85 : 0);
             }
         }
         #endregion
@@ -414,83 +427,94 @@ namespace Aura2API
         /// <param name="sceneView">The current update scene view</param>
         private static void OnSceneViewGUI(SceneView sceneView)
         {
-            _sceneViewEvent = Event.current;
-            _currentSceneView = sceneView;
-            
-            _deltaTime = Time.realtimeSinceStartup - _timestamp;
-            _timestamp = Time.realtimeSinceStartup;
-
-            CheckToRemoveNotification();
-
-            ComputeRects();
-
-            _controlID = 0;
-
-            if (IsVisible || _toolboxApparitionWeight > 0.0f || IsExpanded || _toolboxExpansionWeight > 0.0f)
+            try
             {
-                if(!_isInitialized)
+                _sceneViewEvent = Event.current;
+                _currentSceneView = sceneView;
+            
+                _deltaTime = Time.realtimeSinceStartup - _timestamp;
+                _timestamp = Time.realtimeSinceStartup;
+
+                CheckToRemoveNotification();
+
+                ComputeRects();
+
+                _controlID = 0;
+
+                if (IsVisible || _toolboxApparitionWeight > 0.0f || IsExpanded || _toolboxExpansionWeight > 0.0f)
                 {
-                    Initialize(sceneView);
-                }
+                    if(!_isInitialized)
+                    {
+                        Initialize(sceneView);
+                    }
 
             
-                if (_isCreating)
-                {
-                    if(_isNewObjectCreated)
+                    if (_isCreating)
                     {
-                        Selection.activeGameObject = _createdObject;
-                    }
-                    else
-                    {
-                        Selection.activeGameObject = null;
-                    }
+                        if(_isNewObjectCreated)
+                        {
+                            Selection.activeGameObject = _createdObject;
+                        }
+                        else
+                        {
+                            Selection.activeGameObject = null;
+                        }
             
-                    if (_sceneViewEvent.type != EventType.Layout)
+                        if (_sceneViewEvent.type != EventType.Layout)
+                        {
+                            if(CheckForAbortCreating())
+                            {
+                                return;
+                            }
+
+                            switch (_creationType)
+                            {
+                                case ToolboxCreationType.Camera:
+                                    {
+                                        CreateCamera(sceneView, _sceneViewEvent);
+                                    }
+                                    break;
+
+                                case ToolboxCreationType.Light:
+                                    {
+                                        CreateLight(sceneView, _sceneViewEvent);
+                                    }
+                                    break;
+
+                                case ToolboxCreationType.Volume:
+                                    {
+                                        CreateVolume(sceneView, _sceneViewEvent);
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (_sceneViewEvent.type == EventType.Layout)
                     {
-                        if(CheckForAbortCreating())
-                        {
-                            return;
-                        }
-
-                        switch (_creationType)
-                        {
-                            case ToolboxCreationType.Camera:
-                                {
-                                    CreateCamera(sceneView, _sceneViewEvent);
-                                }
-                                break;
-
-                            case ToolboxCreationType.Light:
-                                {
-                                    CreateLight(sceneView, _sceneViewEvent);
-                                }
-                                break;
-
-                            case ToolboxCreationType.Volume:
-                                {
-                                    CreateVolume(sceneView, _sceneViewEvent);
-                                }
-                                break;
-                        }
+                        DrawToolbox();
+                        DrawPresetsWindow();
                     }
                 }
 
                 if (_sceneViewEvent.type == EventType.Layout)
                 {
-                    DrawToolbox();
-                    DrawPresetsWindow();
+                    DrawActivationToggleButton();
+                    DrawDisplayToggleButton();
+                }
+
+                if (ShouldRepaintSceneView)
+                {
+                    sceneView.Repaint();
                 }
             }
-
-            if (_sceneViewEvent.type == EventType.Layout)
+            catch
             {
-                DrawActivationToggleButton();
-                DrawDisplayToggleButton();
-            }
-
-            if (ShouldRepaintSceneView)
-            {
-                sceneView.Repaint();
+#if UNITY_2019_1_OR_NEWER
+                SceneView.duringSceneGui -= OnSceneViewGUI;
+#else
+                SceneView.onSceneGUIDelegate -= OnSceneViewGUI;
+#endif
             }
         }
 
@@ -500,10 +524,16 @@ namespace Aura2API
         /// <param name="sceneView">The current update scene view</param>
         private static void Initialize(SceneView sceneView)
         {
-            _activationToggleButtonRect = new Rect(256, 0, _activationToggleButtonWidth, _activationToggleButtonHeight);
+            int activationButtonXPosition = 256;
+#if UNITY_2019_1_OR_NEWER
+            activationButtonXPosition += 32;
+#if UNITY_2019_3_OR_NEWER
+            activationButtonXPosition += 48;
+#endif
+#endif
+            _activationToggleButtonRect = new Rect(activationButtonXPosition, 0, _activationToggleButtonWidth, _activationToggleButtonHeight);
             _showPresets = false;
             _presetsApparitionWeight = 0.0f;
-            _toolboxApparitionWeight = 1.0f;
 
             _scenePanelTitleContent = new GUIContent("SCENE", "Globally converts objects to AURA with this panel");
             _presetButtonContent = new GUIContent(Aura.ResourcesCollection.displayPresetsButtonTexture, "Display Presets");
@@ -540,6 +570,7 @@ namespace Aura2API
 
             _debugPanelTitleContent = new GUIContent("DEBUG", "DEBUG view Aura's data with this panel");
             _debugVolumetricLightingButtonContent = new GUIContent("Buffer", "Debug the volumetric lighting buffer");
+            _debugOcclusionCullingButtonContent = new GUIContent("Culling", "Debug the occlusion culling");
 
             sceneView.autoRepaintOnSceneChange = true;
 
@@ -938,7 +969,7 @@ namespace Aura2API
                 GUILayout.Label(_debugPanelTitleContent, GuiStyles.ButtonBoldNoBorder, GUILayout.Width(_toolboxWidth), GUILayout.Height(_buttonWidth));
                 pixelsVerticalOffset += _buttonWidth;
 
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical();
                 bool canDebug = false;
                 Camera[] camerasArray = GameObject.FindObjectsOfType<Camera>();
                 for (int i = 0; i < camerasArray.Length; ++i)
@@ -949,12 +980,14 @@ namespace Aura2API
                         break;
                     }
                 }
+
                 canDebug = canDebug && AuraEditorPrefs.EnableAuraInSceneView;
                 EditorGUI.BeginDisabledGroup(!canDebug);
                 Aura.ResourcesCollection.editionCameraQualitySettings.displayVolumetricLightingBuffer = GUILayout.Toggle(Aura.ResourcesCollection.editionCameraQualitySettings.displayVolumetricLightingBuffer, _debugVolumetricLightingButtonContent, Aura.ResourcesCollection.editionCameraQualitySettings.displayVolumetricLightingBuffer ? GuiStyles.ButtonPressedNoBorder : GuiStyles.ButtonNoBorder, GUILayout.Width(_toolboxWidth), GUILayout.Height(24));
+                Aura.ResourcesCollection.editionCameraQualitySettings.debugOcclusionCulling = GUILayout.Toggle(Aura.ResourcesCollection.editionCameraQualitySettings.debugOcclusionCulling, _debugOcclusionCullingButtonContent, Aura.ResourcesCollection.editionCameraQualitySettings.debugOcclusionCulling ? GuiStyles.ButtonPressedNoBorder : GuiStyles.ButtonNoBorder, GUILayout.Width(_toolboxWidth), GUILayout.Height(24));
                 EditorGUI.EndDisabledGroup();
-                GUILayout.EndHorizontal();
-                pixelsVerticalOffset += 24;
+                GUILayout.EndVertical();
+                pixelsVerticalOffset += 48;
             }
 
             GUILayout.EndVertical();
@@ -981,8 +1014,12 @@ namespace Aura2API
             GUILayout.BeginHorizontal();
             
             GUIContent buttonContent = new GUIContent(EditorApplication.isCompiling ? "PLEASE WAIT" : ((AuraEditorPrefs.EnableAuraInSceneView ? "Disable" : "Enable") + " Aura Preview"), Aura.ResourcesCollection.logoIconTexture);
-            
-            if (GUILayout.Button(buttonContent, new GUIStyle(AuraEditorPrefs.EnableAuraInSceneView ? GuiStyles.ButtonPressedNoBorder : GuiStyles.ButtonNoBorder) { fontSize = 9 }, GUILayout.Width(_activationToggleButtonWidth), GUILayout.Height(_activationToggleButtonHeight)))
+
+            int fontSize = 9;
+#if UNITY_2019_1_OR_NEWER
+            fontSize = 11;
+#endif
+            if (GUILayout.Button(buttonContent, new GUIStyle(AuraEditorPrefs.EnableAuraInSceneView ? GuiStyles.ButtonPressedNoBorder : GuiStyles.ButtonNoBorder) { fontSize = fontSize }, GUILayout.Width(_activationToggleButtonWidth), GUILayout.Height(_activationToggleButtonHeight)))
             {
                 AuraEditorPrefs.EnableAuraInSceneView = !AuraEditorPrefs.EnableAuraInSceneView;
                 _sceneViewEvent.Use();

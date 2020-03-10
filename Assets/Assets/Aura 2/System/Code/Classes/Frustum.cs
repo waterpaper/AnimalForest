@@ -47,6 +47,10 @@ namespace Aura2API
         /// </summary>
         private Material _processOcclusionMapMaterial;
         /// <summary>
+        /// Compute Shader in charge of ruling out the invisible cells of the volumetric grid
+        /// </summary>
+        public ComputeShader _computeVisibleCellsComputeShader;
+        /// <summary>
         /// Compute Shader in charge of computing the data contribution inside the frustum
         /// </summary>
         private ComputeShader _computeDataComputeShader;
@@ -63,9 +67,9 @@ namespace Aura2API
         /// </summary>
         private uint _threadSizeZ;
         /// <summary>
-        /// The dispatch size of the computeDataComputeShader
+        /// Compute buffers used for indirect dispatching
         /// </summary>
-        private Vector3Int _computeShaderDispatchSize;
+        private ComputeBuffer[] _dispatchBuffers;
         /// <summary>
         /// Compute Shader in charge of accumulating the data
         /// </summary>
@@ -75,9 +79,13 @@ namespace Aura2API
         /// </summary>
         private float _farClip;
         /// <summary>
-        /// Contains near and far clips of the volume
+        /// Contains near and far clips of the camera
         /// </summary>
         private Vector4 _cameraRanges;
+        /// <summary>
+        /// Contains near and far clips of the volume
+        /// </summary>
+        private Vector4 _frustumRanges;
         /// <summary>
         /// Data for depthmap linearization
         /// </summary>
@@ -129,7 +137,7 @@ namespace Aura2API
         /// <summary>
         /// The buffers used to compute the volumetric lighting
         /// </summary>
-        private Buffers _workingBuffers;
+        private TextureBuffers _workingBuffers;
         /// <summary>
         /// The volumetric grid resolution
         /// </summary>
@@ -159,6 +167,10 @@ namespace Aura2API
         /// </summary>
         private ComputeShader _applyMedianFilterComputeShader;
         /// <summary>
+        /// The compute shader used to apply the blur filter
+        /// </summary>
+        private ComputeShader _applyBlurFilterComputeShader;
+        /// <summary>
         /// Frustum's corners positions
         /// </summary>
         private float[] _frustumCornersWorldPositionArray;
@@ -185,8 +197,8 @@ namespace Aura2API
             _frustumSettingsToId = new FrustumSettingsToId(_frustumSettings, _auraComponent, _volumesManager, _spotLightsManager, _pointLightsManager);
 
             InitializeResources();
-            
-            _computeDataComputeShader.GetKernelThreadGroupSizes(0, out _threadSizeX, out _threadSizeY, out _threadSizeZ);
+
+            InitializeComputeBuffers();
 
             SetFrustumGridResolution(_frustumSettings.QualitySettings.frustumGridResolution);
 
@@ -194,6 +206,7 @@ namespace Aura2API
             _previousLightProbesState = _frustumSettingsToId.HasFlags(FrustumParameters.EnableLightProbes);
 
             _cameraRanges = new Vector4();
+            _frustumRanges = new Vector4();
             _zParameters = new Vector4();
             _frustumCornersWorldPositionArray = new float[32];
             _secondaryFrustumCornersWorldPositionArray = new float[32];
@@ -262,7 +275,7 @@ namespace Aura2API
         /// <summary>
         /// The buffers used to compute the volumetric lighting
         /// </summary>
-        private Buffers WorkingBuffers
+        private TextureBuffers WorkingBuffers
         {
             get
             {
@@ -275,7 +288,7 @@ namespace Aura2API
 
                 if (_workingBuffers == null)
                 {
-                    _workingBuffers = new Buffers();
+                    _workingBuffers = new TextureBuffers();
                 }
 
                 return _workingBuffers;
@@ -288,7 +301,7 @@ namespace Aura2API
         private SwappableRenderTexture DataVolumeTexture
         {
             get
-            {                
+            {
                 return WorkingBuffers.DataVolumeTexture;
             }
         }
@@ -314,6 +327,17 @@ namespace Aura2API
                 return WorkingBuffers.OcclusionTexture;
             }
         }
+
+        /// <summary>
+        /// Accessor to the buffer containing the maximum depth
+        /// </summary>
+        private SwappableRenderTexture SliceTexture
+        {
+            get
+            {
+                return WorkingBuffers.SliceTexture;
+            }
+        }
         #endregion
 
         #region Functions
@@ -331,11 +355,13 @@ namespace Aura2API
         private void InitializeResources()
         {
             _computeMaximumDepthComputeShader = Aura.ResourcesCollection.computeMaximumDepthComputeShader;
+            _computeVisibleCellsComputeShader = Aura.ResourcesCollection.computeVisibleCellsComputeShader;
             _processOcclusionMapShader = Aura.ResourcesCollection.processOcclusionMapShader;
             _computeDataComputeShader = Aura.ResourcesCollection.computeDataComputeShader;
             _computeAccumulationComputeShader = Aura.ResourcesCollection.computeAccumulationComputeShader;
             _renderLightProbesTextureComputeShader = Aura.ResourcesCollection.renderLightProbesTextureComputeShader;
             _applyMedianFilterComputeShader = Aura.ResourcesCollection.applyDenoisingFilterComputeShader;
+            _applyBlurFilterComputeShader = Aura.ResourcesCollection.applyBlurFilterComputeShader;
         }
 
         /// <summary>
@@ -371,54 +397,73 @@ namespace Aura2API
                 Shader.DisableKeyword("AURA_USE_CUBIC_FILTERING");
             }
             #endregion
-            
+
             #region Variables
             _computeMaximumDepthComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
             _computeDataComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
             _computeAccumulationComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
-            Shader.SetGlobalVector("Aura_BufferResolution", BufferResolutionVector);
+            _computeVisibleCellsComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
             _computeMaximumDepthComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
+            _computeMaximumDepthComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
+            _computeVisibleCellsComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
             _computeDataComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
             _computeAccumulationComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
-            Shader.SetGlobalVector("Aura_BufferTexelSize", BufferTexelSizeVector);
-            Shader.SetGlobalTexture("Aura_VolumetricLightingTexture", FogVolumeTexture);
             float depthBiasCoefficient = Mathf.Max(0.001f, _frustumSettings.QualitySettings.depthBiasCoefficient);
             float depthBiasReciproqualCoefficient = 1.0f / depthBiasCoefficient;
             _computeDataComputeShader.SetFloat("Aura_DepthBiasCoefficient", depthBiasCoefficient);
-            _computeDataComputeShader.SetFloat("Aura_DepthBiasReciproqualCoefficient", depthBiasReciproqualCoefficient);
             _computeAccumulationComputeShader.SetFloat("Aura_DepthBiasCoefficient", depthBiasCoefficient);
-            Shader.SetGlobalFloat("Aura_DepthBiasCoefficient", depthBiasCoefficient);
-            Shader.SetGlobalFloat("Aura_DepthBiasReciproqualCoefficient", depthBiasReciproqualCoefficient);
-
-            _cameraRanges.x = 0.0000000000000001f /*Set close to 0 but need non-zero for stereo projection matrices*/;
-            _cameraRanges.y = Mathf.Min(_cameraComponent.farClipPlane, _frustumSettings.QualitySettings.farClipPlaneDistance);
-            Shader.SetGlobalVector("Aura_FrustumRanges", _cameraRanges);
+            _computeVisibleCellsComputeShader.SetFloat("Aura_DepthBiasCoefficient", depthBiasCoefficient);
+            _computeDataComputeShader.SetFloat("Aura_DepthBiasReciproqualCoefficient", depthBiasReciproqualCoefficient);
+            _computeVisibleCellsComputeShader.SetInt("_frameID", _auraComponent.FrameId);
+            _cameraRanges.x = _cameraComponent.nearClipPlane;
+            _cameraRanges.y = _cameraComponent.farClipPlane;
+            _frustumRanges.x = 0.0000000000000001f /*Set close to 0 but need non-zero for stereo projection matrices*/;
+            _frustumRanges.y = Mathf.Min(_cameraComponent.farClipPlane, _frustumSettings.QualitySettings.farClipPlaneDistance);
             _zParameters.x = -1.0f + _cameraComponent.farClipPlane / _cameraComponent.nearClipPlane;
             _zParameters.y = 1.0f;
             _zParameters.z = _zParameters.x / _cameraComponent.farClipPlane;
             _zParameters.w = _zParameters.y / _cameraComponent.farClipPlane;
+            Color baseColor = _frustumSettings.BaseSettings.useColor ? (_frustumSettings.BaseSettings.color * _frustumSettings.BaseSettings.colorStrength) : Color.black;
+            float baseDensity = _frustumSettings.BaseSettings.useDensity ? _frustumSettings.BaseSettings.density : 0.0f;
+            float extinction = _frustumSettings.BaseSettings.useExtinction ? _frustumSettings.BaseSettings.extinction : 1.0f;
             int currentKernelIndex = _frustumSettingsToId.GetKernelId(_cameraComponent);
+            bool isOrthographic = _cameraComponent.orthographic;
+            #endregion
+
+            #region Shaders Globals
+            Shader.SetGlobalColor("Aura_BaseColor", baseColor);
+            Shader.SetGlobalFloat("Aura_BaseDensity", baseDensity);
+            Shader.SetGlobalFloat("Aura_Extinction", extinction);
+            Shader.SetGlobalVector("Aura_BufferResolution", BufferResolutionVector);
+            Shader.SetGlobalVector("Aura_BufferTexelSize", BufferTexelSizeVector);
+            Shader.SetGlobalTexture("Aura_VolumetricLightingTexture", FogVolumeTexture);
+            Shader.SetGlobalFloat("Aura_DepthBiasCoefficient", depthBiasCoefficient);
+            Shader.SetGlobalFloat("Aura_DepthBiasReciproqualCoefficient", depthBiasReciproqualCoefficient);
+            Shader.SetGlobalVector("Aura_FrustumRanges", _frustumRanges);
             #endregion
 
             Graphics.ClearRandomWriteTargets();
 
             _frustumSettingsToId.ComputeFlags();
 
-            ComputeDispatchSize();
+            bool useReprojection = _frustumSettingsToId.HasFlags(FrustumParameters.EnableTemporalReprojection);
+            _computeVisibleCellsComputeShader.SetBool("useReprojection", useReprojection);
 
             #region Occlusion culling
-            if (_frustumSettingsToId.HasFlags(FrustumParameters.EnableOcclusionCulling))
+            _dispatchBuffers[5].SetCounterValue(0);
+            bool useOcclusion = _frustumSettingsToId.HasFlags(FrustumParameters.EnableOcclusionCulling);
+            if (useOcclusion)
             {
-                Profiler.BeginSample("Aura 2 : Compute occlusion culling data");
+                Profiler.BeginSample("Aura 2 : Compute occlusion data");
 
+                Profiler.BeginSample("Aura 2 : Compute maxima");
                 _computeMaximumDepthComputeShader.SetTextureFromGlobal((int)_frustumSettings.QualitySettings.occlusionCullingAccuracy, "depthTexture", "_CameraDepthTexture");
-                _computeMaximumDepthComputeShader.SetVector("cameraRanges", _cameraRanges);
-                _computeMaximumDepthComputeShader.SetVector("zParameters", _zParameters);
-
+                _computeMaximumDepthComputeShader.SetVector("cameraRanges", _frustumRanges);
+                _computeMaximumDepthComputeShader.SetVector("zParameters", isOrthographic ? _cameraRanges : _zParameters);
+                _computeMaximumDepthComputeShader.SetBool("isOrthographic", isOrthographic);
                 _computeMaximumDepthComputeShader.SetTexture((int)_frustumSettings.QualitySettings.occlusionCullingAccuracy, "occlusionTexture", OcclusionTexture.WriteBuffer);
-                _computeMaximumDepthComputeShader.Dispatch((int)_frustumSettings.QualitySettings.occlusionCullingAccuracy, OcclusionTexture.WriteBuffer.width, OcclusionTexture.WriteBuffer.height/*_frustumSettings.QualitySettings.frustumGridResolution.x, _frustumSettings.QualitySettings.frustumGridResolution.y*/, 1); // TODO : Use parallel reduction (http://diaryofagraphicsprogrammer.blogspot.com/2014/03/compute-shader-optimizations-for-amd.html && https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/reduction/doc/reduction.pdf) to get as close as the target size then resize to perfect size
+                _computeMaximumDepthComputeShader.DispatchIndirect((int)_frustumSettings.QualitySettings.occlusionCullingAccuracy, _dispatchBuffers[2]); // TODO : Use parallel reduction (http://diaryofagraphicsprogrammer.blogspot.com/2014/03/compute-shader-optimizations-for-amd.html && https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/reduction/doc/reduction.pdf) to get as close as the target size then resize to perfect size
                 OcclusionTexture.Swap();
-
                 if (_processOcclusionMapMaterial == null)
                 {
                     _processOcclusionMapMaterial = new Material(_processOcclusionMapShader);
@@ -426,26 +471,42 @@ namespace Aura2API
                 _processOcclusionMapMaterial.SetVector("bufferResolution", BufferResolutionVector);
                 Graphics.Blit(OcclusionTexture.ReadBuffer, OcclusionTexture.WriteBuffer, _processOcclusionMapMaterial);
                 OcclusionTexture.Swap();
+                Profiler.EndSample();
 
-                _computeDataComputeShader.SetBool("useOcclusion", true);
-                _computeDataComputeShader.SetTexture(currentKernelIndex, "occlusionTexture", OcclusionTexture.ReadBuffer);
-                _computeAccumulationComputeShader.SetBool("useOcclusion", true);
-                _computeAccumulationComputeShader.SetTexture(_cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass ? 1 : 0 /*Make more elegant*/, "occlusionTexture", OcclusionTexture.ReadBuffer);
-                
+                Profiler.BeginSample("Aura 2 : Compute visibility");
+                _computeVisibleCellsComputeShader.SetTexture(1, "occlusionTexture", OcclusionTexture.ReadBuffer);
+                _computeVisibleCellsComputeShader.SetBuffer(1, "appendedCellsBuffer", _dispatchBuffers[5]);
+                _computeVisibleCellsComputeShader.SetTexture(1, "maximumSliceAmountTexture", SliceTexture.WriteBuffer);
+                _computeVisibleCellsComputeShader.DispatchIndirect(1, _dispatchBuffers[3]);
+                ComputeBuffer.CopyCount(_dispatchBuffers[5], _dispatchBuffers[0], 0);
+                SliceTexture.Swap();
+
+                _computeVisibleCellsComputeShader.SetBuffer(2, "visibleCellsAmountBuffer", _dispatchBuffers[0]);
+                _computeVisibleCellsComputeShader.SetBuffer(2, "sizeBuffer", _dispatchBuffers[1]);
+                _computeVisibleCellsComputeShader.DispatchIndirect(2, _dispatchBuffers[4]);
+                Profiler.EndSample();
+
                 Profiler.EndSample();
             }
             else
             {
-                if(_previousOcclusionCullingState)
+                if (_previousOcclusionCullingState)
                 {
                     WorkingBuffers.ReleaseOcclusionTextureBuffer();
+                    WorkingBuffers.ReleaseSliceTextureBuffer();
+                    ComputeDispatchSizes();
                 }
 
-                _computeDataComputeShader.SetBool("useOcclusion", false);
-                _computeDataComputeShader.SetTexture(currentKernelIndex, "occlusionTexture", Aura.ResourcesCollection.dummyTexture);
-                _computeAccumulationComputeShader.SetBool("useOcclusion", false);
-                _computeAccumulationComputeShader.SetTexture(_cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass ? 1 : 0 /*Make more elegant*/, "occlusionTexture", Aura.ResourcesCollection.dummyTexture);
+                _computeVisibleCellsComputeShader.SetTexture(0, "occlusionTexture", Aura.ResourcesCollection.dummyTexture);
+                _computeVisibleCellsComputeShader.SetTexture(0, "maximumSliceAmountTexture", Aura.ResourcesCollection.dummyTexture);
+                _computeVisibleCellsComputeShader.SetBuffer(0, "appendedCellsBuffer", _dispatchBuffers[5]);
+                _computeVisibleCellsComputeShader.DispatchIndirect(0, _dispatchBuffers[3]);
 
+                //uint[] tst = new uint[3];
+                //_dispatchBuffers[1].GetData(tst);
+                //Debug.Log(tst[0] + ", " + tst[1] + ", " + tst[2]);
+                //_dispatchBuffers[0].GetData(tst);
+                //Debug.Log(tst[0] + ", " + tst[1] + ", " + tst[2]);
             }
             #endregion
 
@@ -457,24 +518,26 @@ namespace Aura2API
             DataVolumeTexture.WriteBuffer.Clear(Vector4.zero);
             FogVolumeTexture.Clear(Vector4.zero);
 
-            _computeDataComputeShader.SetTexture(currentKernelIndex, "textureBuffer", DataVolumeTexture.WriteBuffer);
+            _computeDataComputeShader.SetTexture(currentKernelIndex, "lightingTexture", DataVolumeTexture.WriteBuffer);
             _computeDataComputeShader.SetTexture(currentKernelIndex, "previousFrameLightingVolumeTexture", DataVolumeTexture.ReadBuffer);
             _computeDataComputeShader.SetFloat("time", AuraCamera.Time);
             _computeDataComputeShader.SetVector("cameraPosition", _cameraComponent.transform.position.AsVector4(1.0f));
-            _computeDataComputeShader.SetVector("cameraRanges", _cameraRanges);
-            _computeDataComputeShader.SetFloat("baseDensity", _frustumSettings.BaseSettings.useDensity ? _frustumSettings.BaseSettings.density : 0.0f);
-            _computeDataComputeShader.SetFloat("baseScattering", _frustumSettings.BaseSettings.useScattering ? (1.0f - _frustumSettings.BaseSettings.scattering) : 0.0f);
-            _computeDataComputeShader.SetVector("baseColor", _frustumSettings.BaseSettings.useColor ? (_frustumSettings.BaseSettings.color * _frustumSettings.BaseSettings.colorStrength) : Color.black);
+            _computeDataComputeShader.SetVector("cameraRanges", _frustumRanges);
+            _computeDataComputeShader.SetFloat("baseDensity", baseDensity);
+            _computeDataComputeShader.SetBool("useScattering", _frustumSettings.BaseSettings.useScattering);
+            _computeDataComputeShader.SetFloat("baseScattering", 1.0f - _frustumSettings.BaseSettings.scattering);
+            _computeDataComputeShader.SetVector("baseTint", _frustumSettings.BaseSettings.useTint ? (_frustumSettings.BaseSettings.tint * _frustumSettings.BaseSettings.tintStrength) : Color.white);
+            _computeDataComputeShader.SetVector("baseColor", baseColor);
 
             #region Frustum Corners
             if (_cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass)
             {
-                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Left, _cameraRanges.x, _cameraRanges.y, ref _frustumCornersWorldPositionArray);
-                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Right, _cameraRanges.x, _cameraRanges.y, ref _secondaryFrustumCornersWorldPositionArray);
+                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Left, _frustumRanges.x, _frustumRanges.y, ref _frustumCornersWorldPositionArray);
+                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Right, _frustumRanges.x, _frustumRanges.y, ref _secondaryFrustumCornersWorldPositionArray);
             }
             else
             {
-                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Mono, _cameraRanges.x, _cameraRanges.y, ref _frustumCornersWorldPositionArray);
+                _cameraComponent.GetFrustumCorners(Camera.MonoOrStereoscopicEye.Mono, _frustumRanges.x, _frustumRanges.y, ref _frustumCornersWorldPositionArray);
             }
             _computeDataComputeShader.SetFloats("frustumCornersWorldPositionArray", _frustumCornersWorldPositionArray);
             _computeDataComputeShader.SetFloats("secondaryFrustumCornersWorldPositionArray", _secondaryFrustumCornersWorldPositionArray);
@@ -483,12 +546,12 @@ namespace Aura2API
             #endregion
 
             #region Temporal Reprojection
-            _computeDataComputeShader.SetBool("useReprojection", _frustumSettingsToId.HasFlags(FrustumParameters.EnableTemporalReprojection));
+            _computeDataComputeShader.SetBool("useReprojection", useReprojection);
             _computeDataComputeShader.SetFloat("temporalReprojectionFactor", _frustumSettings.QualitySettings.temporalReprojectionFactor);
             _computeDataComputeShader.SetFloats("previousFrameWorldToClipMatrix", _previousWorldToClipMatrixFloats);
             _computeDataComputeShader.SetFloats("previousFrameSecondaryWorldToClipMatrix", _previousSecondaryWorldToClipMatrixFloats);
-            _computeDataComputeShader.SetVector("cameraRanges", _cameraRanges);
-            _computeDataComputeShader.SetInt("_frameID", _auraComponent.FrameId);
+            _computeDataComputeShader.SetTexture(currentKernelIndex, "previousMaximumSliceAmountTexture", SliceTexture.WriteBuffer);
+            _computeDataComputeShader.SetVector("cameraRanges", _frustumRanges);
             #endregion
 
             #region Volumes Injection
@@ -723,20 +786,47 @@ namespace Aura2API
             #endregion
 
             #region Compute
+            _computeDataComputeShader.SetBuffer(currentKernelIndex, "visibleCellsAmountBuffer", _dispatchBuffers[0]);
+            _computeDataComputeShader.SetBuffer(currentKernelIndex, "dispatchSizeBuffer", _dispatchBuffers[1]);
+            _computeDataComputeShader.SetBuffer(currentKernelIndex, "visibleCellsBuffer", _dispatchBuffers[5]);
             _computeDataComputeShader.SetFloat("densityFactor", 1.0f / 16.0f); // make human scale
-            _computeDataComputeShader.Dispatch(currentKernelIndex, _computeShaderDispatchSize.x, _computeShaderDispatchSize.y, _computeShaderDispatchSize.z);
+            _computeDataComputeShader.DispatchIndirect(currentKernelIndex, _dispatchBuffers[1]);
+
             Profiler.EndSample();
             #endregion
 
             #region Denoising Filter
-            if(_frustumSettingsToId.HasFlags(FrustumParameters.EnableDenoisingFilter))
+            if (_frustumSettingsToId.HasFlags(FrustumParameters.EnableDenoisingFilter))
             {
                 Profiler.BeginSample("Aura 2 : Apply 3D Denoising Filter");
                 DataVolumeTexture.Swap();
+                currentKernelIndex = (int)_frustumSettings.QualitySettings.EXPERIMENTAL_denoisingFilterRange;
+                _applyMedianFilterComputeShader.SetBuffer(currentKernelIndex, "visibleCellsAmountBuffer", _dispatchBuffers[0]);
+                _applyMedianFilterComputeShader.SetBuffer(currentKernelIndex, "dispatchSizeBuffer", _dispatchBuffers[1]);
+                _applyMedianFilterComputeShader.SetBuffer(currentKernelIndex, "visibleCellsBuffer", _dispatchBuffers[5]);
                 _applyMedianFilterComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
-                _applyMedianFilterComputeShader.SetTexture((int)_frustumSettings.QualitySettings.denoisingFilterRange, "sourceTexture", DataVolumeTexture.ReadBuffer);
-                _applyMedianFilterComputeShader.SetTexture((int)_frustumSettings.QualitySettings.denoisingFilterRange, "destinationTexture", DataVolumeTexture.WriteBuffer);
-                _applyMedianFilterComputeShader.Dispatch((int)_frustumSettings.QualitySettings.denoisingFilterRange, _computeShaderDispatchSize.x, _computeShaderDispatchSize.y, _computeShaderDispatchSize.z);
+                _applyMedianFilterComputeShader.SetTexture(currentKernelIndex, "sourceTexture", DataVolumeTexture.ReadBuffer);
+                _applyMedianFilterComputeShader.SetTexture(currentKernelIndex, "destinationTexture", DataVolumeTexture.WriteBuffer);
+                _applyMedianFilterComputeShader.DispatchIndirect(currentKernelIndex, _dispatchBuffers[1]);
+                Profiler.EndSample();
+            }
+            #endregion
+
+            #region Blur Filter
+            if (_frustumSettingsToId.HasFlags(FrustumParameters.EnableBlurFilter))
+            {
+                Profiler.BeginSample("Aura 2 : Apply 3D Blur Filter");
+                DataVolumeTexture.Swap();
+                currentKernelIndex = (int)_frustumSettings.QualitySettings.EXPERIMENTAL_blurFilterType * 3 + (int)_frustumSettings.QualitySettings.EXPERIMENTAL_blurFilterRange;
+                _applyBlurFilterComputeShader.SetBuffer(currentKernelIndex, "visibleCellsAmountBuffer", _dispatchBuffers[0]);
+                _applyBlurFilterComputeShader.SetBuffer(currentKernelIndex, "dispatchSizeBuffer", _dispatchBuffers[1]);
+                _applyBlurFilterComputeShader.SetBuffer(currentKernelIndex, "visibleCellsBuffer", _dispatchBuffers[5]);
+                _applyBlurFilterComputeShader.SetVector("Aura_BufferResolution", BufferResolutionVector);
+                _applyBlurFilterComputeShader.SetVector("Aura_BufferTexelSize", BufferTexelSizeVector);
+                _applyBlurFilterComputeShader.SetTexture(currentKernelIndex, "sourceTexture", DataVolumeTexture.ReadBuffer);
+                _applyBlurFilterComputeShader.SetTexture(currentKernelIndex, "destinationTexture", DataVolumeTexture.WriteBuffer);
+                _applyBlurFilterComputeShader.SetFloat("gaussianDeviation", _frustumSettings.QualitySettings.EXPERIMENTAL_blurFilterGaussianDeviation);
+                _applyBlurFilterComputeShader.DispatchIndirect(currentKernelIndex, _dispatchBuffers[1]);
                 Profiler.EndSample();
             }
             #endregion
@@ -746,12 +836,13 @@ namespace Aura2API
 
             #region Accumulate fog texture
             Profiler.BeginSample("Aura 2 : Compute accumulated contributions");
-            currentKernelIndex = _cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass ? 1 : 0;
+            currentKernelIndex = (_cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass ? 1 : 0) + (_frustumSettings.QualitySettings.debugOcclusionCulling ? 2 : 0) + (useOcclusion ? 4 : 0);
+            _computeAccumulationComputeShader.SetTexture(currentKernelIndex, "maximumSliceAmountTexture", useOcclusion ? SliceTexture.ReadBuffer : (Texture)Aura.ResourcesCollection.dummyTexture);
             _computeAccumulationComputeShader.SetVector("cameraPosition", _cameraComponent.transform.position);
-            _computeAccumulationComputeShader.SetTexture(currentKernelIndex, "textureBuffer", DataVolumeTexture.WriteBuffer);
-            _computeAccumulationComputeShader.SetFloat("extinction", _frustumSettings.BaseSettings.useExtinction ? _frustumSettings.BaseSettings.extinction : 1.0f);
+            _computeAccumulationComputeShader.SetTexture(currentKernelIndex, "lightingTexture", DataVolumeTexture.WriteBuffer);
+            _computeAccumulationComputeShader.SetFloat("extinction", extinction);
             _computeAccumulationComputeShader.SetTexture(currentKernelIndex, "fogVolumeTexture", FogVolumeTexture);
-            _computeAccumulationComputeShader.Dispatch(currentKernelIndex, _computeShaderDispatchSize.x, _computeShaderDispatchSize.y, _computeShaderDispatchSize.z);
+            _computeAccumulationComputeShader.DispatchIndirect(currentKernelIndex, _dispatchBuffers[3]);
             Profiler.EndSample();
             #endregion
 
@@ -761,13 +852,13 @@ namespace Aura2API
                 if (_cameraComponent.GetCameraStereoMode() == StereoMode.SinglePass)
                 {
                     _cameraComponent.ResetStereoProjectionMatrices();
-                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Left, _cameraRanges.x, _cameraRanges.y, ref _previousWorldToClipMatrix);
-                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Right, _cameraRanges.x, _cameraRanges.y, ref _previousSecondaryWorldToClipMatrix);
+                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Left, _frustumRanges.x, _frustumRanges.y, ref _previousWorldToClipMatrix);
+                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Right, _frustumRanges.x, _frustumRanges.y, ref _previousSecondaryWorldToClipMatrix);
                     _previousSecondaryWorldToClipMatrix.ToFloatArray(ref _previousSecondaryWorldToClipMatrixFloats);
                 }
                 else
                 {
-                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Mono, _cameraRanges.x, _cameraRanges.y, ref _previousWorldToClipMatrix);
+                    _cameraComponent.GetWorldToClipMatrix(Camera.MonoOrStereoscopicEye.Mono, _frustumRanges.x, _frustumRanges.y, ref _previousWorldToClipMatrix);
                 }
 
                 _previousWorldToClipMatrix.ToFloatArray(ref _previousWorldToClipMatrixFloats);
@@ -783,6 +874,7 @@ namespace Aura2API
         /// </summary>
         public void Dispose()
         {
+            ReleaseComputeBuffers();
             WorkingBuffers.ReleaseAllBuffers();
             DisposeManagers();
             _frustumSettings.OnFrustumQualityChanged -= _frustumSettings_OnFrustumQualityChanged;
@@ -807,6 +899,8 @@ namespace Aura2API
         /// <param name="frustumGridResolution">The desired resolution</param>
         public void SetFrustumGridResolution(Vector3Int frustumGridResolution)
         {
+            _computeDataComputeShader.GetKernelThreadGroupSizes(0, out _threadSizeX, out _threadSizeY, out _threadSizeZ);
+
             frustumGridResolution.x = frustumGridResolution.x.SnapMin((int)_threadSizeX);
             frustumGridResolution.y = frustumGridResolution.y.SnapMin((int)_threadSizeY);
             frustumGridResolution.z = frustumGridResolution.z.SnapMin((int)_threadSizeZ);
@@ -817,18 +911,82 @@ namespace Aura2API
             _bufferTexelSizeVector = _bufferResolutionVector.GetReciproqual();
 
             WorkingBuffers.VolumetricBuffersResolution = _frustumGridResolution;
+
+            ComputeDispatchSizes();
+
+            if (_dispatchBuffers[5] != null)
+            {
+                ReleaseComputeBuffer(5);
+            }
+            _dispatchBuffers[5] = new ComputeBuffer(FrustumGridResolution.x * FrustumGridResolution.y * FrustumGridResolution.z, VisibleCellData.Size, ComputeBufferType.Append);
         }
 
         /// <summary>
         /// Computes the dispatch size of the compute shaders
         /// </summary>
-        private void ComputeDispatchSize()
+        private void ComputeDispatchSizes()
         {
             Vector3Int frustumGridResolution = FrustumGridResolution;
-            _computeShaderDispatchSize = new Vector3Int();
-            _computeShaderDispatchSize.x = frustumGridResolution.x / (int)_threadSizeX;
-            _computeShaderDispatchSize.y = frustumGridResolution.y / (int)_threadSizeY;
-            _computeShaderDispatchSize.z = frustumGridResolution.z / (int)_threadSizeZ;
+
+            uint[] dispatchSizeBuffer = new uint[3];
+            dispatchSizeBuffer[0] = (uint)(frustumGridResolution.x / (int)_threadSizeX);
+            dispatchSizeBuffer[1] = (uint)(frustumGridResolution.y / (int)_threadSizeY);
+            dispatchSizeBuffer[2] = (uint)(frustumGridResolution.z / (int)_threadSizeZ);
+            _dispatchBuffers[1].SetData(dispatchSizeBuffer);
+
+            dispatchSizeBuffer[2] = 1;
+            _dispatchBuffers[3].SetData(dispatchSizeBuffer);
+
+            dispatchSizeBuffer[0] = (uint)frustumGridResolution.x;
+            dispatchSizeBuffer[1] = (uint)frustumGridResolution.y;
+            _dispatchBuffers[2].SetData(dispatchSizeBuffer);
+
+            dispatchSizeBuffer = new uint[1];
+            dispatchSizeBuffer[0] = (uint)(frustumGridResolution.x * frustumGridResolution.y * frustumGridResolution.z);
+            _dispatchBuffers[0].SetData(dispatchSizeBuffer);
+        }
+
+        /// <summary>
+        /// Initializes the buffers used by the compute shaders
+        /// </summary>
+        private void InitializeComputeBuffers()
+        {
+            _dispatchBuffers = new ComputeBuffer[6];
+
+            _dispatchBuffers[0] = new ComputeBuffer(1, sizeof(uint), ComputeBufferType.Raw);                // The amount of visible cells
+            _dispatchBuffers[1] = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);  // The variable amount of dispatched groups for computing lighting/density data
+            _dispatchBuffers[2] = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);  // The amount of dispatched groups for computing occlusion data
+            _dispatchBuffers[3] = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);  // The amount of dispatched groups for computing visibility/accumulation data
+
+            _dispatchBuffers[4] = new ComputeBuffer(3, sizeof(uint), ComputeBufferType.IndirectArguments);  // Unique dispatched group
+            uint[] sizeBuffer = new uint[3];
+            sizeBuffer[0] = 1;
+            sizeBuffer[1] = 1;
+            sizeBuffer[2] = 1;
+            _dispatchBuffers[4].SetData(sizeBuffer);
+
+            // _dispatchBuffers[5] -> The reserved buffer for the visible cells
+        }
+
+        /// <summary>
+        /// Releases the given buffer
+        /// </summary>
+        /// <param name="index">The index of the buffer to release</param>
+        private void ReleaseComputeBuffer(int index)
+        {
+            _dispatchBuffers[index].Dispose();
+            _dispatchBuffers[index] = null;
+        }
+
+        /// <summary>
+        /// Releases the buffers used by the compute shaders
+        /// </summary>
+        private void ReleaseComputeBuffers()
+        {
+            for (int i = 0; i < _dispatchBuffers.Length; ++i)
+            {
+                ReleaseComputeBuffer(i);
+            }
         }
         #endregion
     }

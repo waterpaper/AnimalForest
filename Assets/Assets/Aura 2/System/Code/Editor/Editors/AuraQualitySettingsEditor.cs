@@ -107,6 +107,10 @@ namespace Aura2API
         /// </summary>
         private static SerializedProperty _enableOcclusionCullingProperty;
         /// <summary>
+        /// The property for enabling occlusion culling debug
+        /// </summary>
+        private static SerializedProperty _debugOcclusionCullingProperty;
+        /// <summary>
         /// The property for adjusting per cell Occlusion Culling search accuracy
         /// </summary>
         private static SerializedProperty _occlusionCullingAccuracyProperty;
@@ -126,6 +130,22 @@ namespace Aura2API
         /// The property for the range of the denoising filter on the data texture3D
         /// </summary>
         private static SerializedProperty _denoisingFilterRangeProperty;
+        /// <summary>
+        /// The property for enabling blur filter on the data texture3D
+        /// </summary>
+        private static SerializedProperty _enableBlurFilterProperty;
+        /// <summary>
+        /// The property for the range of the blur filter on the data texture3D
+        /// </summary>
+        private static SerializedProperty _blurFilterRangeProperty;
+        /// <summary>
+        /// The property for the type of the blur filter on the data texture3D
+        /// </summary>
+        private static SerializedProperty _blurFilterTypeProperty;
+        /// <summary>
+        /// The property for the type of the blur filter on the data texture3D
+        /// </summary>
+        private static SerializedProperty _blurFilterGaussianDeviationProperty;
         /// <summary>
         /// The property for enabling Temporal Reprojection
         /// </summary>
@@ -187,11 +207,16 @@ namespace Aura2API
             _enableLightsCookiesProperty = serializedObject.FindProperty("enableLightsCookies");
             _enableDitheringProperty = serializedObject.FindProperty("enableDithering");
             _texture3DFilteringProperty = serializedObject.FindProperty("texture3DFiltering");
-            _enableDenoisingFilterProperty = serializedObject.FindProperty("enableDenoisingFilter");
-            _denoisingFilterRangeProperty = serializedObject.FindProperty("denoisingFilterRange");
+            _enableDenoisingFilterProperty = serializedObject.FindProperty("EXPERIMENTAL_enableDenoisingFilter");
+            _denoisingFilterRangeProperty = serializedObject.FindProperty("EXPERIMENTAL_denoisingFilterRange");
+            _enableBlurFilterProperty = serializedObject.FindProperty("EXPERIMENTAL_enableBlurFilter");
+            _blurFilterRangeProperty = serializedObject.FindProperty("EXPERIMENTAL_blurFilterRange");
+            _blurFilterTypeProperty = serializedObject.FindProperty("EXPERIMENTAL_blurFilterType");
+            _blurFilterGaussianDeviationProperty = serializedObject.FindProperty("EXPERIMENTAL_blurFilterGaussianDeviation");
             _enableTemporalReprojectionProperty = serializedObject.FindProperty("enableTemporalReprojection");
             _temporalReprojectionFactorProperty = serializedObject.FindProperty("temporalReprojectionFactor");
             _enableOcclusionCullingProperty = serializedObject.FindProperty("enableOcclusionCulling");
+            _debugOcclusionCullingProperty = serializedObject.FindProperty("debugOcclusionCulling");
             _occlusionCullingAccuracyProperty = serializedObject.FindProperty("occlusionCullingAccuracy");
             _enableLightProbesProperty = serializedObject.FindProperty("enableLightProbes");
             //_lightProbesProxyGridResolutionProperty = serializedObject.FindProperty("lightProbesProxyGridResolution");
@@ -262,6 +287,11 @@ namespace Aura2API
 
             EditorGUILayout.Separator();
 
+            GuiHelpers.DrawToggleChecker(ref _debugOcclusionCullingProperty, "Display Occlusion Miss");
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.Separator();
@@ -323,6 +353,18 @@ namespace Aura2API
 
             GuiHelpers.DrawSlider(ref _depthBiasCoefficientProperty, 0, 1, "Depth Bias", true);
 
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();    
+
+            GuiHelpers.DrawContextualHelpBox("The \"Occlusion Culling\" allows to compute the maximum visible depth of the frustum grid.\n\nThis leads to avoid computing cells that are invisible to the camera because hidden behind objects.");
+            GuiHelpers.DrawToggleChecker(ref _enableOcclusionCullingProperty, "Enable Occlusion Culling");
+            EditorGUI.BeginDisabledGroup(!_enableOcclusionCullingProperty.boolValue);
+            EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
+            EditorGUILayout.PropertyField(_occlusionCullingAccuracyProperty, new GUIContent("Accuracy"));
+            EditorGUILayout.EndVertical();
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
             EditorGUILayout.EndVertical();
@@ -461,8 +503,6 @@ namespace Aura2API
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            EditorGUILayout.BeginVertical();
-
             GuiHelpers.DrawToggleChecker(ref _enableDenoisingFilterProperty, "Enable Denoising Filter");
             EditorGUI.BeginDisabledGroup(!_enableDenoisingFilterProperty.boolValue);
             EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
@@ -472,17 +512,23 @@ namespace Aura2API
 
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
-            
-            GuiHelpers.DrawContextualHelpBox("The \"Occlusion Culling\" allows to compute the maximum visible depth of the frustum grid.\n\nThis leads to avoid computing cells that are invisible to the camera because hidden behind objects.");
-            GuiHelpers.DrawToggleChecker(ref _enableOcclusionCullingProperty, "Enable Occlusion Culling");
-            EditorGUI.BeginDisabledGroup(!_enableOcclusionCullingProperty.boolValue);
+
+            GuiHelpers.DrawToggleChecker(ref _enableBlurFilterProperty, "Enable Blur Filter");
+            EditorGUI.BeginDisabledGroup(!_enableBlurFilterProperty.boolValue);
             EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
-            EditorGUILayout.PropertyField(_occlusionCullingAccuracyProperty, new GUIContent("Accuracy"));
+            EditorGUILayout.PropertyField(_blurFilterRangeProperty, new GUIContent("Range"));
+            EditorGUILayout.PropertyField(_blurFilterTypeProperty, new GUIContent("Type"));
+            if ((BlurFilterType)_blurFilterTypeProperty.enumValueIndex == BlurFilterType.Gaussian)
+            {
+                GuiHelpers.DrawSlider(ref _blurFilterGaussianDeviationProperty, 0.0f, 0.01f, "Lobe Bulge");
+            }
             EditorGUILayout.EndVertical();
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
+
+            EditorGUILayout.BeginVertical();
 
             GuiHelpers.DrawContextualHelpBox("The \"Light Probes\" allows to compute the world space light probes' data and inject it as contributing light in the volumetric lighting system.");
             GuiHelpers.DrawToggleChecker(ref _enableLightProbesProperty, "Enable Light Probes");

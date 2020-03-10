@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine.Networking;
-using System.Text;
 
 public class LoginUI : MonoBehaviour
 {
@@ -14,7 +10,6 @@ public class LoginUI : MonoBehaviour
     [Header("AlramText")]
     public TextMeshProUGUI LoginAlramText;
     
-
     void Awake()
     {
         IDFelid = transform.GetChild(0).GetChild(0).GetChild(2).GetComponent<TMP_InputField>();
@@ -36,5 +31,10 @@ public class LoginUI : MonoBehaviour
     {
         UIManager.instance.UISetting(UiKind.UIKind_SignUpUI);
         UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
+    }
+
+    public void GoogleLoginButton()
+    {
+        
     }
 }

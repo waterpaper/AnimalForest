@@ -14,31 +14,32 @@
 *                                                                          *
 ***************************************************************************/
 
-#define NUM_THREAD_X 8
-#define NUM_THREAD_Y 8
-#define NUM_THREAD_Z 1
-
-// Time (to be set from Unity)
-float time;
+// Time (to be set from code)
+uniform float time;
+// Frame ID (to be set from code)
+uniform int _frameID;
 
 // SamplerStates
-SamplerState _LinearClamp;
-SamplerState _LinearRepeat;
-SamplerState _PointClamp;
-SamplerState _PointRepeat;
+uniform SamplerState _LinearClamp;
+uniform SamplerState _LinearRepeat;
+uniform SamplerState _PointClamp;
+uniform SamplerState _PointRepeat;
 
 // Const variables
 static const float pi = 3.141592653589793f;
-static const float twoPi = pi * 2.0f;
-static const float halfPi = pi * 0.5f;
-static const float quarterPi = pi * 0.25f;
+static const float twoPi = pi * 2;
+static const float halfPi = pi * 0.5;
+static const float quarterPi = pi * 0.25;
+static const float invPi = rcp(pi);
+static const float twoInvPi = 2 * invPi;
 static const float e = 2.71828182845904523536f;
-static const float n = 1.0f / e;
+static const float n = rcp(e);
 
 // Common variables
-float4 Aura_BufferResolution;
-float4 Aura_BufferTexelSize;
-float4 cameraPosition;
-float4 cameraRanges;
-float Aura_DepthBiasCoefficient;
-float Aura_DepthBiasReciproqualCoefficient;
+uniform FP4 Aura_BufferResolution;
+uniform FP4 Aura_BufferTexelSize;
+uniform FP4 cameraPosition;
+uniform FP4 cameraDirection;
+uniform FP4 cameraRanges;
+uniform FP Aura_DepthBiasCoefficient;
+uniform FP Aura_DepthBiasReciproqualCoefficient;

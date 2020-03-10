@@ -45,6 +45,10 @@ namespace Aura2API
         /// Contrast intensity
         /// </summary>
         public float contrast;
+        /// <summary>
+        /// Tells if output values should be clamped between 0 and 1;
+        /// </summary>
+        public bool saturateOutputValues;
         #endregion
 
         #region Private Members

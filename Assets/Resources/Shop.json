@@ -1,6 +1,8 @@
-{
+﻿{
   "saveInfos": [
     {
+      "ID": 1,
+      "Name": "장비상점",
       "ShopKind": 1,
       "ShopItemID": [
         1,
@@ -30,6 +32,8 @@
       ]
     },
     {
+      "ID": 2,
+      "Name": "잡화상점",
       "ShopKind": 2,
       "ShopItemID": [
         25,

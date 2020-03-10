@@ -20,10 +20,10 @@
 //-----------------------------------------------------------------------------------------
 //From UnityCG.cginc
 // viewDirection should be normalized, w=1.0
-half3 SHEvalLinearL0L1(half4 viewDirection, half4 shAr, half4 shAg, half4 shAb)
+FP3 SHEvalLinearL0L1(FP4 viewDirection, FP4 shAr, FP4 shAg, FP4 shAb)
 {
     // Linear (L1) + constant (L0) polynomial terms
-    half3 color;
+    FP3 color;
     color.x = dot(shAr, viewDirection);
     color.y = dot(shAg, viewDirection);
     color.z = dot(shAb, viewDirection);
@@ -31,17 +31,17 @@ half3 SHEvalLinearL0L1(half4 viewDirection, half4 shAr, half4 shAg, half4 shAb)
     return color;
 }
 // viewDirection should be normalized, w=1.0
-half3 SHEvalLinearL2(half4 viewDirection, half4 shBr, half4 shBg, half4 shBb, half4 shC)
+FP3 SHEvalLinearL2(FP4 viewDirection, FP4 shBr, FP4 shBg, FP4 shBb, FP4 shC)
 {
     // 4 of the quadratic (L2) polynomials
-    half4 v = viewDirection.xyzz * viewDirection.yzzx;
-    half3 color;
+    FP4 v = viewDirection.xyzz * viewDirection.yzzx;
+    FP3 color;
     color.r = dot(shBr, v);
     color.g = dot(shBg, v);
     color.b = dot(shBb, v);
 	
     // Final (5th) quadratic (L2) polynomial
-    half vC = viewDirection.x * viewDirection.x - viewDirection.y * viewDirection.y;
+    FP vC = viewDirection.x * viewDirection.x - viewDirection.y * viewDirection.y;
     color += shC.rgb * vC;
 
     return color;
@@ -53,10 +53,10 @@ half3 SHEvalLinearL2(half4 viewDirection, half4 shBr, half4 shBg, half4 shBb, ha
 //-----------------------------------------------------------------------------------------
 //From UnityCG.cginc
 // viewDirection should be normalized, w=1.0
-half3 EvaluateSphericalHarmonics(half4 viewDirection, half4 shAr, half4 shAg, half4 shAb, half4 shBr, half4 shBg, half4 shBb, half4 shC)
+FP3 EvaluateSphericalHarmonics(FP4 viewDirection, FP4 shAr, FP4 shAg, FP4 shAb, FP4 shBr, FP4 shBg, FP4 shBb, FP4 shC)
 {
 	// Linear + constant polynomial terms
-    half3 color = SHEvalLinearL0L1(viewDirection, shAr, shAg, shAb);
+    FP3 color = SHEvalLinearL0L1(viewDirection, shAr, shAg, shAb);
 	// Quadratic polynomials
     color += SHEvalLinearL2(viewDirection, shBr, shBg, shBb, shC);
     return color;

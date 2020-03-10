@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 
-public delegate void ServerDelegate<T> (T id,T data);
+public delegate void ServerDelegate<T>(T id, T data);
 
 enum ServerConnectionKind
 {
@@ -16,11 +16,17 @@ enum ServerConnectionKind
 public class ServerManager : MonoBehaviour
 {
     [Header("Server")]
-    public string url = "http://127.0.0.1:80/";
-    public string loginConnectionName = "login";
-    public string signupConnectionName = "SignUp";
-    public string saveConnectionName = "Save";
-    public string loadConnectionName = "Load";
+    public const string url = "http://127.0.0.1:80/";
+    public const string loginConnectionName = "login";
+    public const string signupConnectionName = "SignUp";
+    public const string saveConnectionName = "Save";
+    public const string loadConnectionName = "Load";
+
+    //해당 아이디는 테스트 아이디로 서버 통신을 더이상 하지 않는다.(어떤 비밀번호와도 로그인이 되고 서버와 통신은 하지 않아 저장, 로드가 없다.)
+    public const string exceptionID = "1234";
+
+    private bool _isUseServer = true;
+
     public TextMeshProUGUI resultTextUI;
 
     private static ServerManager m_instance;
@@ -51,7 +57,7 @@ public class ServerManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     public void Login(string id, string passward, TextMeshProUGUI textUI = null)
     {
         if (textUI != null)
@@ -104,6 +110,20 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator PostLoginConnection(string id, string passward)
     {
+        if (string.Equals(id, exceptionID))
+        {
+            //예외 접근 로그인을 수행합니다.(초기화면으로 서버 통신 x)
+            //서버를 제외한 기능을 테스트할때 사용합니다.
+            _isUseServer = false;
+
+            resultTextUI.text = "로그인에 성공하였습니다.\n게임을 접속합니다.";
+            resultTextUI.gameObject.SetActive(true);
+            yield return new WaitForSeconds(2.0f);
+
+            UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
+            UIManager.instance.UISetting(UiKind.UiKind_CustomUI);
+        }
+
         List<IMultipartFormSection> loginForm = new List<IMultipartFormSection>();
 
         loginForm.Add(new MultipartFormDataSection("ID", id));
@@ -207,11 +227,11 @@ public class ServerManager : MonoBehaviour
 
             if (string.Equals(result, "Success"))
             {
-               
+
             }
             else if (string.Equals(result, "Error"))
             {
-                
+
             }
             Debug.Log(result);
 
@@ -227,9 +247,9 @@ public class ServerManager : MonoBehaviour
         UnityWebRequest WebRequest = UnityWebRequest.Post(string.Format("{00}{01}.php", url, loadConnectionName), loadForm);
         yield return WebRequest.SendWebRequest();
 
-        if(WebRequest != null)
+        if (WebRequest != null)
         {
-            string result =  WebRequest.downloadHandler.text;
+            string result = WebRequest.downloadHandler.text;
 
             if (string.Equals(result, "Error"))
             {
@@ -239,7 +259,7 @@ public class ServerManager : MonoBehaviour
                     resultTextUI.gameObject.SetActive(true);
                 }
             }
-            else if(string.Equals(result, "NotExisted"))
+            else if (string.Equals(result, "NotExisted"))
             {
                 UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
                 UIManager.instance.UISetting(UiKind.UiKind_CustomUI);

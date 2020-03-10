@@ -113,7 +113,7 @@ namespace Aura2API
             int id = GetKernelId();
             id += camera.GetCameraStereoMode() == StereoMode.SinglePass ? 3 : 0;
 
-            return id;
+            return (camera.orthographic ? 0 : id)/*Switch to 1 cascade directional mode when orthographic*/ + (HasFlags(FrustumParameters.EnableOcclusionCulling) ? 6 : 0);
         }
 
         /// <summary>
@@ -124,8 +124,6 @@ namespace Aura2API
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableOcclusionCulling, _frustumSettings.QualitySettings.enableOcclusionCulling);
 
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableTemporalReprojection, _frustumSettings.QualitySettings.enableTemporalReprojection && _auraComponent.FrameId > 1 && !Mathf.Approximately(_frustumSettings.QualitySettings.temporalReprojectionFactor, 0.0f));
-
-            _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableDenoisingFilter, _frustumSettings.QualitySettings.enableDenoisingFilter);
 
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableVolumes, _frustumSettings.QualitySettings.enableVolumes && _volumesManager.HasVisibleVolumes);
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableVolumesNoiseMask, _frustumSettings.QualitySettings.enableVolumesNoiseMask && _frustumParameters.HasFlags(FrustumParameters.EnableVolumes));
@@ -148,6 +146,10 @@ namespace Aura2API
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnablePointLightsShadows, _frustumSettings.QualitySettings.enablePointLightsShadows && _frustumParameters.HasFlags(FrustumParameters.EnablePointLights) && AuraCamera.CommonDataManager.LightsCommonDataManager.HasPointShadowCasters);
 
             _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableLightsCookies, _frustumSettings.QualitySettings.enableLightsCookies && (_frustumParameters.HasFlags(FrustumParameters.EnablePointLights) && AuraCamera.CommonDataManager.LightsCommonDataManager.HasPointCookieCasters || _frustumParameters.HasFlags(FrustumParameters.EnableSpotLights) && AuraCamera.CommonDataManager.LightsCommonDataManager.HasSpotCookieCasters || _frustumParameters.HasFlags(FrustumParameters.EnableDirectionalLights) && AuraCamera.CommonDataManager.LightsCommonDataManager.HasDirectionalCookieCasters));
+
+            _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableDenoisingFilter, _frustumSettings.QualitySettings.EXPERIMENTAL_enableDenoisingFilter);
+
+            _frustumParameters = _frustumParameters.ReplaceFlags(FrustumParameters.EnableBlurFilter, _frustumSettings.QualitySettings.EXPERIMENTAL_enableBlurFilter);
         }
 
         /// <summary>

@@ -1,78 +1,78 @@
 {
   "saveInfos": [
     {
-      "EnemyID": 1,
-      "dropMoneyMin": 100,
-      "dropMoneyMax": 300,
+      "ID": 1,
+      "DropMoneyMin": 100,
+      "DropMoneyMax": 300,
       "EnemyDropItemDataList": [
         {
-          "dropItemId": 25,
-          "dropItemPercent": 10.0
+          "DropItemId": 25,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 26,
-          "dropItemPercent": 10.0
+          "DropItemId": 26,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 29,
-          "dropItemPercent": 100.0
+          "DropItemId": 29,
+          "DropItemPercent": 100.0
         }
       ]
     },
     {
-      "EnemyID": 2,
-      "dropMoneyMin": 100,
-      "dropMoneyMax": 300,
+      "ID": 2,
+      "DropMoneyMin": 100,
+      "DropMoneyMax": 300,
       "EnemyDropItemDataList": [
         {
-          "dropItemId": 25,
-          "dropItemPercent": 10.0
+          "DropItemId": 25,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 26,
-          "dropItemPercent": 10.0
+          "DropItemId": 26,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 30,
-          "dropItemPercent": 100.0
+          "DropItemId": 30,
+          "DropItemPercent": 100.0
         }
       ]
     },
     {
-      "EnemyID": 3,
-      "dropMoneyMin": 100,
-      "dropMoneyMax": 300,
+      "ID": 3,
+      "DropMoneyMin": 100,
+      "DropMoneyMax": 300,
       "EnemyDropItemDataList": [
         {
-          "dropItemId": 25,
-          "dropItemPercent": 10.0
+          "DropItemId": 25,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 26,
-          "dropItemPercent": 10.0
+          "DropItemId": 26,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 31,
-          "dropItemPercent": 100.0
+          "DropItemId": 31,
+          "DropItemPercent": 100.0
         }
       ]
     },
     {
-      "EnemyID": 100,
-      "dropMoneyMin": 1000,
-      "dropMoneyMax": 3000,
+      "ID": 100,
+      "DropMoneyMin": 1000,
+      "DropMoneyMax": 3000,
       "EnemyDropItemDataList": [
         {
-          "dropItemId": 25,
-          "dropItemPercent": 30.0
+          "DropItemId": 25,
+          "DropItemPercent": 30.0
         },
         {
-          "dropItemId": 26,
-          "dropItemPercent": 10.0
+          "DropItemId": 26,
+          "DropItemPercent": 10.0
         },
         {
-          "dropItemId": 32,
-          "dropItemPercent": 100.0
+          "DropItemId": 32,
+          "DropItemPercent": 100.0
         }
       ]
     }

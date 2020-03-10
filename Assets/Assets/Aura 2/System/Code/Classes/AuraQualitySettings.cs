@@ -110,11 +110,27 @@ namespace Aura2API
         /// <summary>
         /// Enables the denoising filter on the data texture3D
         /// </summary>
-        public bool enableDenoisingFilter = false;
+        public bool EXPERIMENTAL_enableDenoisingFilter = false;
         /// <summary>
         /// The range of the denoising filter on the data texture3D
         /// </summary>
-        public DenoisingFilterRange denoisingFilterRange = DenoisingFilterRange.OneNeighbour;
+        public DenoisingFilterRange EXPERIMENTAL_denoisingFilterRange = DenoisingFilterRange.OneNeighbour;
+        /// <summary>
+        /// Enables the blur filter on the data texture3D
+        /// </summary>
+        public bool EXPERIMENTAL_enableBlurFilter = false;
+        /// <summary>
+        /// The range of the blur filter on the data texture3D
+        /// </summary>
+        public BlurFilterRange EXPERIMENTAL_blurFilterRange = BlurFilterRange.OneNeighbour;
+        /// <summary>
+        /// The type of the blur filter on the data texture3D
+        /// </summary>
+        public BlurFilterType EXPERIMENTAL_blurFilterType = BlurFilterType.Box;
+        /// <summary>
+        /// The deviation used to compute the gaussian curve factor
+        /// </summary>
+        public float EXPERIMENTAL_blurFilterGaussianDeviation = 0.0025f;
         /// <summary>
         /// Enables temporal reprojection
         /// </summary>
@@ -129,9 +145,13 @@ namespace Aura2API
         /// </summary>
         public bool enableOcclusionCulling = true;
         /// <summary>
+        /// Highlights the occluded cells for debug
+        /// </summary>
+        public bool debugOcclusionCulling = false;
+        /// <summary>
         /// Accuracy of the occlusion computation
         /// </summary>
-        public OcclusionCullingAccuracy occlusionCullingAccuracy = OcclusionCullingAccuracy.Medium;
+        public OcclusionCullingAccuracy occlusionCullingAccuracy = OcclusionCullingAccuracy.Lowest;
         /// <summary>
         /// Enables the computation of light probes
         /// </summary>

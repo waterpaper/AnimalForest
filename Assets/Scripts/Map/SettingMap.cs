@@ -80,7 +80,7 @@ public class SettingMap : MonoBehaviour
         //몬스터 스폰 포인트를 맵 설정에 맞게 생성하고 저장합니다.
         GameObject groupObjTemp = null;
 
-        for (int i = 0; i < temp.spawnNum; i++)
+        for (int i = 0; i < temp.SpawnNum; i++)
         {
             if (i == 0)
             {
@@ -90,15 +90,15 @@ public class SettingMap : MonoBehaviour
             }
 
             GameObject objTemp = Instantiate(spawnPointPfb, groupObjTemp.transform);
-            objTemp.transform.position = temp.spwanLocation[i];
-            spawnPointList.Add(temp.spwanLocation[i]);
+            objTemp.transform.position = temp.SpwanLocation[i];
+            spawnPointList.Add(temp.SpwanLocation[i]);
         }
     }
 
     void MonsterKindSetting(MapTable temp)
     {
         //현재 맵에 나타나는 몬스터 id를 저장합니다.
-        temp.spwanMonster.ForEach((monsterTemp) => { monsterKindList.Add(monsterTemp); });
+        temp.SpwanMonster.ForEach((monsterTemp) => { monsterKindList.Add(monsterTemp); });
     }
 
     void NpcSetting(MapTable temp)

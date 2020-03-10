@@ -19,10 +19,10 @@
 ///
 struct MatrixFloats
 {
-	half4 a;
-	half4 b;
-	half4 c;
-	half4 d;
+	FP4 a;
+	FP4 b;
+	FP4 c;
+	FP4 d;
 };
 
 ///
@@ -30,11 +30,11 @@ struct MatrixFloats
 ///
 struct LevelsData
 {
-	half levelLowThreshold;
-	half levelHiThreshold;
-	half outputLowValue;
-	half outputHiValue;
-	half contrast;
+	FP levelLowThreshold;
+	FP levelHiThreshold;
+	FP outputLowValue;
+	FP outputHiValue;
+	FP contrast;
 };
 
 ///
@@ -53,7 +53,7 @@ struct VolumetricNoiseData
 {
 	int enable;
 	MatrixFloats transform;
-	half speed;
+	FP speed;
 };
 
 ///
@@ -71,38 +71,48 @@ struct VolumeData
 		Cylinder    = 4
 		Cone        = 5
 	*/
-	half falloffExponent;
-	half xPositiveFade;
-	half xNegativeFade;
-	half yPositiveFade;
-	half yNegativeFade;
-	half zPositiveFade;
-	half zNegativeFade;
+	FP falloffExponent;
+	FP xPositiveFade;
+	FP xNegativeFade;
+	FP yPositiveFade;
+	FP yNegativeFade;
+	FP zPositiveFade;
+	FP zNegativeFade;
     int useAsLightProbesProxyVolume;
-    half lightProbesMultiplier;
+    FP lightProbesMultiplier;
 	TextureMaskData texture2DMaskData;
     TextureMaskData texture3DMaskData;
 	VolumetricNoiseData noiseData;
 	int injectDensity;
-	half densityValue;
+	FP densityValue;
     LevelsData densityTexture2DMaskLevelsParameters;
     LevelsData densityTexture3DMaskLevelsParameters;
     LevelsData densityNoiseLevelsParameters;
     int injectScattering;
-    half scatteringValue;
+    FP scatteringValue;
     LevelsData scatteringTexture2DMaskLevelsParameters;
     LevelsData scatteringTexture3DMaskLevelsParameters;
     LevelsData scatteringNoiseLevelsParameters;
     int injectColor;
-    half3 colorValue;
+    FP3 colorValue;
     LevelsData colorTexture2DMaskLevelsParameters;
     LevelsData colorTexture3DMaskLevelsParameters;
     LevelsData colorNoiseLevelsParameters;
+	int injectTint;
+	FP3 tintColor;
+	LevelsData tintTexture2DMaskLevelsParameters;
+	LevelsData tintTexture3DMaskLevelsParameters;
+	LevelsData tintNoiseLevelsParameters;
     int injectAmbient;
-    half ambientLightingValue;
+    FP ambientLightingValue;
     LevelsData ambientTexture2DMaskLevelsParameters;
     LevelsData ambientTexture3DMaskLevelsParameters;
     LevelsData ambientNoiseLevelsParameters;
+	int injectBoost;
+	FP boostValue;
+	LevelsData boostTexture2DMaskLevelsParameters;
+	LevelsData boostTexture3DMaskLevelsParameters;
+	LevelsData boostNoiseLevelsParameters;
 };
 
 ///
@@ -110,12 +120,12 @@ struct VolumeData
 ///
 struct DirectionalShadowData
 {
-	half4 shadowSplitSqRadii;
-	half4 lightSplitsNear;
-	half4 lightSplitsFar;
-	half4 shadowSplitSpheres[4];
+	FP4 shadowSplitSqRadii;
+	FP4 lightSplitsNear;
+	FP4 lightSplitsFar;
+	FP4 shadowSplitSpheres[4];
 	half4x4 world2Shadow[4];
-	half4 lightShadowData;
+	FP4 lightShadowData;
 };
 
 ///
@@ -123,17 +133,18 @@ struct DirectionalShadowData
 ///
 struct DirectionalLightParameters
 {
-    half3 color;
-    half scatteringBias;
-	half3 lightPosition;
-	half3 lightDirection;
+    FP3 color;
+	int useDefaultScattering;
+    FP scatteringOverride;
+	FP3 lightPosition;
+	FP3 lightDirection;
 	MatrixFloats worldToLightMatrix;
 	MatrixFloats lightToWorldMatrix;
 	int shadowmapIndex;
 	int cookieMapIndex;
-	half2 cookieParameters;
+	FP2 cookieParameters;
 	int enableOutOfPhaseColor;
-    half3 outOfPhaseColor;
+    FP3 outOfPhaseColor;
 };
 
 ///
@@ -141,19 +152,20 @@ struct DirectionalLightParameters
 ///
 struct SpotLightParameters
 {
-    half3 color;
-    half scatteringBias;
-	half3 lightPosition;
-	half3 lightDirection;
-	half lightRange;
-	half lightCosHalfAngle;
-	half2 angularFalloffParameters;
-	half2 distanceFalloffParameters;
+    FP3 color;
+	int useDefaultScattering;
+    FP scatteringOverride;
+	FP3 lightPosition;
+	FP3 lightDirection;
+	FP lightRange;
+	FP lightCosHalfAngle;
+	FP2 angularFalloffParameters;
+	FP2 distanceFalloffParameters;
 	MatrixFloats worldToShadowMatrix;
 	int shadowMapIndex;
-	half shadowStrength;
+	FP shadowStrength;
 	int cookieMapIndex;
-	half3 cookieParameters;
+	FP3 cookieParameters;
 };
 
 ///
@@ -161,19 +173,20 @@ struct SpotLightParameters
 ///
 struct PointLightParameters
 {
-    half3 color;
-    half scatteringBias;
-    half3 lightPosition;
-    half lightRange;
-    half2 distanceFalloffParameters;
+    FP3 color;
+	int useDefaultScattering;
+	FP scatteringOverride;
+    FP3 lightPosition;
+    FP lightRange;
+    FP2 distanceFalloffParameters;
     MatrixFloats worldToShadowMatrix;
 	#if UNITY_VERSION >= 201730
-    half2 lightProjectionParameters;
+    FP2 lightProjectionParameters;
 	#endif
     int shadowMapIndex;
-    half shadowStrength;
+    FP shadowStrength;
 	int cookieMapIndex;
-	half3 cookieParameters;
+	FP3 cookieParameters;
 };
 
 /// 
@@ -181,7 +194,17 @@ struct PointLightParameters
 ///
 struct SphericalHarmonicsFirstBandCoefficients
 {
-    half4 redColorCoefficients;
-    half4 greenColorCoefficients;
-    half4 blueColorCoefficients;
+	FP4 redColorCoefficients;
+	FP4 greenColorCoefficients;
+	FP4 blueColorCoefficients;
+};
+
+/// 
+///			CellData
+///
+struct CellData
+{
+	uint3 id;
+	FP4 localPosition; //(x, y, z-biased, z-unbiased)
+	FP3 jitteredLocalPosition;
 };

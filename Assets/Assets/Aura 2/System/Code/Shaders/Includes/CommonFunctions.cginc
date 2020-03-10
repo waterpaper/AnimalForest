@@ -15,12 +15,17 @@
 ***************************************************************************/
 
 ///-----------------------------------------------------------------------------------------
-///			Noise functions
+///			Depth Accumulation functions
+///-----------------------------------------------------------------------------------------
+#include "DepthAccumulation.cginc"
+
+///-----------------------------------------------------------------------------------------
+///			Spherical Harmonics functions
 ///-----------------------------------------------------------------------------------------
 #include "SphericalHarmonics.cginc"
 
 ///-----------------------------------------------------------------------------------------
-///			Noise functions
+///			Texture Sampling functions
 ///-----------------------------------------------------------------------------------------
 #include "TextureSampling.cginc"
 
@@ -33,60 +38,87 @@
 ///			GetBiasedDepth
 ///			Bias the depth towards the camera
 ///-----------------------------------------------------------------------------------------
-float GetBiasedNormalizedDepth(float normalizedDepth, float biasCoefficient)
+FP GetBiasedNormalizedDepth(FP normalizedDepth, FP biasCoefficient)
 {
 	// https://www.desmos.com/calculator/kwnyuioj2z
-	float inverseDepth = max(0.000001f, 1.0f - normalizedDepth);
-    return 1.0f - pow(inverseDepth, biasCoefficient);
+	FP inverseDepth = max(0.000001f, 1.0f - normalizedDepth);
+	return 1.0f - pow(inverseDepth, biasCoefficient);
+}
+
+///-----------------------------------------------------------------------------------------
+///			BiasNormalizedDepth
+///			Bias the depth towards the camera
+///-----------------------------------------------------------------------------------------
+FP BiasNormalizedDepth(FP normalizedDepth)
+{
+	return GetBiasedNormalizedDepth(normalizedDepth, Aura_DepthBiasCoefficient);
 }
 
 ///-----------------------------------------------------------------------------------------
 ///			ApplyDepthBiasToNormalizedPosition
 ///			Apply depth bias to normalized position
 ///-----------------------------------------------------------------------------------------
-void ApplyDepthBiasToNormalizedPosition(inout float4 normalizedPosition)
+void ApplyDepthBiasToNormalizedPosition(inout FP4 normalizedPosition)
 {
-    normalizedPosition.w = normalizedPosition.z;
-    normalizedPosition.z = GetBiasedNormalizedDepth(normalizedPosition.w, Aura_DepthBiasCoefficient);
+	normalizedPosition.w = normalizedPosition.z;
+	normalizedPosition.z = BiasNormalizedDepth(normalizedPosition.w);
 }
 
 ///-----------------------------------------------------------------------------------------
 ///			GetNormalizedLocalPosition
 ///			Gets the normalized coordinates from the thread id and the Aura_BufferTexelSize
 ///-----------------------------------------------------------------------------------------
-float3 GetNormalizedLocalPosition(uint3 id)
+FP3 GetNormalizedLocalPosition(uint3 id)
 {
-    return ((float3) id + 0.5f) * Aura_BufferTexelSize.xyz;
+    return ((FP3)id + 0.5f) * Aura_BufferTexelSize.xyz;
 }
 
 ///-----------------------------------------------------------------------------------------
-///			GetNormalizedLocalPositionWithDepthBias
-///			Gets the volume normalized coordinates with a depth biased towards the camera
+///			GetIdFromLocalPosition
+///			Gets the id from the normalized coordinates and the Aura_BufferTexelSize
 ///-----------------------------------------------------------------------------------------
-float4 GetNormalizedLocalPositionWithDepthBias(uint3 id)
+uint3 GetIdFromLocalPosition(FP3 localPosition)
 {
-    float3 normalizedLocalPos = GetNormalizedLocalPosition(id);
-    float biasedDepth = GetBiasedNormalizedDepth(normalizedLocalPos.z, Aura_DepthBiasCoefficient);
-    return float4(normalizedLocalPos.xy, biasedDepth, normalizedLocalPos.z); 
+	return (uint3)floor(localPosition * Aura_BufferResolution.xyz);
+}
+
+///-----------------------------------------------------------------------------------------
+///			GetNormalizedLocalLayerPosition
+///			Gets the normalized position along width and height from the thread id and the Aura_BufferTexelSize
+///-----------------------------------------------------------------------------------------
+FP2 GetNormalizedLocalLayerPosition(uint2 idXY)
+{
+	return ((FP2)idXY + 0.5f) * Aura_BufferTexelSize.xy;
 }
 
 ///-----------------------------------------------------------------------------------------
 ///			GetNormalizedLocalDepth
 ///			Gets the normalized depth from the thread id and the Aura_BufferTexelSize
 ///-----------------------------------------------------------------------------------------
-float GetNormalizedLocalDepth(uint idZ)
+FP GetNormalizedLocalDepth(uint idZ)
 {
-    return ((float) idZ + 0.5f) * Aura_BufferTexelSize.z;
+	return ((FP)idZ + 0.5f) * Aura_BufferTexelSize.z;
 }
 
 ///-----------------------------------------------------------------------------------------
 ///			GetNormalizedLocalPositionWithDepthBias
 ///			Gets the volume normalized coordinates with a depth biased towards the camera
 ///-----------------------------------------------------------------------------------------
-float GetNormalizedLocalDepthWithDepthBias(uint idZ)
+FP4 GetNormalizedLocalPositionWithDepthBias(uint3 id)
 {
-    float normalizedLocalDepth = GetNormalizedLocalDepth(idZ);
-    float biasedDepth = GetBiasedNormalizedDepth(normalizedLocalDepth, Aura_DepthBiasCoefficient);
+    FP3 normalizedLocalPos = GetNormalizedLocalPosition(id);
+    FP biasedDepth = BiasNormalizedDepth(normalizedLocalPos.z);
+    return FP4(normalizedLocalPos.xy, biasedDepth, normalizedLocalPos.z); 
+}
+
+///-----------------------------------------------------------------------------------------
+///			GetNormalizedLocalPositionWithDepthBias
+///			Gets the volume normalized coordinates with a depth biased towards the camera
+///-----------------------------------------------------------------------------------------
+FP GetNormalizedLocalDepthWithDepthBias(uint idZ)
+{
+    FP normalizedLocalDepth = GetNormalizedLocalDepth(idZ);
+    FP biasedDepth = BiasNormalizedDepth(normalizedLocalDepth);
     return biasedDepth; 
 }
 
@@ -94,7 +126,7 @@ float GetNormalizedLocalDepthWithDepthBias(uint idZ)
 ///			GetCameraSpaceDepth
 ///			Gets the camera space depth from the normalized volume depth
 ///-----------------------------------------------------------------------------------------
-float GetCameraSpaceDepth(half normalizedDepth)
+FP GetCameraSpaceDepth(half normalizedDepth)
 {
     return lerp(cameraRanges.x, cameraRanges.y, normalizedDepth);
 }
@@ -103,17 +135,17 @@ float GetCameraSpaceDepth(half normalizedDepth)
 ///			GetWorldPosition
 ///			Gets the world position from normalized coordinates and the corners' position of the frustum
 ///-----------------------------------------------------------------------------------------
-float3 GetWorldPosition(float3 normalizedLocalPos, half4 cornersPosition[8])
+FP3 GetWorldPosition(FP3 normalizedLocalPos, FP4 cornersPosition[8])
 {
-	float3 AtoB = lerp(cornersPosition[0].xyz, cornersPosition[1].xyz, normalizedLocalPos.x);
-	float3 DtoC = lerp(cornersPosition[3].xyz, cornersPosition[2].xyz, normalizedLocalPos.x);
-	float3 nearBottomToTop = lerp(DtoC, AtoB, normalizedLocalPos.y);
+	FP3 AtoB = lerp(cornersPosition[0].xyz, cornersPosition[1].xyz, normalizedLocalPos.x);
+	FP3 DtoC = lerp(cornersPosition[3].xyz, cornersPosition[2].xyz, normalizedLocalPos.x);
+	FP3 nearBottomToTop = lerp(DtoC, AtoB, normalizedLocalPos.y);
 
-	float3 EtoF = lerp(cornersPosition[4].xyz, cornersPosition[5].xyz, normalizedLocalPos.x);
-	float3 HtoG = lerp(cornersPosition[7].xyz, cornersPosition[6].xyz, normalizedLocalPos.x);
-	float3 farBottomToTop = lerp(HtoG, EtoF, normalizedLocalPos.y);
+	FP3 EtoF = lerp(cornersPosition[4].xyz, cornersPosition[5].xyz, normalizedLocalPos.x);
+	FP3 HtoG = lerp(cornersPosition[7].xyz, cornersPosition[6].xyz, normalizedLocalPos.x);
+	FP3 farBottomToTop = lerp(HtoG, EtoF, normalizedLocalPos.y);
 
-	float3 worldPosition = lerp(nearBottomToTop, farBottomToTop, normalizedLocalPos.z);
+	FP3 worldPosition = lerp(nearBottomToTop, farBottomToTop, normalizedLocalPos.z);
 
 	return worldPosition;
 }
@@ -122,37 +154,33 @@ float3 GetWorldPosition(float3 normalizedLocalPos, half4 cornersPosition[8])
 ///			TransformPositions
 ///			Gets the 3d texture coordinates to be used with combined Texture 3D
 ///-----------------------------------------------------------------------------------------
-float3 TransformPoint(float3 p, float4x4 transform)
+FP3 TransformPoint(FP3 p, FP4x4 transform)
 {
-	return mul(transform, float4(p, 1)).xyz;
+	return mul(transform, FP4(p, 1)).xyz;
 }
 
 ///-----------------------------------------------------------------------------------------
 ///			GetNormalizedYawPitchFromNormalizedVector
 ///			Compute normalized Yaw Pitch angles from a normalized direction vector
 ///-----------------------------------------------------------------------------------------
-float2 GetNormalizedYawPitchFromNormalizedVector(float3 NormalizedVector)
+FP2 GetNormalizedYawPitchFromNormalizedVector(FP3 NormalizedVector)
 {
-	const float InvPi = 0.31830988618379067153776752674503f;
-	const float TwoInvPi = 2.0f * InvPi;
-	float Yaw = (atan2(NormalizedVector.z, NormalizedVector.x) * InvPi + 1.0f) * 0.5f;
-	float Pitch = (asin(NormalizedVector.y) * TwoInvPi + 1.0f) * 0.5f;
+	FP Yaw = (atan2(NormalizedVector.z, NormalizedVector.x) * invPi + 1.0f) * 0.5f;
+	FP Pitch = (asin(NormalizedVector.y) * twoInvPi + 1.0f) * 0.5f;
 
-	return float2(Yaw, Pitch);
+	return FP2(Yaw, Pitch);
 }
 ///-----------------------------------------------------------------------------------------
 ///			GetNormalizedVectorFromNormalizedYawPitch
 ///			Compute a normalized direction vector from normalized Yaw Pitch angles
 ///-----------------------------------------------------------------------------------------
-float3 GetNormalizedVectorFromNormalizedYawPitch(float Yaw, float Pitch)
+FP3 GetNormalizedVectorFromNormalizedYawPitch(FP Yaw, FP Pitch)
 {
-	const float Pi = 3.1415926535897932384626433832795f;
-	const float HalfPi = Pi * 0.5f;
-	Yaw = (Yaw * 2.0f - 1.0f) * Pi;
-	Pitch = (Pitch * 2.0f - 1.0f) * HalfPi;
-	return float3(cos(Yaw) * cos(Pitch), sin(Pitch), cos(Pitch) * sin(Yaw));
+	Yaw = (Yaw * 2.0f - 1.0f) * pi;
+	Pitch = (Pitch * 2.0f - 1.0f) * halfPi;
+	return FP3(cos(Yaw) * cos(Pitch), sin(Pitch), cos(Pitch) * sin(Yaw));
 }
-float3 GetNormalizedVectorFromNormalizedYawPitch(float2 YawPitch)
+FP3 GetNormalizedVectorFromNormalizedYawPitch(FP2 YawPitch)
 {
 	return GetNormalizedVectorFromNormalizedYawPitch(YawPitch.x, YawPitch.y);
 }
@@ -161,13 +189,13 @@ float3 GetNormalizedVectorFromNormalizedYawPitch(float2 YawPitch)
 ///			GetCombinedTexture3dCoordinates
 ///			Gets the 3d texture coordinates to be used with combined Texture 3D
 ///-----------------------------------------------------------------------------------------
-float3 GetCombinedTexture3dCoordinates(float3 positions, float textureWidth, float textureDepth, float index, float4x4 transform)
+FP3 GetCombinedTexture3dCoordinates(FP3 positions, FP textureWidth, FP textureDepth, FP index, FP4x4 transform)
 {
-	float textureCount = textureDepth / textureWidth;
-	float borderClamp = 0.5f / textureWidth;
-	float offset = index / textureCount;
+	FP textureCount = textureDepth / textureWidth;
+	FP borderClamp = 0.5f / textureWidth;
+	FP offset = index / textureCount;
 
-    float3 textureCoordinates = frac(TransformPoint(positions, transform) + +float3(0.5f, 0.5f, 0.5f));
+    FP3 textureCoordinates = frac(TransformPoint(positions, transform) + +FP3(0.5f, 0.5f, 0.5f));
 	textureCoordinates.z /= textureCount;
 	textureCoordinates.z += offset;
 	textureCoordinates.z = clamp(offset + borderClamp, offset + 1.0f - borderClamp, textureCoordinates.z);
@@ -179,7 +207,7 @@ float3 GetCombinedTexture3dCoordinates(float3 positions, float textureWidth, flo
 ///			GetExponentialValue
 ///			Gets "exponentialized" value based on 0->1 gradient
 ///-----------------------------------------------------------------------------------------
-float GetExponentialValue(float value)
+FP GetExponentialValue(FP value)
 {
 	return pow(abs(value), e);
 }
@@ -187,7 +215,7 @@ float GetExponentialValue(float value)
 ///			GetLogarithmicValue
 ///			Gets "logarithmized" value based on 0->1 gradient
 ///-----------------------------------------------------------------------------------------
-float GetLogarithmicValue(float value)
+FP GetLogarithmicValue(FP value)
 {
 	return pow(abs(value), n);
 }
@@ -196,19 +224,19 @@ float GetLogarithmicValue(float value)
 ///			(Clamped)InverseLerp
 ///			Gets the linear gradient, returning where the value locates between the low and hi thresholds
 ///-----------------------------------------------------------------------------------------
-float InverseLerp(float lowThreshold, float hiThreshold, float value)
+FP InverseLerp(FP lowThreshold, FP hiThreshold, FP value)
 {
 	return (value - lowThreshold) / (hiThreshold - lowThreshold);
 }
-float ClampedInverseLerp(float lowThreshold, float hiThreshold, float value)
+FP ClampedInverseLerp(FP lowThreshold, FP hiThreshold, FP value)
 {
 	return saturate(InverseLerp(lowThreshold, hiThreshold, value));
 }
-float3 InverseLerp(float lowThreshold, float hiThreshold, float3 value)
+FP3 InverseLerp(FP lowThreshold, FP hiThreshold, FP3 value)
 {
 	return (value - lowThreshold) / (hiThreshold - lowThreshold);
 }
-float3 ClampedInverseLerp(float lowThreshold, float hiThreshold, float3 value)
+FP3 ClampedInverseLerp(FP lowThreshold, FP hiThreshold, FP3 value)
 {
 	return saturate(InverseLerp(lowThreshold, hiThreshold, value));
 }
@@ -217,17 +245,17 @@ float3 ClampedInverseLerp(float lowThreshold, float hiThreshold, float3 value)
 ///			LevelValue
 ///			Filters value between "levelLowThreshold" and "levelHiThreshold", contrast by "contrast" factor, then rescale the result between "outputLowValue" and "outputHiValue". Similar to the Levels adjustment tool in Photoshop.
 ///-----------------------------------------------------------------------------------------
-float LevelValue(LevelsData levelsParameters, float value)
+FP LevelValue(LevelsData levelsParameters, FP value)
 {
-	float tmp = ClampedInverseLerp(levelsParameters.levelLowThreshold, levelsParameters.levelHiThreshold, value);
+	FP tmp = ClampedInverseLerp(levelsParameters.levelLowThreshold, levelsParameters.levelHiThreshold, value);
 	tmp = saturate(lerp(0.5f, tmp, levelsParameters.contrast));
 	tmp = lerp(levelsParameters.outputLowValue, levelsParameters.outputHiValue, tmp);
 
 	return tmp;
 }
-float3 LevelValue(LevelsData levelsParameters, float3 value)
+FP3 LevelValue(LevelsData levelsParameters, FP3 value)
 {
-	float3 tmp;
+	FP3 tmp;
 	tmp.x = LevelValue(levelsParameters, value.x);
 	tmp.y = LevelValue(levelsParameters, value.y);
 	tmp.z = LevelValue(levelsParameters, value.z);
@@ -240,25 +268,41 @@ float3 LevelValue(LevelsData levelsParameters, float3 value)
 //			Lights phase function. Returns the anisotropic scattering factor.
 //			http://renderwonk.com/publications/s2003-course/premoze1/notes-premoze.pdf
 //-----------------------------------------------------------------------------------------
-float HenyeyGreensteinPhaseFunction(float cosAngle, float coefficient, float squareCoefficient)
+FP HenyeyGreensteinPhaseFunction(FP cosAngle, FP coefficient, FP squareCoefficient)
 {	
 	
-	float topPart = 1.0f - squareCoefficient;
-	float bottomPart = sqrt(1.0f + squareCoefficient - 2.0f * coefficient * cosAngle);
+	FP topPart = 1.0f - squareCoefficient;
+	FP bottomPart = sqrt(1.0f + squareCoefficient - 2.0f * coefficient * cosAngle);
 	bottomPart *= bottomPart * bottomPart;
-	//float bottomPart = 1.0f + squareCoefficient - 2.0f * coefficient * cosAngle; // More controllable
-	//float bottomPart = pow(1.0f + squareCoefficient - 2.0f * coefficient * cosAngle, 0.75f); // More controllable
+	//FP bottomPart = 1.0f + squareCoefficient - 2.0f * coefficient * cosAngle; // More controllable
+	//FP bottomPart = pow(1.0f + squareCoefficient - 2.0f * coefficient * cosAngle, 0.75f); // More controllable
     bottomPart = rcp(bottomPart);
     return topPart * bottomPart;
 }
-float CornetteShanksPhaseFunction(float cosAngle, float coefficient, float squareCoefficient)
+FP CornetteShanksPhaseFunction(FP cosAngle, FP coefficient, FP squareCoefficient)
 {
 	return (3.0f / 2.0f) * ((1.0f + cosAngle * cosAngle) / (2.0f + squareCoefficient)) * HenyeyGreensteinPhaseFunction(cosAngle, coefficient, squareCoefficient);
 }
-float GetScatteringFactor(float cosAngle, float coefficient)
+FP GetScatteringFactor(FP3 lightVector, FP3 viewVector, bool useScattering, bool useDefaultScattering, FP coefficient, FP scatteringOverride)
 {
-	float squareCoefficient = coefficient * coefficient;
-	return quarterPi * CornetteShanksPhaseFunction(cosAngle, coefficient, squareCoefficient);
+	bool shouldComputeScattering = useDefaultScattering ? useScattering : (scatteringOverride > -2 ? true : false);
+	BRANCH
+	if (shouldComputeScattering)
+	{
+		FP cosAngle = saturate(dot(-lightVector, viewVector));
+		BRANCH
+		if (scatteringOverride > -1)
+		{
+			coefficient = scatteringOverride;
+		}
+
+		FP squareCoefficient = coefficient * coefficient;
+		return quarterPi * CornetteShanksPhaseFunction(cosAngle, coefficient, squareCoefficient);
+	}
+	else
+	{
+		return 1.0f;
+	}
 }
 
 //-----------------------------------------------------------------------------------------
@@ -276,11 +320,30 @@ float GetScatteringFactor(float cosAngle, float coefficient)
 //          z = x/far
 //          w = 1/far
 //-----------------------------------------------------------------------------------------
-float GetLinearDepth(float depth, float4 params)
+FP GetLinearDepthOrtho(FP depth, FP2 params)
+{
+	return lerp(params.x, params.y, 1.0f - depth);
+}
+FP GetLinearDepth(FP depth, FP4 params)
 {
 	return 1.0f / (params.z * depth + params.w);
 }
-float GetLinearDepth01(float depth, float4 params)
+FP GetLinearDepth(FP depth, FP4 params, bool isOrthographic)
+{
+	if (isOrthographic)
+	{
+		return GetLinearDepthOrtho(depth, params.xy);
+	}
+	else
+	{
+#if defined(SHADER_STAGE_COMPUTE)
+		return GetLinearDepth(depth, params); // Custom replica of the original function as it is inaccessible in compute
+#else
+		return LinearEyeDepth(depth); // Call original function if not in a compute
+#endif
+	}
+}
+FP GetLinearDepth01(FP depth, FP4 params)
 {
 	return 1.0f / (params.z * depth + params.y);
 }
@@ -289,9 +352,9 @@ float GetLinearDepth01(float depth, float4 params)
 //			GetLightDistanceAttenuation
 //			Computes the distance attenuation factor for Point and Spot lights
 //-----------------------------------------------------------------------------------------
-half GetLightDistanceAttenuation(half2 distanceFalloffParameters, half normalizedDistance)
+half GetLightDistanceAttenuation(FP2 distanceFalloffParameters, half normalizedDistance)
 {
-    float distanceAttenuation = ClampedInverseLerp(1.0f, distanceFalloffParameters.x, normalizedDistance);
+    FP distanceAttenuation = ClampedInverseLerp(1.0f, distanceFalloffParameters.x, normalizedDistance);
     distanceAttenuation = pow(distanceAttenuation, distanceFalloffParameters.y);
 
     return distanceAttenuation;
@@ -299,9 +362,22 @@ half GetLightDistanceAttenuation(half2 distanceFalloffParameters, half normalize
 
 //-----------------------------------------------------------------------------------------
 //			ConvertMatrixFloatsToMatrix
-//			Coonverts a MatrixFloats struct into a float4x4 matrix
+//			Converts a MatrixFloats struct into a FP4x4 matrix
 //-----------------------------------------------------------------------------------------
 half4x4 ConvertMatrixFloatsToMatrix(MatrixFloats data)
 {
-    return half4x4(half4(data.a.x, data.b.x, data.c.x, data.d.x), half4(data.a.y, data.b.y, data.c.y, data.d.y), half4(data.a.z, data.b.z, data.c.z, data.d.z), half4(data.a.w, data.b.w, data.c.w, data.d.w));
+    return half4x4(FP4(data.a.x, data.b.x, data.c.x, data.d.x), FP4(data.a.y, data.b.y, data.c.y, data.d.y), FP4(data.a.z, data.b.z, data.c.z, data.d.z), FP4(data.a.w, data.b.w, data.c.w, data.d.w));
+}
+
+//-----------------------------------------------------------------------------------------
+//			GetFlattenedIndex
+//			Computes the thread id according to its position in the total dispatch and the amount of dispatched threads
+//-----------------------------------------------------------------------------------------
+uint GetFlattenedIndex(uint3 id, uint3 size)
+{
+	return id.z * size.x * size.y + id.y * size.x + id.x;
+}
+uint GetFlattenedIndex(uint2 id, uint2 size)
+{
+	return id.y * size.x + id.x;
 }

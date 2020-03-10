@@ -23,23 +23,32 @@
 #pragma kernel ComputeDataBuffer SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_ONE_CASCADE
 #pragma kernel ComputeDataBuffer SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_TWO_CASCADES
 #pragma kernel ComputeDataBuffer SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_FOUR_CASCADES
+#pragma kernel ComputeDataBuffer OCCLUSION DIRECTIONAL_LIGHTS_SHADOWS_ONE_CASCADE
+#pragma kernel ComputeDataBuffer OCCLUSION DIRECTIONAL_LIGHTS_SHADOWS_TWO_CASCADES
+#pragma kernel ComputeDataBuffer OCCLUSION DIRECTIONAL_LIGHTS_SHADOWS_FOUR_CASCADES
+#pragma kernel ComputeDataBuffer OCCLUSION SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_ONE_CASCADE
+#pragma kernel ComputeDataBuffer OCCLUSION SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_TWO_CASCADES
+#pragma kernel ComputeDataBuffer OCCLUSION SINGLE_PASS_STEREO DIRECTIONAL_LIGHTS_SHADOWS_FOUR_CASCADES
 
 // Includes all the common variables and functions
 #include "../Includes/Common.cginc"
 
 // Local variables
-uniform RWTexture3D<half4> textureBuffer;
-uniform half4 frustumCornersWorldPositionArray[8];
-uniform half4 secondaryFrustumCornersWorldPositionArray[8];
-uniform half baseDensity;
-uniform half densityFactor;
-uniform half baseScattering;
-uniform half4 baseColor;
-uniform half ambientLightingFactor;
+uniform StructuredBuffer<uint> dispatchSizeBuffer;			// size = 3 -> x, y, z
+uniform StructuredBuffer<uint> visibleCellsAmountBuffer;	// size = 1
+uniform StructuredBuffer<CellData> visibleCellsBuffer;		// size = visibleCellsAmountBuffer[0]
+uniform RWTexture3D<FP4> lightingTexture;
+uniform FP4 frustumCornersWorldPositionArray[8];
+uniform FP4 secondaryFrustumCornersWorldPositionArray[8];
+uniform FP baseDensity;
+uniform FP densityFactor;
+uniform FP baseScattering;
+uniform FP4 baseColor;
+uniform FP4 baseTint;
+uniform FP ambientLightingFactor;
 
 // Options
 uniform bool useReprojection;
-uniform bool useOcclusion;
 uniform bool useVolumes;
 uniform bool useTexture2DMasks;
 uniform bool useTexture3DMasks;
@@ -53,9 +62,9 @@ uniform bool useSpotLightsShadows;
 uniform bool usePointLights;
 uniform bool usePointLightsShadows;
 uniform bool useLightsCookies;
+uniform bool useScattering;
 
 // Includes specific files
-#include "Includes/OcclusionCulling.cginc"
 #include "Includes/TemporalReprojection.cginc"
 #include "Includes/VolumeInjection.cginc"
 #include "Includes/AmbientLightingInjection.cginc"
@@ -64,27 +73,26 @@ uniform bool useLightsCookies;
 #include "Includes/SpotLightInjection.cginc"
 #include "Includes/PointLightInjection.cginc"
 
-// Local functions
-inline void FormatData(inout half4 accumulationColor, half density)
-{
-    accumulationColor.w = density * densityFactor;
-    accumulationColor.xyz = max(float3(0.0f, 0.0f, 0.0f), accumulationColor.xyz);
-}
-
-inline void WriteIntoTextureBuffer(half4 accumulationColor, uint3 id)
-{
-	textureBuffer[id] = accumulationColor;
-}
-
 // Main function
-[numthreads(NUM_THREAD_X,NUM_THREAD_Y,NUM_THREAD_Z)]
-void ComputeDataBuffer (uint3 id : SV_DispatchThreadID)
+[numthreads(VISIBILITY_GROUPS_SIZE_X, VISIBILITY_GROUPS_SIZE_Y, VISIBILITY_GROUPS_SIZE_Z)]
+void ComputeDataBuffer (uint3 dispatchThreadID : SV_DispatchThreadID)
 {
-    float4 normalizedLocalPos; 
-    normalizedLocalPos.xyz = GetNormalizedLocalPosition(id);
-    normalizedLocalPos.w = 0.0f;
+	uint visibleCellsAmount = visibleCellsAmountBuffer[0];
+	uint3 totalDispatchsize = uint3(dispatchSizeBuffer[0], dispatchSizeBuffer[1], dispatchSizeBuffer[2]) * VISIBILITY_GROUPS_SIZE;
+	uint currentThreadIndex = GetFlattenedIndex(dispatchThreadID, totalDispatchsize);
+	
+	if (currentThreadIndex >= visibleCellsAmount)
+	{ 
+		return;
+	}
+	
+	CellData currentCell = visibleCellsBuffer[currentThreadIndex];
 
-    half4 frustumCorners[8] = frustumCornersWorldPositionArray;
+	uint3 id = currentCell.id;
+	FP4 normalizedLocalPos = currentCell.localPosition;
+	FP4 jitteredLocalPos = FP4(currentCell.jitteredLocalPosition, 0.0f);
+
+    FP4 frustumCorners[8] = frustumCornersWorldPositionArray;
 
 	bool isSecondaryFrustum = false;
 	#if defined(SINGLE_PASS_STEREO)
@@ -94,90 +102,87 @@ void ComputeDataBuffer (uint3 id : SV_DispatchThreadID)
 		frustumCorners = secondaryFrustumCornersWorldPositionArray;
 	}
 	normalizedLocalPos.x = frac(normalizedLocalPos.x * 2);
+	jitteredLocalPos.x = frac(jitteredLocalPos.x * 2);
 	#endif
-	
-	// Check if jittering and reprojection should be performed
-	half4 unjitteredNormalizedLocalPos = normalizedLocalPos;
-    half3 unjitteredUnbiasedWorldPosition = GetWorldPosition(unjitteredNormalizedLocalPos.xyz, frustumCorners);
-    ApplyDepthBiasToNormalizedPosition(unjitteredNormalizedLocalPos);
-	[branch]
-    if(useReprojection)
-	{
-		JitterPosition(normalizedLocalPos.xyz, id);
-    }
-    ApplyDepthBiasToNormalizedPosition(normalizedLocalPos);
-	
-	half density = baseDensity;
-	half scattering = baseScattering;
-	half4 accumulationColor = baseColor;
-			
-	// Checks if the cell is occluded
-    [branch]
-    if (!useOcclusion || IsNotOccluded(normalizedLocalPos.z, id))
-	{
-        half3 jitteredWorldPosition = GetWorldPosition(normalizedLocalPos.xyz, frustumCorners);
-        half3 unjitteredWorldPosition = GetWorldPosition(unjitteredNormalizedLocalPos.xyz, frustumCorners);
-        half4 jitteredViewVector = half4(normalize(jitteredWorldPosition.xyz - cameraPosition.xyz), 1.0f);
-        half4 unjitteredViewVector = half4(normalize(unjitteredWorldPosition.xyz - cameraPosition.xyz), 1.0f);
-        half globalIlluminationMask = 0;
-        half lightProbesMultiplier = 0;
-        half ambientLightingMultiplier = ambientLightingFactor;
 
-		// Computes Volumes' contributions
-		[branch]
-        if (useVolumes)
-		{
-            ComputeVolumesInjection(jitteredWorldPosition, unjitteredWorldPosition, accumulationColor.xyz, density, scattering, globalIlluminationMask, lightProbesMultiplier, ambientLightingMultiplier); // Don't reproject volumes 
-        }
+	FP3 worldPosition = GetWorldPosition(normalizedLocalPos.xyz, frustumCorners);
+    FP4 viewVector = FP4(normalize(worldPosition.xyz - cameraPosition.xyz), 1.0f);
+	FP3 jitteredWorldPosition = worldPosition;
+	FP4 jitteredViewVector = viewVector;
+	if (useReprojection)
+	{
+		jitteredWorldPosition = GetWorldPosition(jitteredLocalPos.xyz, frustumCorners);
+		jitteredViewVector = FP4(normalize(jitteredWorldPosition.xyz - cameraPosition.xyz), 1.0f);
+	}
+	
+	FP density = baseDensity;
+	FP scattering = baseScattering;
+	FP4 accumulationColor = baseColor;
+	FP3 tint = baseTint.xyz;
+	FP globalIlluminationMask = 0.0f;
+	FP lightProbesMultiplier = 0.0f;
+	FP ambientLightingMultiplier = ambientLightingFactor;
+	FP directIlluminationMultiplier = 1.0f;
+	
+	// Computes Volumes' contributions
+	BRANCH
+    if (useVolumes)
+	{
+        ComputeVolumesInjection(jitteredWorldPosition, worldPosition, accumulationColor.xyz, density, scattering, globalIlluminationMask, lightProbesMultiplier, ambientLightingMultiplier, tint, directIlluminationMultiplier); // Don't jitter volume's noise
+    }
 		
-        half3 globalIlluminationColor = half3(0, 0, 0);
-		// Computes the ambient lighting's contribution
-		[branch]
-        if (useAmbientLighting)
-        {
-            globalIlluminationColor = ComputeAmbientLighting(unjitteredViewVector, scattering) * ambientLightingMultiplier;
-        }
-		// Computes the light probes' contribution
-		[branch]
-        if (useLightProbes && globalIlluminationMask > 0)
-        {
-            globalIlluminationColor += ComputeLightProbesInjection(unjitteredViewVector, unjitteredNormalizedLocalPos.xyz, scattering) * lightProbesMultiplier;
-        }
-        accumulationColor.xyz += globalIlluminationColor;
+    FP3 globalIlluminationColor = FP3(0, 0, 0);
+	// Computes the ambient lighting's contribution
+	BRANCH
+    if (useAmbientLighting)
+    {
+        globalIlluminationColor = ComputeAmbientLighting(viewVector, scattering) * ambientLightingMultiplier;
+    }
+	// Computes the light probes' contribution
+	BRANCH
+    if (useLightProbes && globalIlluminationMask > 0)
+    {
+        globalIlluminationColor += ComputeLightProbesInjection(viewVector, normalizedLocalPos.xyz, scattering) * lightProbesMultiplier;
+    }
+    accumulationColor.xyz += globalIlluminationColor;
                 
-		// Computes Directional Lights' contribution
-		[branch]
-        if (useDirectionalLights)
-		{
-            half distanceToCam = GetCameraSpaceDepth(normalizedLocalPos.z);
-            ComputeDirectionalLightsInjection(jitteredWorldPosition, distanceToCam, jitteredViewVector.xyz, accumulationColor, scattering);
-        }
+	FP3 directIlluminationColor = FP3(0, 0, 0);
+	// Computes Directional Lights' contribution
+	BRANCH
+    if (useDirectionalLights)
+	{
+        FP distanceToCam = GetCameraSpaceDepth(normalizedLocalPos.z);
+        ComputeDirectionalLightsInjection(jitteredWorldPosition, distanceToCam, jitteredViewVector.xyz, directIlluminationColor, useScattering, scattering);
+    }
         		
-		// Computes Spot Lights' contribution
-		[branch]
-        if (useSpotLights)
-		{
-            ComputeSpotLightsInjection(jitteredWorldPosition, jitteredViewVector.xyz, accumulationColor, scattering);
-        }
-                
-		// Computes Point Lights' contribution
-		[branch]
-        if (usePointLights)
-		{
-            ComputePointLightsInjection(jitteredWorldPosition, jitteredViewVector.xyz, accumulationColor, scattering);
-        }
-		
-		// Reprojects data onto previous frame
-		[branch]
-        if (useReprojection)
-        {
-            ReprojectPreviousFrame(accumulationColor.xyz, unjitteredUnbiasedWorldPosition, isSecondaryFrustum);
-        } 
-
-		// Formats light color and density
-        FormatData(accumulationColor, density);
-
-		// Writes data into the texture buffer
-		WriteIntoTextureBuffer(accumulationColor, id);
+	// Computes Spot Lights' contribution
+	BRANCH
+    if (useSpotLights)
+	{
+        ComputeSpotLightsInjection(jitteredWorldPosition, jitteredViewVector.xyz, directIlluminationColor, useScattering, scattering);
     }
+                
+	// Computes Point Lights' contribution
+	BRANCH
+    if (usePointLights)
+	{
+        ComputePointLightsInjection(jitteredWorldPosition, jitteredViewVector.xyz, directIlluminationColor, useScattering, scattering);
+    }
+
+	accumulationColor.xyz += directIlluminationColor * directIlluminationMultiplier;
+		
+	// Reprojects data onto previous frame
+	BRANCH
+    if (useReprojection)
+    {
+		FP3 unbiasedWorldPosition = GetWorldPosition(normalizedLocalPos.xyw, frustumCorners);
+        ReprojectPreviousFrame(accumulationColor.xyz, unbiasedWorldPosition, isSecondaryFrustum);
+    } 
+
+	// Formats light color and density
+	accumulationColor.xyz = max(FP3(0.0f, 0.0f, 0.0f), accumulationColor.xyz * tint);
+	accumulationColor.w = density * densityFactor;
+
+	// Writes data into the texture buffer
+	lightingTexture[id] = accumulationColor;
 } 

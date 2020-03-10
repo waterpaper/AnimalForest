@@ -223,6 +223,8 @@ namespace Aura2API
             {
                 Graphics.CopyTexture(src, dest);
             }
+
+            GL.Flush();
         }
         #endregion
 
