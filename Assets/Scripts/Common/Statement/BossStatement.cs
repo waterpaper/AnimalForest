@@ -54,7 +54,7 @@ public class BossStatement : MonoBehaviour
     void Setting(BossTable temp)
     {
         //테이블 정보를 받아와 스텟을 저장합니다.
-        bossName = temp.BossName;
+        bossName = temp.Name;
         level = temp.Level;
         exp = temp.Exp;
         hp =temp.Hp;

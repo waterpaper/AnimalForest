@@ -14,21 +14,22 @@
 *                                                                          *
 ***************************************************************************/
 
-static const float blueNoiseTexturesSize = 64.0f;
-Texture2DArray _blueNoiseTexturesArray;
-int _frameID;
-
-#ifndef UNITY_SHADER_VARIABLES_INCLUDED
-float4 _ScreenParams;
+#if defined(SHADER_STAGE_FRAGMENT)
+UNITY_DECLARE_TEX2DARRAY(_blueNoiseTexturesArray);
 #endif
 
-float4 GetBlueNoise(float2 screenPos, int idOffset)
+FP4 GetBlueNoise(FP2 screenPos, int idOffset)
 {
-    int4 blueNoiseSamplingPosition = int4(screenPos * _ScreenParams.xy % float2(blueNoiseTexturesSize, blueNoiseTexturesSize), (_frameID + idOffset) % blueNoiseTexturesSize, 0);
-	float4 blueNoise = _blueNoiseTexturesArray.Load(blueNoiseSamplingPosition);
+#if defined(SHADER_STAGE_FRAGMENT)
+	const FP blueNoiseTexturesSize = 64;
+	FP3 blueNoiseSamplingPosition = FP3(fmod(screenPos * _ScreenParams.xy * rcp(blueNoiseTexturesSize), blueNoiseTexturesSize), (_frameID + idOffset) % blueNoiseTexturesSize);
+	FP4 blueNoise = UNITY_SAMPLE_TEX2DARRAY(_blueNoiseTexturesArray, blueNoiseSamplingPosition);
 	blueNoise = mad(blueNoise, 2.0f, -1.0f);
 	blueNoise = sign(blueNoise)*(1.0f - sqrt(1.0f - abs(blueNoise)));
 	blueNoise /= 255.0f;
 
     return blueNoise;
+#else
+	return FP4(0, 0, 0, 0);
+#endif
 }

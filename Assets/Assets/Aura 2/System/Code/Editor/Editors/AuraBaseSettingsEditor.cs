@@ -55,6 +55,18 @@ namespace Aura2API
         /// </summary>
         private static SerializedProperty _baseColorStrengthProperty;
         /// <summary>
+        /// The property for base tint usage
+        /// </summary>
+        private static SerializedProperty _useTintProperty;
+        /// <summary>
+        /// The property for base tint
+        /// </summary>
+        private static SerializedProperty _baseTintProperty;
+        /// <summary>
+        /// The property for base tint strength
+        /// </summary>
+        private static SerializedProperty _baseTintStrengthProperty;
+        /// <summary>
         /// The property for ambient lighting usage
         /// </summary>
         private static SerializedProperty _useAmbientLightingProperty;
@@ -98,6 +110,9 @@ namespace Aura2API
             _useColorProperty = serializedObject.FindProperty("useColor");
             _baseColorProperty = serializedObject.FindProperty("color");
             _baseColorStrengthProperty = serializedObject.FindProperty("colorStrength");
+            _useTintProperty = serializedObject.FindProperty("useTint");
+            _baseTintProperty = serializedObject.FindProperty("tint");
+            _baseTintStrengthProperty = serializedObject.FindProperty("tintStrength");
             _useAmbientLightingProperty = serializedObject.FindProperty("useAmbientLighting");
             _ambientLightingStrengthProperty = serializedObject.FindProperty("ambientLightingStrength");
             _useExtinctionProperty = serializedObject.FindProperty("useExtinction");
@@ -161,12 +176,12 @@ namespace Aura2API
             EditorGUILayout.Separator();
 
             EditorGUILayout.BeginVertical();
-            GuiHelpers.DrawToggleChecker(ref _useDensityProperty, new GUIContent(" Use Global Density", Aura.ResourcesCollection.densityIconTexture, "Injects an ambient density"), true, true);
+            GuiHelpers.DrawToggleChecker(ref _useDensityProperty, new GUIContent(" Density", Aura.ResourcesCollection.densityIconTexture, "Injects an ambient density"), true, true);
             if(_useDensityProperty.boolValue)
             {
                 //EditorGUI.BeginDisabledGroup(!_useDensityProperty.boolValue);
                 EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
-                GuiHelpers.DrawPositiveOnlyFloatField(ref _baseDensityProperty, "Global Density");
+                GuiHelpers.DrawPositiveOnlyFloatField(ref _baseDensityProperty, "Density");
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();
@@ -175,12 +190,12 @@ namespace Aura2API
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            GuiHelpers.DrawToggleChecker(ref _useScatteringProperty, new GUIContent(" Use Global Scattering", Aura.ResourcesCollection.scatteringIconTexture, "Injects an ambient scattering"), true, true);
+            GuiHelpers.DrawToggleChecker(ref _useScatteringProperty, new GUIContent(" Scattering", Aura.ResourcesCollection.scatteringIconTexture, "Injects an ambient scattering"), true, true);
             if (_useScatteringProperty.boolValue)
             {
                 //EditorGUI.BeginDisabledGroup(!_useScatteringProperty.boolValue);
                 EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
-                GuiHelpers.DrawSlider(ref _baseScatteringProperty, 0, 1, "Global Scattering");
+                GuiHelpers.DrawSlider(ref _baseScatteringProperty, 0, 1);
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();
@@ -189,27 +204,42 @@ namespace Aura2API
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            GuiHelpers.DrawToggleChecker(ref _useAmbientLightingProperty, new GUIContent(" Use Ambient Lighting", Aura.ResourcesCollection.illuminationIconTexture, "Injects the \"Environment lighting\" set in the \"Lighting\" window"), true, true);
+            GuiHelpers.DrawToggleChecker(ref _useAmbientLightingProperty, new GUIContent(" Ambient Lighting", Aura.ResourcesCollection.illuminationIconTexture, "Injects the \"Environment lighting\" set in the \"Lighting\" window"), true, true);
             if (_useAmbientLightingProperty.boolValue)
             {
                 //EditorGUI.BeginDisabledGroup(!_useAmbientLightingProperty.boolValue);
                 EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
-                GuiHelpers.DrawPositiveOnlyFloatField(ref _ambientLightingStrengthProperty, "Ambient Strength");
+                GuiHelpers.DrawPositiveOnlyFloatField(ref _ambientLightingStrengthProperty, "Strength");
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();
             }
-            
+
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            GuiHelpers.DrawToggleChecker(ref _useColorProperty, new GUIContent(" Use Global Light", Aura.ResourcesCollection.colorIconTexture, "Injects an ambient light"), true, true);
+            GuiHelpers.DrawToggleChecker(ref _useTintProperty, new GUIContent(" Tint", Aura.ResourcesCollection.tintIconTexture, "Injects an tinting tint"), true, true);
+            if (_useTintProperty.boolValue)
+            {
+                //EditorGUI.BeginDisabledGroup(!_useTintProperty.boolValue);
+                EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
+                EditorGUILayout.PropertyField(_baseTintProperty);
+                GuiHelpers.DrawSlider(ref _baseTintStrengthProperty, 0.0f, 1.0f, "Brightness");
+                EditorGUILayout.Separator();
+                EditorGUILayout.EndVertical();
+                //EditorGUI.EndDisabledGroup();
+            }
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
+            GuiHelpers.DrawToggleChecker(ref _useColorProperty, new GUIContent(" Light", Aura.ResourcesCollection.illuminationColorIconTexture, "Injects an ambient light"), true, true);
             if (_useColorProperty.boolValue)
             {
                 //EditorGUI.BeginDisabledGroup(!_useColorProperty.boolValue);
                 EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
                 EditorGUILayout.PropertyField(_baseColorProperty);
-                GuiHelpers.DrawPositiveOnlyFloatField(ref _baseColorStrengthProperty, "Global Light Strength");
+                GuiHelpers.DrawPositiveOnlyFloatField(ref _baseColorStrengthProperty, "Strength");
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();
@@ -218,12 +248,12 @@ namespace Aura2API
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            GuiHelpers.DrawToggleChecker(ref _useExtinctionProperty, new GUIContent(" Use Extinction", Aura.ResourcesCollection.extinctionIconTexture, "Simulates the depth related decay of light"), true, true);
+            GuiHelpers.DrawToggleChecker(ref _useExtinctionProperty, new GUIContent(" Extinction", Aura.ResourcesCollection.extinctionIconTexture, "Simulates the depth related decay of light"), true, true);
             if (_useExtinctionProperty.boolValue)
             {
                 //EditorGUI.BeginDisabledGroup(!_useExtinctionProperty.boolValue);
                 EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
-                GuiHelpers.DrawSlider(ref _extinctionProperty, 0, 1, "Global Extinction", true);
+                GuiHelpers.DrawSlider(ref _extinctionProperty, 0, 1, true);
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();

@@ -62,15 +62,15 @@ public class DropItemManager : MonoBehaviour
 
             if (dropItemTableTemp != null)
             {
-                dropMoney = Random.Range(dropItemTableTemp.dropMoneyMin, dropItemTableTemp.dropMoneyMax);
+                dropMoney = Random.Range(dropItemTableTemp.DropMoneyMin, dropItemTableTemp.DropMoneyMax);
                 float randIdx = Random.Range(0, 100);
 
                 for (int j = 0; j < dropItemTableTemp.EnemyDropItemDataList.Count; j++)
                 {
                     
-                    if (randIdx < dropItemTableTemp.EnemyDropItemDataList[j].dropItemPercent)
+                    if (randIdx < dropItemTableTemp.EnemyDropItemDataList[j].DropItemPercent)
                     {
-                        Item itemTemp = DataManager.instance.ItemSetting(dropItemTableTemp.EnemyDropItemDataList[j].dropItemId);
+                        Item itemTemp = DataManager.instance.ItemSetting(dropItemTableTemp.EnemyDropItemDataList[j].DropItemId);
 
                         if (itemTemp == null) continue;
                             dropItemListTemp.Add(itemTemp);

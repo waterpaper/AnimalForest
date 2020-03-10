@@ -191,11 +191,18 @@ namespace Aura2API
         /// Draws the field required to draw a VolumeInjectionParameters object
         /// </summary>
         /// <param name="injectionProperty">The related serialized property</param>
-        /// <param name="displayMask">Int mask to display texture/noise mask</param>
-        public static void DrawInjectionField(ref SerializedProperty injectionProperty, bool displayNoiseParameters, bool displayTexture2DMaskParameters, bool displayTexture3DMaskParameters)
+        public static void DrawInjectionField(ref SerializedProperty injectionProperty, bool displayNoiseParameters, bool displayTexture2DMaskParameters, bool displayTexture3DMaskParameters, bool clampStrength = false, float clampStrengthMin = 0.0f, float clampStrengthMax = 1.0f, bool saturateLevelOuput = false, string strengthLabel = "Strength", string strengthTooltip = "Strength of the injected data. Can be set negative to remove data.")
         {
             SerializedProperty strengthProperty = injectionProperty.FindPropertyRelative("strength");
-            DrawFloatField(ref strengthProperty, new GUIContent("Strength", "Strength of the injected data. Can be set negative to remove data."));
+            GUIContent strengthContent = new GUIContent(strengthLabel, strengthTooltip);
+            if(clampStrength)
+            {
+                DrawSlider(ref strengthProperty, clampStrengthMin, clampStrengthMax, strengthContent.text);
+            }
+            else
+            {
+                DrawFloatField(ref strengthProperty, strengthContent);
+            }
 
             if (displayNoiseParameters)
             {
@@ -219,7 +226,7 @@ namespace Aura2API
                         EditorGUILayout.Separator();
                         //EditorGUI.BeginDisabledGroup(!useNoiseMaskLevels.boolValue);
                         SerializedProperty noiseMaskLevelsProperty = injectionProperty.FindPropertyRelative("noiseMaskLevelParameters");
-                        GuiHelpers.DrawLevelsField(ref noiseMaskLevelsProperty);
+                        GuiHelpers.DrawLevelsField(ref noiseMaskLevelsProperty, saturateLevelOuput);
                         //EditorGUI.EndDisabledGroup();
                     }
                     EditorGUILayout.EndVertical();
@@ -250,7 +257,7 @@ namespace Aura2API
                         EditorGUILayout.Separator();
                         //EditorGUI.BeginDisabledGroup(!useTexture2DMaskLevels.boolValue);
                         SerializedProperty texture2DMaskLevelsProperty = injectionProperty.FindPropertyRelative("texture2DMaskLevelParameters");
-                        GuiHelpers.DrawLevelsField(ref texture2DMaskLevelsProperty);
+                        GuiHelpers.DrawLevelsField(ref texture2DMaskLevelsProperty, saturateLevelOuput);
                         //EditorGUI.EndDisabledGroup();
                     }
                     EditorGUILayout.EndVertical();
@@ -281,7 +288,7 @@ namespace Aura2API
                         EditorGUILayout.Separator();
                         //EditorGUI.BeginDisabledGroup(!useTexture3DMaskLevels.boolValue);
                         SerializedProperty texture3DMaskLevelsProperty = injectionProperty.FindPropertyRelative("texture3DMaskLevelParameters");
-                        GuiHelpers.DrawLevelsField(ref texture3DMaskLevelsProperty);
+                        GuiHelpers.DrawLevelsField(ref texture3DMaskLevelsProperty, saturateLevelOuput);
                         //EditorGUI.EndDisabledGroup();
                     }
                     EditorGUILayout.EndVertical();
@@ -295,7 +302,7 @@ namespace Aura2API
         /// Draws the fields required for a LevelsParameters object
         /// </summary>
         /// <param name="levelsProperty">The related serialized property</param>
-        public static void DrawLevelsField(ref SerializedProperty levelsProperty)
+        public static void DrawLevelsField(ref SerializedProperty levelsProperty, bool saturateOuput = false)
         {
             GuiHelpers.DrawContextualHelpBox("The \"Levels\" parameter will filter the input value.\n\nKeeps the value between the \"Level Thresholds\" and remaps the range from 0 to 1.\"");
             EditorGUILayout.BeginHorizontal();
@@ -306,17 +313,36 @@ namespace Aura2API
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Separator();
-            
+
+            GUIContent content = new GUIContent("Contrast", "Contrast the input mask");
             SerializedProperty contrastProperty = levelsProperty.FindPropertyRelative("contrast");
-            DrawFloatField(ref contrastProperty, new GUIContent("Contrast", "Contrast the input mask"));
+            DrawFloatField(ref contrastProperty, content);
 
             EditorGUILayout.Separator();
 
+            content.text = "Output Min";
+            content.tooltip = "Output minimum value";
             GuiHelpers.DrawContextualHelpBox("The \"Output\" parameters will rescale this new range\n\n0 will now equal the lower \"Output Value\" and 1 will now equal the higher.");
             SerializedProperty outputLowValueProperty = levelsProperty.FindPropertyRelative("outputLowValue");
-            DrawFloatField(ref outputLowValueProperty, new GUIContent("Output Min", "Output minimum value"));            
+            if(saturateOuput)
+            {
+                DrawSlider(ref outputLowValueProperty, 0.0f, 1.0f, content.text);
+            }
+            else
+            {
+                DrawFloatField(ref outputLowValueProperty, content);
+            }
+            content.text = "Output Max";
+            content.tooltip = "Output maximum value";
             SerializedProperty outputHiValueProperty = levelsProperty.FindPropertyRelative("outputHiValue");
-            DrawFloatField(ref outputHiValueProperty, new GUIContent("Output Max", "Output maximum value"));
+            if (saturateOuput)
+            {
+                DrawSlider(ref outputHiValueProperty, 0.0f, 1.0f, content.text);
+            }
+            else
+            {
+                DrawFloatField(ref outputHiValueProperty, content);
+            }
         }
 
         /// <summary>

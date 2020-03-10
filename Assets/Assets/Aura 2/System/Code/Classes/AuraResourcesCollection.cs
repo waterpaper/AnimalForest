@@ -32,6 +32,10 @@ namespace Aura2API
         /// </summary>
         public ComputeShader computeMaximumDepthComputeShader;
         /// <summary>
+        /// Compute Shader in charge of ruling out the invisible cells of the volumetric grid
+        /// </summary>
+        public ComputeShader computeVisibleCellsComputeShader;
+        /// <summary>
         /// Compute Shader in charge of computing the data contribution inside the frustum
         /// </summary>
         public ComputeShader computeDataComputeShader;
@@ -47,6 +51,10 @@ namespace Aura2API
         /// Compute Shader in charge of applying the denoising filter
         /// </summary>
         public ComputeShader applyDenoisingFilterComputeShader;
+        /// <summary>
+        /// Compute Shader in charge of applying the blur filter
+        /// </summary>
+        public ComputeShader applyBlurFilterComputeShader;
 
         [Header("Shaders")]
         /// <summary>
@@ -73,6 +81,14 @@ namespace Aura2API
         /// Shader used to store the point light's cookie map (renders the TextureCUBE into a Texture2D)
         /// </summary>
         public Shader storePointCookieMapShader;
+        /// <summary>
+        /// Lit shader used to make sprites work with the Aura system
+        /// </summary>
+        public Shader spriteLitShader;
+        /// <summary>
+        /// Unlit shader used to make sprites work with the Aura system
+        /// </summary>
+        public Shader spriteUnlitShader;
 
         [Header("Textures")]
         /// <summary>
@@ -91,6 +107,10 @@ namespace Aura2API
         /// Dummy Texture3D with 2x2x2 white pixels
         /// </summary>
         public Texture3D dummyTexture3D;
+        /// <summary>
+        /// Default Sprite texture
+        /// </summary>
+        public Sprite defaultSprite;
 
         [Header("Meshes")]
         /// <summary>
@@ -117,24 +137,33 @@ namespace Aura2API
         public Texture2D additionalSettingsIconTexture;
         public Texture2D lightIconTexture;
         public Texture2D shapeIconTexture;
+        public Texture2D shapeMiniIconTexture;
         public Texture2D texture3DIconTexture;
         public Texture2D textureIconTexture;
         public Texture2D noiseIconTexture;
         public Texture2D densityIconTexture;
         public Texture2D colorIconTexture;
+        public Texture2D tintIconTexture;
         public Texture2D scatteringIconTexture;
         public Texture2D extinctionIconTexture;
+        public Texture2D illuminationColorIconTexture;
         public Texture2D illuminationIconTexture;
         public Texture2D lightProbesIconTexture;
+        public Texture2D boostIconTexture;
         public Texture2D logoIconTexture;
         public Texture2D baseSettingsPresetIconTexture;
         public Texture2D qualitySettingsPresetIconTexture;
         public Texture2D saveIconTexture;
         public Texture2D loadIconTexture;
+        public Texture2D cameraUiIconTexture;
         public Texture2D cameraIconTexture;
+        public Texture2D cameraMiniIconTexture;
         public Texture2D directionalLightIconTexture;
+        public Texture2D directionalLightMiniIconTexture;
         public Texture2D spotLightIconTexture;
+        public Texture2D spotLightMiniIconTexture;
         public Texture2D pointLightIconTexture;
+        public Texture2D pointLightMiniIconTexture;
         public Texture2D displayPresetsButtonTexture;
         public Texture2D presetUiIconTexture;
         public Texture2D addIconTexture;
@@ -142,7 +171,6 @@ namespace Aura2API
         public Texture2D toggleIconTexture;
         public Texture2D questionIconTexture;
         public Texture2D warningIconTexture;
-        public Texture2D cameraUiIconTexture;
         public Texture2D lightUiIconTexture;
         public Texture2D volumeUiIconTexture;
         public Texture2D creationSpaceButtonTopologyTexture;
@@ -163,6 +191,9 @@ namespace Aura2API
         public Texture2D downIconTexture;
         public Texture2D leftIconTexture;
         public Texture2D rightIconTexture;
+        public Texture2D spriteUiIconTexture;
+        public Texture2D spriteIconTexture;
+        public Texture2D spriteMiniIconTexture;
         [Header("Presets buttons textures")]
         public Texture2D[] presetsButtonsTextures;
         [Header("Styles Textures")]

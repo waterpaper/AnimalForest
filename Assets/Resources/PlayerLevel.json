@@ -1,6 +1,7 @@
 {
   "saveInfos": [
     {
+      "ID": 1,
       "Level": 1,
       "ExpMax": 150,
       "AddHp": 20,
@@ -9,6 +10,7 @@
       "AddDef": 1
     },
     {
+      "ID": 2,
       "Level": 2,
       "ExpMax": 210,
       "AddHp": 20,
@@ -17,6 +19,7 @@
       "AddDef": 1
     },
     {
+      "ID": 3,
       "Level": 3,
       "ExpMax": 280,
       "AddHp": 20,
@@ -25,6 +28,7 @@
       "AddDef": 1
     },
     {
+      "ID": 4,
       "Level": 4,
       "ExpMax": 360,
       "AddHp": 20,
@@ -33,6 +37,7 @@
       "AddDef": 1
     },
     {
+      "ID": 5,
       "Level": 5,
       "ExpMax": 450,
       "AddHp": 20,
@@ -41,6 +46,7 @@
       "AddDef": 1
     },
     {
+      "ID": 6,
       "Level": 6,
       "ExpMax": 550,
       "AddHp": 20,
@@ -49,6 +55,7 @@
       "AddDef": 1
     },
     {
+      "ID": 7,
       "Level": 7,
       "ExpMax": 660,
       "AddHp": 20,
@@ -57,6 +64,7 @@
       "AddDef": 1
     },
     {
+      "ID": 8,
       "Level": 8,
       "ExpMax": 800,
       "AddHp": 20,
@@ -65,6 +73,7 @@
       "AddDef": 1
     },
     {
+      "ID": 9,
       "Level": 9,
       "ExpMax": 1000,
       "AddHp": 20,
@@ -73,6 +82,7 @@
       "AddDef": 1
     },
     {
+      "ID": 10,
       "Level": 10,
       "ExpMax": 100000,
       "AddHp": 20,

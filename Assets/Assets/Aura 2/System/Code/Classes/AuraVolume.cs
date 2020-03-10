@@ -69,9 +69,17 @@ namespace Aura2API
         /// </summary>
         public VolumeInjectionColorParameters lightInjection;
         /// <summary>
+        ///     Tint injection parameters
+        /// </summary>
+        public VolumeInjectionColorParameters tintInjection;
+        /// <summary>
         ///     Ambient lighting injection parameters
         /// </summary>
         public VolumeInjectionCommonParameters ambientInjection;
+        /// <summary>
+        /// Boost injection parameters
+        /// </summary>
+        public VolumeInjectionCommonParameters boostInjection;
         #endregion
 
         #region Private members
@@ -183,7 +191,21 @@ namespace Aura2API
         {
             get
             {
-                return texture2DMask.enable && texture2DMask.texture != null;
+                return texture2DMask.enable && texture2DMask.texture != null ;
+            }
+        }
+        /// <summary>
+        /// Tells if it should compute Texture2D masking
+        /// </summary>
+        public bool ShoukdComputeTexture2DMasking
+        {
+            get
+            {
+                return UsesTexture2DMasking
+                    && ((densityInjection.enable && densityInjection.useTexture2DMask)
+                        || (scatteringInjection.enable && scatteringInjection.useTexture2DMask)
+                        || (lightInjection.injectionParameters.enable && lightInjection.injectionParameters.useTexture2DMask)
+                        || (tintInjection.injectionParameters.enable && tintInjection.injectionParameters.useTexture2DMask));
             }
         }
 
@@ -195,6 +217,35 @@ namespace Aura2API
             get
             {
                 return texture3DMask.enable && texture3DMask.texture != null;
+            }
+        }
+        /// <summary>
+        /// Tells if it should compute Texture3D masking
+        /// </summary>
+        public bool ShouldComputeTexture3DMasking
+        {
+            get
+            {
+                return UsesTexture3DMasking
+                    && ((densityInjection.enable && densityInjection.useTexture3DMask)
+                        || (scatteringInjection.enable && scatteringInjection.useTexture3DMask)
+                        || (lightInjection.injectionParameters.enable && lightInjection.injectionParameters.useTexture3DMask)
+                        || (tintInjection.injectionParameters.enable && tintInjection.injectionParameters.useTexture3DMask));
+            }
+        }
+
+        /// <summary>
+        /// Tells if it should compute Noise
+        /// </summary>
+        public bool ShouldComputeNoise
+        {
+            get
+            {
+                return noiseMask.enable
+                    && ((densityInjection.enable && densityInjection.useNoiseMask)
+                        || (scatteringInjection.enable && scatteringInjection.useNoiseMask)
+                        || (lightInjection.injectionParameters.enable && lightInjection.injectionParameters.useNoiseMask)
+                        || (tintInjection.injectionParameters.enable && tintInjection.injectionParameters.useNoiseMask));
             }
         }
         #endregion
@@ -363,22 +414,22 @@ namespace Aura2API
             _volumeData.useAsLightProbesProxyVolume = useAsLightProbesProxyVolume ? 1 : 0;
             _volumeData.lightProbesMultiplier = lightProbesMultiplier * Mathf.PI;
 
-            if (UsesTexture2DMasking)
+            if (ShoukdComputeTexture2DMasking)
             {
                 Matrix4x4 localMatrix = texture2DMask.transform.Matrix.inverse;
                 _volumeData.texture2DMaskData.transform = MatrixFloats.ToMatrixFloats(noiseMask.transform.space == Space.Self ? localMatrix * transform.worldToLocalMatrix : localMatrix);
             }
             _volumeData.texture2DMaskData.index = texture2DMask.textureIndex;
 
-            if (UsesTexture3DMasking)
+            if (ShouldComputeTexture3DMasking)
             {
                 Matrix4x4 localMatrix = texture3DMask.transform.Matrix.inverse;
                 _volumeData.texture3DMaskData.transform = MatrixFloats.ToMatrixFloats(noiseMask.transform.space == Space.Self ? localMatrix * transform.worldToLocalMatrix : localMatrix);
             }
             _volumeData.texture3DMaskData.index = texture3DMask.textureIndex;
 
-            _volumeData.noiseData.enable = noiseMask.enable ? 1 : 0;
-            if (noiseMask.enable)
+            _volumeData.noiseData.enable = ShouldComputeNoise ? 1 : 0;
+            if (ShouldComputeNoise)
             {
                 Matrix4x4 localMatrix = noiseMask.transform.Matrix.inverse;
                 _volumeData.noiseData.transform = MatrixFloats.ToMatrixFloats(noiseMask.transform.space == Space.Self ? localMatrix * transform.worldToLocalMatrix : localMatrix);
@@ -403,11 +454,23 @@ namespace Aura2API
             _volumeData.colorTexture2DMaskLevelsParameters = lightInjection.injectionParameters.useTexture2DMask ? (lightInjection.injectionParameters.useTexture2DMaskLevels ? lightInjection.injectionParameters.texture2DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
             _volumeData.colorTexture3DMaskLevelsParameters = lightInjection.injectionParameters.useTexture3DMask ? (lightInjection.injectionParameters.useTexture3DMaskLevels ? lightInjection.injectionParameters.texture3DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
 
+            _volumeData.injectTint = tintInjection.injectionParameters.enable ? 1 : 0;
+            _volumeData.tintColor = (Vector4)(tintInjection.color * tintInjection.injectionParameters.strength);
+            _volumeData.tintNoiseLevelsParameters = tintInjection.injectionParameters.useNoiseMask ? (tintInjection.injectionParameters.useNoiseMaskLevels ? tintInjection.injectionParameters.noiseMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+            _volumeData.tintTexture2DMaskLevelsParameters = tintInjection.injectionParameters.useTexture2DMask ? (tintInjection.injectionParameters.useTexture2DMaskLevels ? tintInjection.injectionParameters.texture2DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+            _volumeData.tintTexture3DMaskLevelsParameters = tintInjection.injectionParameters.useTexture3DMask ? (tintInjection.injectionParameters.useTexture3DMaskLevels ? tintInjection.injectionParameters.texture3DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+
             _volumeData.injectAmbient = ambientInjection.enable ? 1 : 0;
             _volumeData.ambientLightingValue = ambientInjection.strength;
             _volumeData.ambientNoiseLevelsParameters = ambientInjection.useNoiseMask ? (ambientInjection.useNoiseMaskLevels ? ambientInjection.noiseMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
             _volumeData.ambientTexture2DMaskLevelsParameters = ambientInjection.useTexture2DMask ? (ambientInjection.useTexture2DMaskLevels ? ambientInjection.texture2DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
             _volumeData.ambientTexture3DMaskLevelsParameters = ambientInjection.useTexture3DMask ? (ambientInjection.useTexture3DMaskLevels ? ambientInjection.texture3DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+
+            _volumeData.injectBoost = boostInjection.enable ? 1 : 0;
+            _volumeData.boostValue = boostInjection.strength;
+            _volumeData.boostNoiseLevelsParameters = boostInjection.useNoiseMask ? (boostInjection.useNoiseMaskLevels ? boostInjection.noiseMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+            _volumeData.boostTexture2DMaskLevelsParameters = boostInjection.useTexture2DMask ? (boostInjection.useTexture2DMaskLevels ? boostInjection.texture2DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
+            _volumeData.boostTexture3DMaskLevelsParameters = boostInjection.useTexture3DMask ? (boostInjection.useTexture3DMaskLevels ? boostInjection.texture3DMaskLevelParameters.Data : LevelsParameters.Default.Data) : LevelsParameters.One.Data;
         }
 
         /// <summary>
@@ -522,6 +585,34 @@ namespace Aura2API
             auraVolume.lightInjection.injectionParameters.texture3DMaskLevelParameters.SetDefaultValues();
             auraVolume.lightInjection.injectionParameters.strength = 1;
             auraVolume.lightInjection.color = Color.white;
+            auraVolume.tintInjection.injectionParameters.useNoiseMask = true;
+            auraVolume.tintInjection.injectionParameters.useNoiseMaskLevels = true;
+            auraVolume.tintInjection.injectionParameters.noiseMaskLevelParameters.SetDefaultValues();
+            auraVolume.tintInjection.injectionParameters.noiseMaskLevelParameters.contrast = 5.0f;
+            auraVolume.tintInjection.injectionParameters.useTexture2DMask = true;
+            auraVolume.tintInjection.injectionParameters.texture2DMaskLevelParameters.SetDefaultValues();
+            auraVolume.tintInjection.injectionParameters.useTexture3DMask = true;
+            auraVolume.tintInjection.injectionParameters.texture3DMaskLevelParameters.SetDefaultValues();
+            auraVolume.tintInjection.injectionParameters.strength = 1;
+            auraVolume.tintInjection.color = Color.white;
+            auraVolume.ambientInjection.strength = 1;
+            auraVolume.ambientInjection.useNoiseMask = true;
+            auraVolume.ambientInjection.useNoiseMaskLevels = true;
+            auraVolume.ambientInjection.noiseMaskLevelParameters.SetDefaultValues();
+            auraVolume.ambientInjection.noiseMaskLevelParameters.contrast = 5.0f;
+            auraVolume.ambientInjection.useTexture2DMask = true;
+            auraVolume.ambientInjection.texture2DMaskLevelParameters.SetDefaultValues();
+            auraVolume.ambientInjection.useTexture3DMask = true;
+            auraVolume.ambientInjection.texture3DMaskLevelParameters.SetDefaultValues();
+            auraVolume.boostInjection.strength = 1;
+            auraVolume.boostInjection.useNoiseMask = true;
+            auraVolume.boostInjection.useNoiseMaskLevels = true;
+            auraVolume.boostInjection.noiseMaskLevelParameters.SetDefaultValues();
+            auraVolume.boostInjection.noiseMaskLevelParameters.contrast = 5.0f;
+            auraVolume.boostInjection.useTexture2DMask = true;
+            auraVolume.boostInjection.texture2DMaskLevelParameters.SetDefaultValues();
+            auraVolume.boostInjection.useTexture3DMask = true;
+            auraVolume.boostInjection.texture3DMaskLevelParameters.SetDefaultValues();
         }
         #endregion
 

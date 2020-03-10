@@ -132,17 +132,40 @@ namespace Aura2API
         /// <param name="planeCornersArray">The array to fill with the four corners of the intersecting plane</param>
         public static void GetFrustumPlaneCorners(this Camera camera, Camera.MonoOrStereoscopicEye eye, float planeDistance, ref Vector4[] planeCornersArray)
         {
-            camera.CalculateFrustumCorners(new Rect(0,0,1,1), planeDistance, eye, _tmpRetrievedFrustumPlaneCornersArray);
-            for (int i = 0; i < 4; ++i)
+            if (camera.orthographic)
             {
-                _tmpRetrievedFrustumPlaneCornersArray[i] = camera.transform.localToWorldMatrix.MultiplyPoint(_tmpRetrievedFrustumPlaneCornersArray[i]);
+                _tmpRetrievedFrustumPlaneCornersArray[0].x = 0.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[0].y = 1.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[0].z = planeDistance;
+                _tmpRetrievedFrustumPlaneCornersArray[1].x = 1.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[1].y = 1.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[1].z = planeDistance;
+                _tmpRetrievedFrustumPlaneCornersArray[2].x = 1.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[2].y = 0.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[2].z = planeDistance;
+                _tmpRetrievedFrustumPlaneCornersArray[3].x = 0.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[3].y = 0.0f;
+                _tmpRetrievedFrustumPlaneCornersArray[3].z = planeDistance;
+
+                for (int i = 0; i < 4; ++i)
+                {
+                    planeCornersArray[i] = camera.ViewportToWorldPoint(_tmpRetrievedFrustumPlaneCornersArray[i]);
+                }
             }
+            else
+            {
+                camera.CalculateFrustumCorners(new Rect(0,0,1,1), planeDistance, eye, _tmpRetrievedFrustumPlaneCornersArray);
+                for (int i = 0; i < 4; ++i)
+                {
+                    _tmpRetrievedFrustumPlaneCornersArray[i] = camera.transform.localToWorldMatrix.MultiplyPoint(_tmpRetrievedFrustumPlaneCornersArray[i]);
+                }
             
-            Vector3 tmp = _tmpRetrievedFrustumPlaneCornersArray[0];
-            planeCornersArray[0] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[1].x, _tmpRetrievedFrustumPlaneCornersArray[1].y, _tmpRetrievedFrustumPlaneCornersArray[1].z, 1.0f);
-            planeCornersArray[1] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[2].x, _tmpRetrievedFrustumPlaneCornersArray[2].y, _tmpRetrievedFrustumPlaneCornersArray[2].z, 1.0f);
-            planeCornersArray[2] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[3].x, _tmpRetrievedFrustumPlaneCornersArray[3].y, _tmpRetrievedFrustumPlaneCornersArray[3].z, 1.0f);
-            planeCornersArray[3] = new Vector4(tmp.x, tmp.y, tmp.z, 1.0f);
+                Vector3 tmp = _tmpRetrievedFrustumPlaneCornersArray[0];
+                planeCornersArray[0] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[1].x, _tmpRetrievedFrustumPlaneCornersArray[1].y, _tmpRetrievedFrustumPlaneCornersArray[1].z, 1.0f);
+                planeCornersArray[1] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[2].x, _tmpRetrievedFrustumPlaneCornersArray[2].y, _tmpRetrievedFrustumPlaneCornersArray[2].z, 1.0f);
+                planeCornersArray[2] = new Vector4(_tmpRetrievedFrustumPlaneCornersArray[3].x, _tmpRetrievedFrustumPlaneCornersArray[3].y, _tmpRetrievedFrustumPlaneCornersArray[3].z, 1.0f);
+                planeCornersArray[3] = new Vector4(tmp.x, tmp.y, tmp.z, 1.0f);
+            }
         }
 
         /// <summary>

@@ -16,52 +16,52 @@
 
 uniform uint directionalLightCount;
 uniform StructuredBuffer<DirectionalLightParameters> directionalLightDataBuffer;
-uniform Texture2DArray<half> directionalShadowMapsArray;
-uniform Texture2DArray<half4> directionalShadowDataArray;
-uniform Texture2DArray<half> directionalCookieMapsArray;
+uniform Texture2DArray<FP> directionalShadowMapsArray;
+uniform Texture2DArray<FP4> directionalShadowDataArray;
+uniform Texture2DArray<FP> directionalCookieMapsArray;
 
 #if defined(DIRECTIONAL_LIGHTS_SHADOWS_FOUR_CASCADES)
 	#define GET_SHADOW_CASCADES(worldPos, shadowData, depth) GetCascadeWeights_FourCascades(worldPos, shadowData)
 	#define GET_SHADOW_COORDS(worldPos, shadowData, depth) GetCascadeShadowCoord_FourCascades(worldPos, GET_SHADOW_CASCADES(worldPos, shadowData, depth), shadowData)
 
-	inline half4 GetCascadeWeights_FourCascades(half3 worldPos, DirectionalShadowData shadowData)
+	inline FP4 GetCascadeWeights_FourCascades(FP3 worldPos, DirectionalShadowData shadowData)
 	{
-		half3 fromCenterA = worldPos - shadowData.shadowSplitSpheres[0].xyz;
-		half3 fromCenterB = worldPos - shadowData.shadowSplitSpheres[1].xyz;
-		half3 fromCenterC = worldPos - shadowData.shadowSplitSpheres[2].xyz;
-		half3 fromCenterD = worldPos - shadowData.shadowSplitSpheres[3].xyz;
-		half4 squareDistances = half4(dot(fromCenterA, fromCenterA), dot(fromCenterB, fromCenterB), dot(fromCenterC, fromCenterC), dot(fromCenterD, fromCenterD));
-		half4 weights = half4(squareDistances >= shadowData.shadowSplitSqRadii);
+		FP3 fromCenterA = worldPos - shadowData.shadowSplitSpheres[0].xyz;
+		FP3 fromCenterB = worldPos - shadowData.shadowSplitSpheres[1].xyz;
+		FP3 fromCenterC = worldPos - shadowData.shadowSplitSpheres[2].xyz;
+		FP3 fromCenterD = worldPos - shadowData.shadowSplitSpheres[3].xyz;
+		FP4 squareDistances = FP4(dot(fromCenterA, fromCenterA), dot(fromCenterB, fromCenterB), dot(fromCenterC, fromCenterC), dot(fromCenterD, fromCenterD));
+		FP4 weights = FP4(squareDistances >= shadowData.shadowSplitSqRadii);
 
 		return weights;
 	}
 
-	inline half4 GetCascadeShadowCoord_FourCascades(half3 worldPos, half4 cascadeWeights, DirectionalShadowData shadowData)
+	inline FP4 GetCascadeShadowCoord_FourCascades(FP3 worldPos, FP4 cascadeWeights, DirectionalShadowData shadowData)
 	{
-		return mul(shadowData.world2Shadow[(int)dot(cascadeWeights, half4(1, 1, 1, 1))], half4(worldPos, 1));
+		return mul(shadowData.world2Shadow[(int)dot(cascadeWeights, FP4(1, 1, 1, 1))], FP4(worldPos, 1));
 	}
 #elif defined(DIRECTIONAL_LIGHTS_SHADOWS_TWO_CASCADES)
 	#define GET_SHADOW_CASCADES(worldPos, shadowData, depth) GetCascadeWeights_TwoCascades(worldPos, shadowData, depth)
 	#define GET_SHADOW_COORDS(worldPos, shadowData, depth) GetCascadeShadowCoord_TwoCascades(worldPos, GET_SHADOW_CASCADES(worldPos, shadowData, depth), shadowData)
 
-	inline half4 GetCascadeWeights_TwoCascades(half3 worldPos, DirectionalShadowData shadowData, half depth)
+	inline FP4 GetCascadeWeights_TwoCascades(FP3 worldPos, DirectionalShadowData shadowData, FP depth)
 	{
-		half4 zNear = half4(depth >= shadowData.lightSplitsNear);
-		half4 zFar = half4(depth < shadowData.lightSplitsFar);
-		half4 weights = zNear * zFar;
+		FP4 zNear = FP4(depth >= shadowData.lightSplitsNear);
+		FP4 zFar = FP4(depth < shadowData.lightSplitsFar);
+		FP4 weights = zNear * zFar;
 
 		return weights;
 	}
 
-	inline half4 GetCascadeShadowCoord_TwoCascades(half3 worldPos, half4 cascadeWeights, DirectionalShadowData shadowData)
+	inline FP4 GetCascadeShadowCoord_TwoCascades(FP3 worldPos, FP4 cascadeWeights, DirectionalShadowData shadowData)
 	{
-		half3 sc0 = mul((shadowData.world2Shadow[0]), half4(worldPos,1)).xyz;
-		half3 sc1 = mul((shadowData.world2Shadow[1]), half4(worldPos,1)).xyz;
-		half3 sc2 = mul((shadowData.world2Shadow[2]), half4(worldPos,1)).xyz;
-		half3 sc3 = mul((shadowData.world2Shadow[3]), half4(worldPos,1)).xyz;
-		half4 shadowMapCoordinate = half4(sc0 * cascadeWeights.x + sc1 * cascadeWeights.y + sc2 * cascadeWeights.z + sc3 * cascadeWeights.w, 1);
+		FP3 sc0 = mul((shadowData.world2Shadow[0]), FP4(worldPos,1)).xyz;
+		FP3 sc1 = mul((shadowData.world2Shadow[1]), FP4(worldPos,1)).xyz;
+		FP3 sc2 = mul((shadowData.world2Shadow[2]), FP4(worldPos,1)).xyz;
+		FP3 sc3 = mul((shadowData.world2Shadow[3]), FP4(worldPos,1)).xyz;
+		FP4 shadowMapCoordinate = FP4(sc0 * cascadeWeights.x + sc1 * cascadeWeights.y + sc2 * cascadeWeights.z + sc3 * cascadeWeights.w, 1);
 
-		half  noCascadeWeights = 1 - dot(cascadeWeights, half4(1, 1, 1, 1));
+		FP  noCascadeWeights = 1 - dot(cascadeWeights, FP4(1, 1, 1, 1));
 		shadowMapCoordinate.z += noCascadeWeights;
 
 		return shadowMapCoordinate;
@@ -69,23 +69,23 @@ uniform Texture2DArray<half> directionalCookieMapsArray;
 #elif defined(DIRECTIONAL_LIGHTS_SHADOWS_ONE_CASCADE)
 	#define GET_SHADOW_COORDS(worldPos, shadowData, depth) GetCascadeShadowCoord_OneCascade(worldPos, shadowData)
 
-	inline half4 GetCascadeShadowCoord_OneCascade(half3 worldPos, DirectionalShadowData shadowData)
+	inline FP4 GetCascadeShadowCoord_OneCascade(FP3 worldPos, DirectionalShadowData shadowData)
 	{
-		return mul((shadowData.world2Shadow[0]), half4(worldPos, 1));
+		return mul((shadowData.world2Shadow[0]), FP4(worldPos, 1));
 	}
 #else
-    #define GET_SHADOW_COORDS(worldPos, shadowData, depth) half4(0,0,0,0);
+    #define GET_SHADOW_COORDS(worldPos, shadowData, depth) FP4(0,0,0,0);
 #endif
 
-half SampleShadowMap(half3 worldPosition, DirectionalShadowData shadowData, DirectionalLightParameters lightParameters, half depth)
+FP SampleShadowMap(FP3 worldPosition, DirectionalShadowData shadowData, DirectionalLightParameters lightParameters, FP depth)
 {
-	half4 samplePos = GET_SHADOW_COORDS(worldPosition, shadowData, depth);
-	half shadowMapValue = directionalShadowMapsArray.SampleLevel(_LinearRepeat, half3(samplePos.xy, lightParameters.shadowmapIndex), 0).x;
+	FP4 samplePos = GET_SHADOW_COORDS(worldPosition, shadowData, depth);
+	FP shadowMapValue = directionalShadowMapsArray.SampleLevel(_LinearRepeat, FP3(samplePos.xy, lightParameters.shadowmapIndex), 0).x;
 
 	return step(samplePos.z, shadowMapValue);
 }
 
-void ComputeShadow(inout half attenuation, DirectionalLightParameters lightParameters, half3 worldPosition, half depth)
+void ComputeShadow(inout FP attenuation, DirectionalLightParameters lightParameters, FP3 worldPosition, FP depth)
 {
         DirectionalShadowData shadowData;
 		shadowData.shadowSplitSqRadii =		directionalShadowDataArray[int3(0, 0, lightParameters.shadowmapIndex)];
@@ -113,58 +113,57 @@ void ComputeShadow(inout half attenuation, DirectionalLightParameters lightParam
 		shadowData.world2Shadow[3][3] =		directionalShadowDataArray[int3(22, 0, lightParameters.shadowmapIndex)];
 		shadowData.lightShadowData =		directionalShadowDataArray[int3(23, 0, lightParameters.shadowmapIndex)];
         
-		half shadowAttenuation = SampleShadowMap(worldPosition, shadowData, lightParameters, depth);
+		FP shadowAttenuation = SampleShadowMap(worldPosition, shadowData, lightParameters, depth);
 		shadowAttenuation = lerp(shadowData.lightShadowData.x, 1.0f, 1.0f - shadowAttenuation);
 
 		attenuation *= shadowAttenuation;
 }
 
-half SampleCookieMapArray(half2 textureCoordinates, int index)
+FP SampleCookieMapArray(FP2 textureCoordinates, int index)
 {
-	return directionalCookieMapsArray.SampleLevel(_LinearRepeat, half3(textureCoordinates, index), 0).x;
+	return directionalCookieMapsArray.SampleLevel(_LinearRepeat, FP3(textureCoordinates, index), 0).x;
 }
 
-void ComputeDirectionalLightInjection(DirectionalLightParameters lightParameters, half3 worldPosition, half distanceToCam, half3 viewVector, inout half4 accumulationColor, half scattering)
+void ComputeDirectionalLightInjection(DirectionalLightParameters lightParameters, FP3 worldPosition, FP distanceToCam, FP3 viewVector, inout FP3 accumulationColor, bool useScattering, FP scattering)
 {
-	half scatteringCosAngle = saturate(dot(-lightParameters.lightDirection, viewVector));
-    half scatteringFactor = GetScatteringFactor(scatteringCosAngle, saturate(scattering + lightParameters.scatteringBias));
-	half attenuation = 1.0f;
+    FP scatteringFactor = GetScatteringFactor(lightParameters.lightDirection, viewVector, useScattering, lightParameters.useDefaultScattering, scattering, lightParameters.scatteringOverride);
+	FP attenuation = 1.0f;
 	    
-    half3 lightPos = mul(ConvertMatrixFloatsToMatrix(lightParameters.worldToLightMatrix), half4(worldPosition, 1)).xyz;
+    FP3 lightPos = mul(ConvertMatrixFloatsToMatrix(lightParameters.worldToLightMatrix), FP4(worldPosition, 1)).xyz;
 	
-    [branch]
+    BRANCH
 	if (useDirectionalLightsShadows && lightParameters.shadowmapIndex > -1)
 	{
 		ComputeShadow(attenuation, lightParameters, worldPosition, distanceToCam);
 	}
 	
-    [branch]
+    BRANCH
     if (useLightsCookies && lightParameters.cookieMapIndex > -1)
 	{
 		lightPos.xy /= lightParameters.cookieParameters.x;
 		lightPos.xy += 0.5;
-        [branch]
+        BRANCH
 		if (lightParameters.cookieParameters.y > 0)
 		{
 			lightPos.xy = saturate(lightPos.xy);
 		}
 		lightPos.xy = frac(lightPos.xy);
     
-		half cookieMapValue = SampleCookieMapArray(lightPos.xy, lightParameters.cookieMapIndex).x;
+		FP cookieMapValue = SampleCookieMapArray(lightPos.xy, lightParameters.cookieMapIndex).x;
     
 		attenuation *= cookieMapValue; 
 	}
 
-    half3 color = lerp(lightParameters.outOfPhaseColor * lightParameters.enableOutOfPhaseColor, lightParameters.color * scatteringFactor, saturate(scatteringFactor));
+    FP3 color = lerp(lightParameters.outOfPhaseColor * lightParameters.enableOutOfPhaseColor, lightParameters.color * scatteringFactor, saturate(scatteringFactor));
 
-	accumulationColor.xyz += color * attenuation;
+	accumulationColor += color * attenuation;
 }
 
-void ComputeDirectionalLightsInjection(half3 worldPosition, half distanceToCam, half3 viewVector, inout half4 accumulationColor, half scattering)
+void ComputeDirectionalLightsInjection(FP3 worldPosition, FP distanceToCam, FP3 viewVector, inout FP3 accumulationColor, bool useScattering, FP scattering)
 {
     [allow_uav_condition]
 	for (uint i = 0; i < directionalLightCount; ++i)
 	{
-        ComputeDirectionalLightInjection(directionalLightDataBuffer[i], worldPosition, distanceToCam, viewVector, accumulationColor, scattering);
+        ComputeDirectionalLightInjection(directionalLightDataBuffer[i], worldPosition, distanceToCam, viewVector, accumulationColor, useScattering, scattering);
     }
 }

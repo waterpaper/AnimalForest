@@ -14,7 +14,7 @@ MonoBehaviour:
   displayVolumetricLightingBuffer: 0
   frustumGridResolution: {x: 64, y: 32, z: 32}
   enableAutomaticStereoResizing: 0
-  farClipPlaneDistance: 128
+  farClipPlaneDistance: 64
   depthBiasCoefficient: 0.35000002
   enableVolumes: 1
   enableVolumesTexture2DMask: 1
@@ -30,10 +30,15 @@ MonoBehaviour:
   enableLightsCookies: 1
   enableDithering: 0
   texture3DFiltering: 0
-  enableDenoisingFilter: 0
-  denoisingFilterRange: 0
+  EXPERIMENTAL_enableDenoisingFilter: 0
+  EXPERIMENTAL_denoisingFilterRange: 0
+  EXPERIMENTAL_enableBlurFilter: 0
+  EXPERIMENTAL_blurFilterRange: 0
+  EXPERIMENTAL_blurFilterType: 0
+  EXPERIMENTAL_blurFilterGaussianDeviation: 0.00205
   enableTemporalReprojection: 1
-  temporalReprojectionFactor: 0.5
+  temporalReprojectionFactor: 0.824
   enableOcclusionCulling: 1
-  occlusionCullingAccuracy: 2
+  debugOcclusionCulling: 0
+  occlusionCullingAccuracy: 0
   enableLightProbes: 0

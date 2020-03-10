@@ -10,7 +10,6 @@ public class PlayerJoystickController : MonoBehaviour
 
     float radius;
     Vector3 defaultCenter;
-    Touch myTouch;
     
     void Start()
     {
@@ -19,9 +18,27 @@ public class PlayerJoystickController : MonoBehaviour
         playerInput = GameObject.Find("Player").GetComponent<PlayerInput>();
     }
 
+    private void OnDisable()
+    {
+        End();
+    }
+
     public void Move()
     {
-        Vector3 touchPos = Input.mousePosition;
+        Vector3 touchPos = Vector3.zero;
+
+        if (Input.touchCount > 0)
+        {
+            Touch myTouch = Input.GetTouch(0);
+            //mobile
+            touchPos = myTouch.position;
+        }
+        else
+        {
+            //pc용
+            touchPos = Input.mousePosition;   
+        }
+
         axis = (touchPos - defaultCenter).normalized;
 
         float Distance = Vector3.Distance(touchPos, defaultCenter);
@@ -49,7 +66,20 @@ public class PlayerJoystickController : MonoBehaviour
 
     public void RotationStart()
     {
-        Vector3 touchPos = Input.mousePosition;
+        Vector3 touchPos = Vector3.zero;
+
+        if (Input.touchCount > 0)
+        {
+            Touch myTouch = Input.GetTouch(0);
+            //mobile
+            touchPos = myTouch.position;
+        }
+        else
+        {
+            //pc용
+            touchPos = Input.mousePosition;
+        }
+
         axis = (touchPos - defaultCenter).normalized;
 
         float Distance = Vector3.Distance(touchPos, defaultCenter);
@@ -59,7 +89,7 @@ public class PlayerJoystickController : MonoBehaviour
         else
             Stick.position = defaultCenter + axis * Distance;
 
-        CameraManager.instance.FixedTick(Time.deltaTime, axis.x*2, -axis.y*2);
+        CameraManager.instance.FixedTick(Time.deltaTime, axis.x, -axis.y);
 
         playerInput.IsJoyStickControll = true;
     }

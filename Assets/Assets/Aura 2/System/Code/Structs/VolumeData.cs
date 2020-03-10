@@ -141,6 +141,26 @@ namespace Aura2API
         /// </summary>
         public LevelsData colorNoiseLevelsParameters;
         /// <summary>
+        /// Enables tint injection
+        /// </summary>
+        public int injectTint;
+        /// <summary>
+        /// Tint value
+        /// </summary>
+        public Vector3 tintColor;
+        /// <summary>
+        /// Tint Texture2D mask levels parameters
+        /// </summary>
+        public LevelsData tintTexture2DMaskLevelsParameters;
+        /// <summary>
+        /// Tint Texture3D mask levels parameters
+        /// </summary>
+        public LevelsData tintTexture3DMaskLevelsParameters;
+        /// <summary>
+        /// Tint noise mask levels parameters
+        /// </summary>
+        public LevelsData tintNoiseLevelsParameters;
+        /// <summary>
         /// Enables ambient lighting injection
         /// </summary>
         public int injectAmbient;
@@ -160,6 +180,26 @@ namespace Aura2API
         /// Ambient noise mask levels parameters
         /// </summary>
         public LevelsData ambientNoiseLevelsParameters;
+        /// <summary>
+        /// Enables boost injection
+        /// </summary>
+        public int injectBoost;
+        /// <summary>
+        /// Boost injection strength
+        /// </summary>
+        public float boostValue;
+        /// <summary>
+        /// Boost Texture2D mask levels parameters
+        /// </summary>
+        public LevelsData boostTexture2DMaskLevelsParameters;
+        /// <summary>
+        /// Boost Texture3D mask levels parameters
+        /// </summary>
+        public LevelsData boostTexture3DMaskLevelsParameters;
+        /// <summary>
+        /// Boost noise mask levels parameters
+        /// </summary>
+        public LevelsData boostNoiseLevelsParameters;
         #endregion
 
         #region Private Members
@@ -208,11 +248,21 @@ namespace Aura2API
                     _byteSize += LevelsData.Size;                // colorTexture2DMaskLevelsParameters
                     _byteSize += LevelsData.Size;                // colorTexture3DMaskLevelsParameters
                     _byteSize += LevelsData.Size;                // colorNoiseLevelsParameters
+                    _byteSize += sizeof(int);                    // injectTint
+                    _byteSize += sizeof(float) * 3;              // tintColor
+                    _byteSize += LevelsData.Size;                // tintTexture2DMaskLevelsParameters
+                    _byteSize += LevelsData.Size;                // tintTexture3DMaskLevelsParameters
+                    _byteSize += LevelsData.Size;                // tintNoiseLevelsParameters
                     _byteSize += sizeof(int);                    // injectAmbient
                     _byteSize += sizeof(float);                  // ambientLightingValue
                     _byteSize += LevelsData.Size;                // ambientTexture2DMaskLevelsParameters
                     _byteSize += LevelsData.Size;                // ambientTexture3DMaskLevelsParameters
                     _byteSize += LevelsData.Size;                // ambientNoiseLevelsParameters
+                    _byteSize += sizeof(int);                    // injectBoost
+                    _byteSize += sizeof(float);                  // boostValue
+                    _byteSize += LevelsData.Size;                // boostTexture2DMaskLevelsParameters
+                    _byteSize += LevelsData.Size;                // boostTexture3DMaskLevelsParameters
+                    _byteSize += LevelsData.Size;                // boostNoiseLevelsParameters
                 }
 
                 return _byteSize;

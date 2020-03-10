@@ -13,6 +13,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   computeMaximumDepthComputeShader: {fileID: 7200000, guid: a5d52c8a306e8b746ab60b306575aa3e,
     type: 3}
+  computeVisibleCellsComputeShader: {fileID: 7200000, guid: 7a52cd4738fa0d5408a79491845f8780,
+    type: 3}
   computeDataComputeShader: {fileID: 7200000, guid: 971d5d94be5bebc44aa6d832c17f5e62,
     type: 3}
   computeAccumulationComputeShader: {fileID: 7200000, guid: 41ac7d79af1f9614ebe54df4f30ac3e0,
@@ -20,6 +22,8 @@ MonoBehaviour:
   renderLightProbesTextureComputeShader: {fileID: 7200000, guid: f3f44f2a4ccec9d4b96cf98431285281,
     type: 3}
   applyDenoisingFilterComputeShader: {fileID: 7200000, guid: de61867bd36a42f468c8be1d4ed0ac06,
+    type: 3}
+  applyBlurFilterComputeShader: {fileID: 7200000, guid: 67db3a053131bf341bad361f89c22e5d,
     type: 3}
   processOcclusionMapShader: {fileID: 4800000, guid: b9b5b0990ea6cfa4d96c89a9c1cec3e9,
     type: 3}
@@ -32,11 +36,14 @@ MonoBehaviour:
     type: 3}
   storePointCookieMapShader: {fileID: 4800000, guid: 83815c326d7f2514884f3fc7a05b5aef,
     type: 3}
+  spriteLitShader: {fileID: 4800000, guid: ffbd4d17e1e35c148aeed0dfc4411c5c, type: 3}
+  spriteUnlitShader: {fileID: 4800000, guid: a1901b6b0e5452c49b2439fb615c7be2, type: 3}
   blueNoiseTextureArray: {fileID: 18700000, guid: 518b8337a0340444aa49dd0780efa9c2,
     type: 2}
   dummyTexture: {fileID: 2800000, guid: 87d7ecc4e3347a24f8e920fb5117fa64, type: 3}
   dummyTextureArray: {fileID: 18700000, guid: 277d5691bc6f8aa49af6eb11ccf3437e, type: 2}
   dummyTexture3D: {fileID: 11700000, guid: 8d85e65c85da6594e83ede201a92c68e, type: 2}
+  defaultSprite: {fileID: 21300000, guid: f9da07db4c698ae4182de9110f9a254a, type: 3}
   storePointShadowMapMesh: {fileID: 4300000, guid: d68bec3f4c08e40468fad98606344ea6,
     type: 3}
   customWindowsInMotionDuration: 0.75
@@ -127,20 +134,26 @@ MonoBehaviour:
     type: 3}
   lightIconTexture: {fileID: 2800000, guid: 774acb600b926ec49ba0c3366afdcb9c, type: 3}
   shapeIconTexture: {fileID: 2800000, guid: f464f58a5563cdc45aeb8704c57e22bc, type: 3}
+  shapeMiniIconTexture: {fileID: 2800000, guid: 37424f7de7188574ca135bd1d1e9c768,
+    type: 3}
   texture3DIconTexture: {fileID: 2800000, guid: 133b11dab7918fe45afe7fdba65c3654,
     type: 3}
   textureIconTexture: {fileID: 2800000, guid: d9bd11406ae7be84690d8eb8f8384fd1, type: 3}
   noiseIconTexture: {fileID: 2800000, guid: cd3f43586c0ac8b48812870026a4b5bb, type: 3}
   densityIconTexture: {fileID: 2800000, guid: af3eda9f5ccee364a8977a14d013f20d, type: 3}
   colorIconTexture: {fileID: 2800000, guid: f076e4752df4e4d47bdb29d1dfe0ee58, type: 3}
+  tintIconTexture: {fileID: 2800000, guid: 98869a78c010c384c861e7033a715a00, type: 3}
   scatteringIconTexture: {fileID: 2800000, guid: 3e22e0a7c76be9d4eb3bec2094aeb326,
     type: 3}
   extinctionIconTexture: {fileID: 2800000, guid: f026c9c37b8a4574682c873aab67e44e,
+    type: 3}
+  illuminationColorIconTexture: {fileID: 2800000, guid: 9e7ae8da31c8f524d8d8d32a2e529e7b,
     type: 3}
   illuminationIconTexture: {fileID: 2800000, guid: 774acb600b926ec49ba0c3366afdcb9c,
     type: 3}
   lightProbesIconTexture: {fileID: 2800000, guid: b5df36518107e0d4685e02952f21d3f0,
     type: 3}
+  boostIconTexture: {fileID: 2800000, guid: 04c726ede0dc37849992123c6a9853f9, type: 3}
   logoIconTexture: {fileID: 2800000, guid: 904c8ecfd9c278641b8c979dcc6e41fd, type: 3}
   baseSettingsPresetIconTexture: {fileID: 2800000, guid: 1c224e2ff444a534e8dbda9287c197ac,
     type: 3}
@@ -148,12 +161,21 @@ MonoBehaviour:
     type: 3}
   saveIconTexture: {fileID: 2800000, guid: c39ea69c8cdb9bc459769f6e90a84d6a, type: 3}
   loadIconTexture: {fileID: 2800000, guid: 3c1d80ca539f1ca4081d566566d488ca, type: 3}
+  cameraUiIconTexture: {fileID: 2800000, guid: a5443c762f94a3149af8a888a69a0737, type: 3}
   cameraIconTexture: {fileID: 2800000, guid: 04261a616d453c041a4b2ccbe70e191b, type: 3}
+  cameraMiniIconTexture: {fileID: 2800000, guid: 17729f9a5efce8641a831e8212a54923,
+    type: 3}
   directionalLightIconTexture: {fileID: 2800000, guid: 6be92151762e10a44b5006c3805be0c0,
+    type: 3}
+  directionalLightMiniIconTexture: {fileID: 2800000, guid: a84e6fc6d4cb72e4fa87c62f90d592ca,
     type: 3}
   spotLightIconTexture: {fileID: 2800000, guid: 5d974bd6b83d23241939449c744a1cee,
     type: 3}
+  spotLightMiniIconTexture: {fileID: 2800000, guid: 790cb801ccc9c7343b1576d65d63a2fe,
+    type: 3}
   pointLightIconTexture: {fileID: 2800000, guid: 43ace4fd6b5f6b145aa055ec4a8b373f,
+    type: 3}
+  pointLightMiniIconTexture: {fileID: 2800000, guid: b95b05f4795f8b345a82dcf91820fdef,
     type: 3}
   displayPresetsButtonTexture: {fileID: 2800000, guid: 0afdf3429e60e794eba1f1ea15e16e2c,
     type: 3}
@@ -163,7 +185,6 @@ MonoBehaviour:
   toggleIconTexture: {fileID: 2800000, guid: 89e5355feab03c4429a3b6e2be8ab8a2, type: 3}
   questionIconTexture: {fileID: 2800000, guid: 765f9d7c15934e04fa128f55436a2f93, type: 3}
   warningIconTexture: {fileID: 2800000, guid: 61c844d04e225924185ad1dbf17e4c25, type: 3}
-  cameraUiIconTexture: {fileID: 2800000, guid: a5443c762f94a3149af8a888a69a0737, type: 3}
   lightUiIconTexture: {fileID: 2800000, guid: 8f52544825150eb4f97911a138e0f454, type: 3}
   volumeUiIconTexture: {fileID: 2800000, guid: 375e122d26d2b3440b368be86f048caa, type: 3}
   creationSpaceButtonTopologyTexture: {fileID: 2800000, guid: 8399949af3b560946ba94c379fc98292,
@@ -197,6 +218,10 @@ MonoBehaviour:
   downIconTexture: {fileID: 2800000, guid: 8042c77879611cb47b2faeb1e1603e1b, type: 3}
   leftIconTexture: {fileID: 2800000, guid: 6d34626494e3e734991c15ea16767441, type: 3}
   rightIconTexture: {fileID: 2800000, guid: 345a11a066093ae4381010231595f5a3, type: 3}
+  spriteUiIconTexture: {fileID: 2800000, guid: 4c6ba087239505b41a8ba3668f26e678, type: 3}
+  spriteIconTexture: {fileID: 2800000, guid: 4d588d087343c3a48b732e97e1ab1e6e, type: 3}
+  spriteMiniIconTexture: {fileID: 2800000, guid: e73662b0014f8f843938f38eab295319,
+    type: 3}
   presetsButtonsTextures:
   - {fileID: 2800000, guid: dada4e5d5805d5b4b890408655b4f96c, type: 3}
   - {fileID: 2800000, guid: 2c3c1e41a90046744978a030c587be03, type: 3}

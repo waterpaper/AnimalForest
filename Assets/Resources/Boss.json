@@ -2,7 +2,7 @@
   "saveInfos": [
     {
       "ID": 100,
-      "BossName": "머리 큰 스켈레톤",
+      "Name": "머리 큰 스켈레톤",
       "Level": 10,
       "Exp": 500,
       "Hp": 1000,

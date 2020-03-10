@@ -22,7 +22,7 @@ namespace Aura2API
     /// <summary>
     /// Collection of texture buffers which contain the computed volumetric data
     /// </summary>
-    public class Buffers
+    public class TextureBuffers
     {
         #region Private Members
         /// <summary>
@@ -41,6 +41,10 @@ namespace Aura2API
         /// The Texture2D buffer containing the minimum depth per cell
         /// </summary>
         private SwappableRenderTexture _occlusionTexture;
+        /// <summary>
+        /// The Texture2D buffer containing the maximum amount of slices per cell
+        /// </summary>
+        private SwappableRenderTexture _sliceTexture;
         /// <summary>
         /// The resolution of the light probes lighting buffer
         /// </summary>
@@ -82,6 +86,7 @@ namespace Aura2API
             {
                 ReleaseVolumeTextureBuffers();
                 ReleaseOcclusionTextureBuffer();
+                ReleaseSliceTextureBuffer();
 
                 _volumetricBuffersResolution = value;
             }
@@ -199,6 +204,28 @@ namespace Aura2API
         }
 
         /// <summary>
+        /// The Texture2D buffer containing the maximum amount of slices per cell
+        /// </summary>
+        public SwappableRenderTexture SliceTexture
+        {
+            get
+            {
+                if (!VolumetricBuffersResolutionIsValid)
+                {
+                    Debug.LogError("Error while creating OcclusionTexture buffer in \"" + this + "\". The resolution parameter seems not set.");
+                    return null;
+                }
+
+                if (_sliceTexture == null)
+                {
+                    _sliceTexture = new SwappableRenderTexture(VolumetricBuffersResolution.x, VolumetricBuffersResolution.y, RenderTextureFormat.RInt, RenderTextureReadWrite.Linear, TextureWrapMode.Clamp, FilterMode.Point); // Lack of R32UINT
+                }
+
+                return _sliceTexture;
+            }
+        }
+
+        /// <summary>
         /// Accessor to the volumetric light probes coefficients texture
         /// </summary>
         public RenderTexture LightProbesCoefficientsTexture
@@ -279,6 +306,7 @@ namespace Aura2API
         {
             ReleaseVolumeTextureBuffers();
             ReleaseOcclusionTextureBuffer();
+            ReleaseSliceTextureBuffer();
             ReleaseAllLightProbesBuffers();
         }
 
@@ -309,6 +337,18 @@ namespace Aura2API
             {
                 _occlusionTexture.Release();
                 _occlusionTexture = null;
+            }
+        }
+
+        /// <summary>
+        /// Releases the occlusion texture buffer
+        /// </summary>
+        public void ReleaseSliceTextureBuffer()
+        {
+            if (_sliceTexture != null)
+            {
+                _sliceTexture.Release();
+                _sliceTexture = null;
             }
         }
 

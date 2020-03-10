@@ -23,7 +23,7 @@ namespace Aura2API
     /// Custom Inspector for AuraLight class
     /// </summary>
     [CustomEditor(typeof(AuraLight))]
-    [CanEditMultipleObjects]
+    //[CanEditMultipleObjects]
     public class AuraLightEditor : Editor
     {
         #region Private Members
@@ -56,9 +56,17 @@ namespace Aura2API
         /// </summary>
         private SerializedProperty _strengthProperty;
         /// <summary>
-        /// The property for strength
+        /// The property for enabling light scattering use
         /// </summary>
-        private SerializedProperty _scatteringBiasProperty;
+        private SerializedProperty _useScatteringProperty;
+        /// <summary>
+        /// The property for enabling light scattering overriding
+        /// </summary>
+        private SerializedProperty _overrideScatteringProperty;
+        /// <summary>
+        /// The property for scattering to override with
+        /// </summary>
+        private SerializedProperty _overridingScatteringProperty;
         /// <summary>
         /// The property for using the color temperature tint
         /// </summary>
@@ -132,7 +140,9 @@ namespace Aura2API
 
 
             _strengthProperty = serializedObject.FindProperty("strength");
-            _scatteringBiasProperty = serializedObject.FindProperty("scatteringBias");
+            _useScatteringProperty = serializedObject.FindProperty("useScattering");
+            _overrideScatteringProperty = serializedObject.FindProperty("overrideScattering");
+            _overridingScatteringProperty = serializedObject.FindProperty("overridingScattering");
             _useColorTemperatureTintProperty = serializedObject.FindProperty("useColorTemperatureTint");
             _overrideColorProperty = serializedObject.FindProperty("overrideColor");
             _overridingColorProperty = serializedObject.FindProperty("overridingColor");
@@ -212,6 +222,24 @@ namespace Aura2API
 
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
+            EditorGUILayout.PropertyField(_useScatteringProperty);
+            if((BooleanChoice)_useScatteringProperty.enumValueIndex == BooleanChoice.Default || (BooleanChoice)_useScatteringProperty.enumValueIndex == BooleanChoice.True)
+            {
+                EditorGUILayout.Separator();
+                GuiHelpers.DrawToggleChecker(ref _overrideScatteringProperty, "Override Scattering");
+                if (_overrideScatteringProperty.boolValue)
+                {
+                    EditorGUILayout.BeginVertical();
+                    EditorGUILayout.PropertyField(_overridingScatteringProperty);
+                    EditorGUILayout.EndVertical();
+                }
+            }
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
 
             GuiHelpers.DrawContextualHelpBox("The \"Enable Shadows\" parameter allows you to compute the light's shadows (if enabled) in the system.");
             GuiHelpers.DrawToggleChecker(ref _useShadowsProperty, "Enable Shadows");
@@ -224,6 +252,7 @@ namespace Aura2API
             GuiHelpers.DrawToggleChecker(ref _useCookieProperty, "Enable Cookie");
             //EditorGUI.EndDisabledGroup();
 
+            EditorGUILayout.Separator();
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
@@ -239,16 +268,9 @@ namespace Aura2API
                 //EditorGUI.EndDisabledGroup();
             }
 
-            EditorGUILayout.Separator();
-
-            GuiHelpers.DrawContextualHelpBox("The \"Scattering Bias\" parameter allows to have more control of how the light will scatter in the environment.");
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Scattering Bias", GuiStyles.Label, GUILayout.MaxWidth(160));
-            GuiHelpers.DrawSlider(ref _scatteringBiasProperty, -1.0f, 1.0f);
-            EditorGUILayout.EndHorizontal();
-
             if(LightHelpers.IsColorTemperatureAvailable)
             {
+                EditorGUILayout.Separator();
                 EditorGUILayout.Separator();
                 EditorGUILayout.Separator();
 

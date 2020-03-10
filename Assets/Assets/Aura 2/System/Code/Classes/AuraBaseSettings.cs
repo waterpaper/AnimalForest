@@ -67,6 +67,19 @@ namespace Aura2API
         /// </summary>
         public float colorStrength = 1.0f;
         /// <summary>
+        /// Enables the injection of the tint color
+        /// </summary>
+        public bool useTint = false;
+        /// <summary>
+        /// The tint color of the environment
+        /// </summary>
+        [ColorCircularPicker]
+        public Color tint = Color.yellow;
+        /// <summary>
+        /// The tint color factor of the environment
+        /// </summary>
+        public float tintStrength = 1.0f;
+        /// <summary>
         /// Enables the depth extinction of light
         /// </summary>
         public bool useExtinction = false;

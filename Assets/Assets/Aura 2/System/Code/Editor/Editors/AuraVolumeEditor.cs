@@ -23,7 +23,7 @@ namespace Aura2API
     /// Custom Inspector for AuraVolume class
     /// </summary>
     [CustomEditor(typeof(AuraVolume))]
-    [CanEditMultipleObjects]
+    //[CanEditMultipleObjects]
     public class AuraVolumeEditor : Editor
     {
         #region Private Members
@@ -44,9 +44,17 @@ namespace Aura2API
         /// </summary>
         private GUIContent _lightInjectionTitleContent;
         /// <summary>
+        /// The content of the tint injection title
+        /// </summary>
+        private GUIContent _tintInjectionTitleContent;
+        /// <summary>
         /// The content of the ambient lighting injection title
         /// </summary>
         private GUIContent _ambientInjectionTitleContent;
+        /// <summary>
+        /// The content of the boost injection title
+        /// </summary>
+        private GUIContent _boostInjectionTitleContent;
         /// <summary>
         /// The property for choosing the shape of the volume
         /// </summary>
@@ -168,6 +176,18 @@ namespace Aura2API
         /// </summary>
         private SerializedProperty _lightInjectionParametersProperty;
         /// <summary>
+        /// The property for enabling tint injection
+        /// </summary>
+        private SerializedProperty _tintInjectionBoolProperty;
+        /// <summary>
+        /// The property for the tint injection
+        /// </summary>
+        private SerializedProperty _tintInjectionColorProperty;
+        /// <summary>
+        /// The property for the tint injection parameters
+        /// </summary>
+        private SerializedProperty _tintInjectionParametersProperty;
+        /// <summary>
         /// The property for enabling scattering injection
         /// </summary>
         private SerializedProperty _scatteringInjectionBoolProperty;
@@ -183,6 +203,14 @@ namespace Aura2API
         /// The property for ambient lighting injection parameters
         /// </summary>
         private SerializedProperty _ambientInjectionParametersProperty;
+        /// <summary>
+        /// The property for enabling boost injection
+        /// </summary>
+        private SerializedProperty _boostInjectionBoolProperty;
+        /// <summary>
+        /// The property for boost injection parameters
+        /// </summary>
+        private SerializedProperty _boostInjectionParametersProperty;
         /// <summary>
         /// The current inspected Aura Volume
         /// </summary>
@@ -259,14 +287,23 @@ namespace Aura2API
             _scatteringInjectionBoolProperty = serializedObject.FindProperty("scatteringInjection.enable");
             _scatteringInjectionParametersProperty = serializedObject.FindProperty("scatteringInjection");
 
-            _lightInjectionTitleContent = new GUIContent("Light", Aura.ResourcesCollection.colorIconTexture);
+            _lightInjectionTitleContent = new GUIContent("Light", Aura.ResourcesCollection.illuminationColorIconTexture);
             _lightInjectionBoolProperty = serializedObject.FindProperty("lightInjection.injectionParameters.enable");
             _lightInjectionColorProperty = serializedObject.FindProperty("lightInjection.color");
             _lightInjectionParametersProperty = serializedObject.FindProperty("lightInjection.injectionParameters");
 
+            _tintInjectionTitleContent = new GUIContent("Tint", Aura.ResourcesCollection.tintIconTexture);
+            _tintInjectionBoolProperty = serializedObject.FindProperty("tintInjection.injectionParameters.enable");
+            _tintInjectionColorProperty = serializedObject.FindProperty("tintInjection.color");
+            _tintInjectionParametersProperty = serializedObject.FindProperty("tintInjection.injectionParameters");
+
             _ambientInjectionTitleContent = new GUIContent("Ambient Lighting", Aura.ResourcesCollection.illuminationIconTexture);
             _ambientInjectionBoolProperty = serializedObject.FindProperty("ambientInjection.enable");
             _ambientInjectionParametersProperty = serializedObject.FindProperty("ambientInjection");
+
+            _boostInjectionTitleContent = new GUIContent("Boost", Aura.ResourcesCollection.boostIconTexture);
+            _boostInjectionBoolProperty = serializedObject.FindProperty("boostInjection.enable");
+            _boostInjectionParametersProperty = serializedObject.FindProperty("boostInjection");
 
             _currentVolume = (AuraVolume)target;
         }
@@ -358,7 +395,7 @@ namespace Aura2API
             EditorGUILayout.BeginVertical(GuiStyles.ButtonNoHover);
 
             EditorGUILayout.Separator();
-            GUILayout.Label(new GUIContent(" Inject Data", Aura.ResourcesCollection.injectionIconTexture), new GUIStyle(GuiStyles.LabelBoldCenteredBig) { fontSize = 15 });
+            GUILayout.Label(new GUIContent(" Data", Aura.ResourcesCollection.injectionIconTexture), new GUIStyle(GuiStyles.LabelBoldCenteredBig) { fontSize = 15 });
             EditorGUILayout.Separator();
 
             DisplayDensityInjectionArea();
@@ -367,13 +404,25 @@ namespace Aura2API
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
-            DisplayLightInjectionArea();
+            DisplayTintInjectionArea();
 
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
             DisplayScatteringInjectionArea();
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
+            DisplayBoostInjectionArea();
+
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
+
+            DisplayLightInjectionArea();
 
             EditorGUILayout.Separator();
             EditorGUILayout.Separator();
@@ -475,7 +524,7 @@ namespace Aura2API
             EditorGUILayout.BeginVertical(GuiStyles.ButtonNoHover);
 
             EditorGUILayout.Separator();
-            GUILayout.Label(new GUIContent(" Volume Mask", Aura.ResourcesCollection.shapeIconTexture), new GUIStyle(GuiStyles.LabelBoldCenteredBig) { fontSize = 15 });
+            GUILayout.Label(new GUIContent(" Masks", Aura.ResourcesCollection.shapeIconTexture), new GUIStyle(GuiStyles.LabelBoldCenteredBig) { fontSize = 15 });
             EditorGUILayout.Separator();
 
             DisplayShapeSettingsArea();
@@ -718,6 +767,24 @@ namespace Aura2API
         }
 
         /// <summary>
+        /// Displays Tint Injection area
+        /// </summary>
+        private void DisplayTintInjectionArea()
+        {
+            EditorGUILayout.BeginVertical(GuiStyles.Background);
+            GuiHelpers.DrawToggleChecker(ref _tintInjectionBoolProperty, _tintInjectionTitleContent, true, true);
+            if (_tintInjectionBoolProperty.boolValue)
+            {
+                EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
+                EditorGUILayout.PropertyField(_tintInjectionColorProperty);
+                GuiHelpers.DrawInjectionField(ref _tintInjectionParametersProperty, _noiseMaskBoolProperty.boolValue, _currentVolume.UsesTexture2DMasking, _currentVolume.UsesTexture3DMasking, true, 0, 1, true, "Brightness", "Brightness of the tinting color");
+                EditorGUILayout.Separator();
+                EditorGUILayout.EndVertical();
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
         /// Displays Scattering Injection area
         /// </summary>
         private void DisplayScatteringInjectionArea()
@@ -733,6 +800,23 @@ namespace Aura2API
                 EditorGUILayout.Separator();
                 EditorGUILayout.EndVertical();
                 //EditorGUI.EndDisabledGroup();
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// Displays Boost Injection area
+        /// </summary>
+        private void DisplayBoostInjectionArea()
+        {
+            EditorGUILayout.BeginVertical(GuiStyles.Background);
+            GuiHelpers.DrawToggleChecker(ref _boostInjectionBoolProperty, _boostInjectionTitleContent, true, true);
+            if (_boostInjectionBoolProperty.boolValue)
+            {
+                EditorGUILayout.BeginVertical(GuiStyles.EmptyMiddleAligned);
+                GuiHelpers.DrawInjectionField(ref _boostInjectionParametersProperty, _noiseMaskBoolProperty.boolValue, _currentVolume.UsesTexture2DMasking, _currentVolume.UsesTexture3DMasking);
+                EditorGUILayout.Separator();
+                EditorGUILayout.EndVertical();
             }
             EditorGUILayout.EndVertical();
         }

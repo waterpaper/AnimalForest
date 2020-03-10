@@ -14,7 +14,7 @@
 *                                                                          *
 ***************************************************************************/
 
+#include "CommonDefines.cginc"
 #include "CommonVariables.cginc"
 #include "Structs.cginc"
 #include "CommonFunctions.cginc"
-#include "BlueNoise.cginc"

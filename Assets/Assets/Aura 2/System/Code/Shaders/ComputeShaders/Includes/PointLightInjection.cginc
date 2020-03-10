@@ -17,82 +17,80 @@
 uniform uint pointLightCount;
 uniform StructuredBuffer<PointLightParameters> pointLightDataBuffer;
 #if UNITY_VERSION >= 201730
-uniform Texture2DArray<half3> pointShadowMapsArray;
+uniform Texture2DArray<FP3> pointShadowMapsArray;
 #else
-uniform Texture2DArray<half2> pointShadowMapsArray;
+uniform Texture2DArray<FP2> pointShadowMapsArray;
 #endif
-uniform Texture2DArray<half> pointCookieMapsArray;
+uniform Texture2DArray<FP> pointCookieMapsArray;
 
-half SamplePointShadowMap(PointLightParameters lightParameters, half3 samplingDirection, half2 polarCoordinates)
+FP SamplePointShadowMap(PointLightParameters lightParameters, FP3 samplingDirection, FP2 polarCoordinates)
 {
 	#if UNITY_VERSION >= 201730
-	half3 shadowMapValue = pointShadowMapsArray.SampleLevel(_LinearClamp, half3(polarCoordinates, lightParameters.shadowMapIndex), 0).xyz;
-	half4 lightProjectionParams = half4( lightParameters.lightProjectionParameters, shadowMapValue.yz); // From UnityShaderVariables.cginc:114        
+	FP3 shadowMapValue = pointShadowMapsArray.SampleLevel(_LinearClamp, FP3(polarCoordinates, lightParameters.shadowMapIndex), 0).xyz;
+	FP4 lightProjectionParams = FP4( lightParameters.lightProjectionParameters, shadowMapValue.yz); // From UnityShaderVariables.cginc:114        
 	float3 absVec = abs(samplingDirection);
 	// From UnityShadowLibrary.cginc:119
     float dominantAxis = max(max(absVec.x, absVec.y), absVec.z);
 		dominantAxis = max(0.00001, dominantAxis - lightProjectionParams.z);
 		dominantAxis *= lightProjectionParams.w;
-    half biasedReferenceDistance = -lightProjectionParams.x + lightProjectionParams.y/dominantAxis;
+    FP biasedReferenceDistance = -lightProjectionParams.x + lightProjectionParams.y/dominantAxis;
 		biasedReferenceDistance = 1.0f - biasedReferenceDistance;
 	return step(shadowMapValue.x, biasedReferenceDistance);
 	#else
-	half2 shadowMapValue = pointShadowMapsArray.SampleLevel(_LinearClamp, half3(polarCoordinates, lightParameters.shadowMapIndex), 0).xy;
-    half biasedReferenceDistance = length(samplingDirection) * shadowMapValue.y;
+	FP2 shadowMapValue = pointShadowMapsArray.SampleLevel(_LinearClamp, FP3(polarCoordinates, lightParameters.shadowMapIndex), 0).xy;
+    FP biasedReferenceDistance = length(samplingDirection) * shadowMapValue.y;
         biasedReferenceDistance *= 0.97f; // bias
 	return step(biasedReferenceDistance, shadowMapValue.x);
 	#endif
 }
 
-void ComputePointLightInjection(PointLightParameters lightParameters, half3 worldPosition, half3 viewVector, inout half4 accumulationColor, half scattering)
+void ComputePointLightInjection(PointLightParameters lightParameters, FP3 worldPosition, FP3 viewVector, inout FP3 accumulationColor, bool useScattering, FP scattering)
 {
-	half3 lightVector = worldPosition - lightParameters.lightPosition;
-    half3 normalizedLightVector = normalize(lightVector);
-	half dist = distance(lightParameters.lightPosition, worldPosition);
+	FP3 lightVector = worldPosition - lightParameters.lightPosition;
+    FP3 normalizedLightVector = normalize(lightVector);
+	FP dist = distance(lightParameters.lightPosition, worldPosition);
 
-	[branch]
+	BRANCH
 	if (dist > lightParameters.lightRange)
 	{
 		return; 
 	}
 	else
 	{
-		half normalizedDistance = saturate(dist / lightParameters.lightRange);
-        half scatteringCosAngle = dot(-normalizedLightVector, viewVector);
-        half scatteringFactor = GetScatteringFactor(scatteringCosAngle, saturate(scattering + lightParameters.scatteringBias));
-        half attenuation = scatteringFactor;
+		FP normalizedDistance = saturate(dist / lightParameters.lightRange);
+		FP attenuation = GetScatteringFactor(normalizedLightVector, viewVector, useScattering, lightParameters.useDefaultScattering, scattering, lightParameters.scatteringOverride);
 	
 		attenuation *= GetLightDistanceAttenuation(lightParameters.distanceFalloffParameters, normalizedDistance);
 		
-        half2 polarCoordinates = GetNormalizedYawPitchFromNormalizedVector(normalizedLightVector);
+        FP2 polarCoordinates = GetNormalizedYawPitchFromNormalizedVector(normalizedLightVector);
 		
-		[branch]
+		BRANCH
         if (usePointLightsShadows && lightParameters.shadowMapIndex > -1)
 		{
-			half shadowAttenuation = SamplePointShadowMap(lightParameters, lightVector, polarCoordinates);
+			FP shadowAttenuation = SamplePointShadowMap(lightParameters, lightVector, polarCoordinates);
 			shadowAttenuation = lerp(lightParameters.shadowStrength, 1.0f, shadowAttenuation);
 		
 			attenuation *= shadowAttenuation;
 		}
 
-		[branch]
+		BRANCH
         if (useLightsCookies && lightParameters.cookieMapIndex > -1)
 		{        
-			half cookieMapValue = pointCookieMapsArray.SampleLevel(_LinearClamp, half3(polarCoordinates, lightParameters.cookieMapIndex), 0).x;
+			FP cookieMapValue = pointCookieMapsArray.SampleLevel(_LinearClamp, FP3(polarCoordinates, lightParameters.cookieMapIndex), 0).x;
 			cookieMapValue = lerp(1, cookieMapValue, pow(smoothstep(lightParameters.cookieParameters.x, lightParameters.cookieParameters.y, normalizedDistance), lightParameters.cookieParameters.z));
         
 			attenuation *= cookieMapValue;
 		}
 
-		accumulationColor.xyz += lightParameters.color * attenuation;
+		accumulationColor += lightParameters.color * attenuation;
 	}
 }
 
-void ComputePointLightsInjection(half3 worldPosition, half3 viewVector, inout half4 accumulationColor, half scattering)
+void ComputePointLightsInjection(FP3 worldPosition, FP3 viewVector, inout FP3 accumulationColor, bool useScattering, FP scattering)
 {
 	[allow_uav_condition]
 	for (uint i = 0; i < pointLightCount; ++i)
 	{
-        ComputePointLightInjection(pointLightDataBuffer[i], worldPosition, viewVector, accumulationColor, scattering);
+        ComputePointLightInjection(pointLightDataBuffer[i], worldPosition, viewVector, accumulationColor, useScattering, scattering);
     }
 }

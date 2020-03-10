@@ -14,21 +14,21 @@
 *                                                                          *
 ***************************************************************************/
 
-uniform half3 ambientColorBottom;
-uniform half3 ambientColorHorizon;
-uniform half3 ambientColorTop;
-uniform half4 ambientShAr;
-uniform half4 ambientShAg;
-uniform half4 ambientShAb;
-uniform half4 ambientShBr;
-uniform half4 ambientShBg;
-uniform half4 ambientShBb;
-uniform half4 ambientShC;
+uniform FP3 ambientColorBottom;
+uniform FP3 ambientColorHorizon;
+uniform FP3 ambientColorTop;
+uniform FP4 ambientShAr;
+uniform FP4 ambientShAg;
+uniform FP4 ambientShAb;
+uniform FP4 ambientShBr;
+uniform FP4 ambientShBg;
+uniform FP4 ambientShBb;
+uniform FP4 ambientShC;
 uniform uint ambientMode;
 
-half3 ComputeAmbientLighting(half4 viewDirection, half scattering)
+FP3 ComputeAmbientLighting(FP4 viewDirection, FP scattering)
 {
-    half3 ambientLight;
+    FP3 ambientLight;
 
     if (ambientMode == 3) // Flat ambient
     {
@@ -36,11 +36,11 @@ half3 ComputeAmbientLighting(half4 viewDirection, half scattering)
     }
     else if (ambientMode == 1) // Gradient ambient
     {
-        half gradient = viewDirection.y;
-        half3 color = lerp(ambientColorBottom, ambientColorHorizon, saturate(gradient + 1.0f)); // bottom to horizon
+        FP gradient = viewDirection.y;
+        FP3 color = lerp(ambientColorBottom, ambientColorHorizon, saturate(gradient + 1.0f)); // bottom to horizon
         color = lerp(color, ambientColorTop, saturate(gradient));								// horizon to top
 		
-		half3 meanColor = (ambientColorBottom + ambientColorHorizon + ambientColorTop) * 1.0f / 3.0f;	// does it work? yes
+		FP3 meanColor = (ambientColorBottom + ambientColorHorizon + ambientColorTop) * 1.0f / 3.0f;	// does it work? yes
 		color = lerp(color, meanColor, scattering);														// is it mathematically correct? probably not
 		
         ambientLight = color;

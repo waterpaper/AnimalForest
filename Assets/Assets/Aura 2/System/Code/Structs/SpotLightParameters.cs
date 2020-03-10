@@ -25,7 +25,8 @@ namespace Aura2API
     {
         #region Public Members
         public Vector3 color;
-        public float scatteringBias;
+        public int useDefaultScattering;
+        public float scatteringOverride;
         public Vector3 lightPosition;
         public Vector3 lightDirection;
         public float lightRange;
@@ -57,6 +58,7 @@ namespace Aura2API
                 if (_byteSize == 0)
                 {
                     _byteSize += sizeof(float) * 3;      //color
+                    _byteSize += sizeof(int);            //useDefaultScattering
                     _byteSize += sizeof(float);          //scatteringBias
                     _byteSize += sizeof(float) * 3;      //lightPosition
                     _byteSize += sizeof(float) * 3;      //lightDirection

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
 [System.Serializable]
 public struct DropItemData
 {
-    public int dropItemId;
-    public float dropItemPercent;
+    public int DropItemId;
+    public float DropItemPercent;
 }
 
 [System.Serializable]
@@ -26,10 +25,15 @@ public struct BossLocationData
 }
 
 [System.Serializable]
-public class CharacterTable
+public class TableInfo
 {
     public int ID;
     public string Name;
+}
+
+[System.Serializable]
+public class CharacterTable : TableInfo
+{
     public int Level;
     public int Exp;
     public int ExpMax;
@@ -42,10 +46,8 @@ public class CharacterTable
 }
 
 [System.Serializable]
-public class EnemyTable
+public class EnemyTable : TableInfo
 {
-    public int ID;
-    public string Name;
     public string Explanation;
     public int EnemyType;
     public int Level;
@@ -59,10 +61,8 @@ public class EnemyTable
 }
 
 [System.Serializable]
-public class BossTable
+public class BossTable : TableInfo
 {
-    public int ID;
-    public string BossName;
     public int Level;
     public int Exp;
     public int Hp;
@@ -80,10 +80,8 @@ public class BossTable
 }
 
 [System.Serializable]
-public class ItemTable
+public class ItemTable : TableInfo
 {
-    public int ID;
-    public string Name;
     public string Explanation;
     public int Value;
     public float AddHp;
@@ -97,10 +95,8 @@ public class ItemTable
 }
 
 [System.Serializable]
-public class QuestTable
+public class QuestTable : TableInfo
 {
-    public int ID;
-    public string Name;
     public string OrderNpcConversation;
     public string TargetNpcConversation;
     public int MinLevel;
@@ -115,38 +111,34 @@ public class QuestTable
 }
 
 [System.Serializable]
-public class MapTable
+public class MapTable : TableInfo
 {
-    public string MapName;
-    public int spawnNum;
-    public List<Vector3> spwanLocation;
-    public List<int> spwanMonster;
+    public int SpawnNum;
+    public List<Vector3> SpwanLocation;
+    public List<int> SpwanMonster;
     public List<NpcLocationData> NpcLocation;
     public List<BossLocationData> BossLocation;
 }
 
 [System.Serializable]
-public class ShopTable
+public class ShopTable : TableInfo
 {
     public int ShopKind;
     public List<int> ShopItemID;
 }
 
 [System.Serializable]
-public class EnemyDropItemTable
+public class EnemyDropItemTable : TableInfo
 {
-    public int EnemyID;
-    public int dropMoneyMin;
-    public int dropMoneyMax;
+    public int DropMoneyMin;
+    public int DropMoneyMax;
     public List<DropItemData> EnemyDropItemDataList;
 }
 
 [System.Serializable]
-public class NpcTable
+public class NpcTable : TableInfo
 {
-    public int ID;
     public int Type;
-    public string Name;
     public int Level;
     public float Hp;
     public float HpMax;
@@ -160,15 +152,14 @@ public class NpcTable
 }
 
 [System.Serializable]
-public class SingleConversationTable
+public class SingleConversationTable : TableInfo
 {
-    public int ID;
     public string Text;
     public int Type;
 }
 
 [System.Serializable]
-public class PlayerLevelTable
+public class PlayerLevelTable : TableInfo
 {
     public int Level;
     public int ExpMax;
@@ -180,33 +171,33 @@ public class PlayerLevelTable
 
 public class DataManager : MonoBehaviour
 {
-    private static DataManager m_instance;
+    private static DataManager _instance;
 
     //싱글톤 접근
     public static DataManager instance
     {
         get
         {
-            if (m_instance == null)
+            if (_instance == null)
             {
-                m_instance = FindObjectOfType<DataManager>();
-                DontDestroyOnLoad(m_instance);
+                _instance = FindObjectOfType<DataManager>();
+                DontDestroyOnLoad(_instance);
             }
-            return m_instance;
+            return _instance;
         }
     }
 
-    public string characterTable_FileName = "Character";
-    public string enemyTable_FileName = "Enemy";
-    public string bossTable_FileName = "Boss";
-    public string ItemTable_FileName = "Item";
-    public string QuestTable_FileName = "Quest";
-    public string MapTable_FlieName = "Map";
-    public string ShopTable_FlieName = "Shop";
-    public string NpcTable_FileName = "Npc";
-    public string EnemyDropItemTable_FileName = "EnemyDropItem";
-    public string SingleConversationTable_FileName = "SingleConversationData";
-    public string PlayerLevelTable_FileName = "PlayerLevel";
+    private const string _characterTable_FileName = "Character";
+    private const string _enemyTable_FileName = "Enemy";
+    private const string _bossTable_FileName = "Boss";
+    private const string _ItemTable_FileName = "Item";
+    private const string _QuestTable_FileName = "Quest";
+    private const string _MapTable_FlieName = "Map";
+    private const string _ShopTable_FlieName = "Shop";
+    private const string _NpcTable_FileName = "Npc";
+    private const string _EnemyDropItemTable_FileName = "EnemyDropItem";
+    private const string _SingleConversationTable_FileName = "SingleConversationData";
+    private const string _PlayerLevelTable_FileName = "PlayerLevel";
     
     Dictionary<int, CharacterTable> CharacterInfoTable;
     Dictionary<int, EnemyTable> EnemyInfoTable;
@@ -229,6 +220,7 @@ public class DataManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
         CharacterInfoTable = new Dictionary<int, CharacterTable>();
         EnemyInfoTable = new Dictionary<int, EnemyTable>();
         BossInfoTable = new Dictionary<int, BossTable>();
@@ -241,101 +233,61 @@ public class DataManager : MonoBehaviour
         SingleConversationInfoTable = new Dictionary<int, SingleConversationTable>();
         PlayerLevelInfoTable = new Dictionary<int, PlayerLevelTable>();
 
-        LoadData();
+        AllLoadData();
     }
-    void LoadData()
+
+    void AllLoadData()
     {
-        TextAsset strings = Resources.Load<TextAsset>(characterTable_FileName);
-        CharacterTable[] characterData = JsonHelper.FromJson<CharacterTable>(strings.text);
+        //딕셔너리에 데이터를 저장합니다.
+        LoadDictionaryData(CharacterInfoTable, _characterTable_FileName);
+        LoadDictionaryData(EnemyInfoTable, _enemyTable_FileName);
+        LoadDictionaryData(BossInfoTable, _bossTable_FileName);
+        LoadDictionaryData(ItemInfoTable, _ItemTable_FileName);
+        LoadDictionaryData(QuestInfoTable, _QuestTable_FileName);
+        LoadDictionaryData(MapInfoTable, _MapTable_FlieName);
+        LoadDictionaryData(ShopInfoTable, _ShopTable_FlieName);
+        LoadDictionaryData(NpcInfoTable, _NpcTable_FileName);
+        LoadDictionaryData(EnemyDropItemInfoTable, _EnemyDropItemTable_FileName);
+        LoadDictionaryData(SingleConversationInfoTable, _SingleConversationTable_FileName);
+        LoadDictionaryData(PlayerLevelInfoTable, _PlayerLevelTable_FileName);
 
-        foreach (var info in characterData)
-        {
-            CharacterInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(enemyTable_FileName);
-        EnemyTable[] enemyData = JsonHelper.FromJson<EnemyTable>(strings.text);
-
-        foreach (var info in enemyData)
-        {
-            EnemyInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(bossTable_FileName);
-        BossTable[] bossData = JsonHelper.FromJson<BossTable>(strings.text);
-
-        foreach (var info in bossData)
-        {
-            BossInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(ItemTable_FileName);
-        ItemTable[] itemData = JsonHelper.FromJson<ItemTable>(strings.text);
-
-        foreach (var info in itemData)
-        {
-            ItemInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(QuestTable_FileName);
-        QuestTable[] questData = JsonHelper.FromJson<QuestTable>(strings.text);
-
-        foreach (var info in questData)
-        {
-            QuestInfoTable.Add(info.ID, info);
-        }
-
+        //이미지를 리스트에 저장합니다.
         CharacterIconData = Resources.LoadAll<Sprite>("CharacterIcon");
         ItemIconData = Resources.LoadAll<Sprite>("ItemIcon");
+    }
 
-        strings = Resources.Load<TextAsset>(MapTable_FlieName);
-        MapTable[] stageTable = JsonHelper.FromJson<MapTable>(strings.text);
+    //딕셔너리 내부의 데이터를 저장해주는 함수입니다.
+    public void LoadDictionaryData<Table>(Dictionary<int, Table> dictionary, string path)
+        where Table : TableInfo
+    {
+        TextAsset strings = Resources.Load<TextAsset>(path);
+        Table[] data = JsonHelper.FromJson<Table>(strings.text);
 
-        foreach (var info in stageTable)
+        foreach (var info in data)
         {
-            MapInfoTable.Add(info.MapName, info);
-        }
-
-        strings = Resources.Load<TextAsset>(ShopTable_FlieName);
-        ShopTable[] shopData = JsonHelper.FromJson<ShopTable>(strings.text);
-
-        foreach (var info in shopData)
-        {
-            ShopInfoTable.Add(info.ShopKind, info);
-        }
-
-        strings = Resources.Load<TextAsset>(NpcTable_FileName);
-        NpcTable[] npcData = JsonHelper.FromJson<NpcTable>(strings.text);
-
-        foreach (var info in npcData)
-        {
-            NpcInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(EnemyDropItemTable_FileName);
-        EnemyDropItemTable[] enmmyDropItemData = JsonHelper.FromJson<EnemyDropItemTable>(strings.text);
-
-        foreach (var info in enmmyDropItemData)
-        {
-            EnemyDropItemInfoTable.Add(info.EnemyID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(SingleConversationTable_FileName);
-        SingleConversationTable[] singleConversationData = JsonHelper.FromJson<SingleConversationTable>(strings.text);
-
-        foreach (var info in singleConversationData)
-        {
-            SingleConversationInfoTable.Add(info.ID, info);
-        }
-
-        strings = Resources.Load<TextAsset>(PlayerLevelTable_FileName);
-        PlayerLevelTable[] playerLevelData = JsonHelper.FromJson<PlayerLevelTable>(strings.text);
-
-        foreach (var info in playerLevelData)
-        {
-            PlayerLevelInfoTable.Add(info.Level, info);
+            dictionary.Add(info.ID, info);
         }
     }
+
+    public void LoadDictionaryData<Table>(Dictionary<string, Table> dictionary, string path)
+        where Table : TableInfo
+    {
+        TextAsset strings = Resources.Load<TextAsset>(path);
+        Table[] data = JsonHelper.FromJson<Table>(strings.text);
+
+        foreach (var info in data)
+        {
+            dictionary.Add(info.Name, info);
+        }
+    }
+
+    /*
+    public table GetTableData<table>()
+    {
+        if(table.GetType())
+        { }
+    }
+    */
 
     public CharacterTable CharacterInfo(int id)
     {

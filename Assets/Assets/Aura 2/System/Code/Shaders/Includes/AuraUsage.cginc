@@ -15,82 +15,93 @@
 ***************************************************************************/
 
 #include "Common.cginc"
+#include "BlueNoise.cginc"
 
-float4 Aura_FrustumRanges;
+FP4 Aura_FrustumRanges;
 sampler3D Aura_VolumetricDataTexture;
 sampler3D Aura_VolumetricLightingTexture;
 
 //////////// Helper functions
-float Aura2_RescaleDepth(float depth)
+FP GetLinearEyeDepth(FP depth)
 {
-    half rescaledDepth = InverseLerp(Aura_FrustumRanges.x, Aura_FrustumRanges.y, depth);
+	return GetLinearDepth(depth, _ProjectionParams.yzzz, unity_OrthoParams.w);
+}
+
+FP Aura2_RescaleDepth(FP depth)
+{
+	FP rescaledDepth = InverseLerp(Aura_FrustumRanges.x, Aura_FrustumRanges.y, depth);
     return GetBiasedNormalizedDepth(rescaledDepth, Aura_DepthBiasReciproqualCoefficient);
 }
 
-float3 Aura2_GetFrustumSpaceCoordinates(float4 inVertex)
+FP3 Aura2_GetFrustumSpaceCoordinates(FP4 inVertex)
 {
-    float4 clipPos = UnityObjectToClipPos(inVertex);	
+	FP4 clipPos = UnityObjectToClipPos(inVertex);
 
-    float z = -UnityObjectToViewPos(inVertex).z;
+	FP4 frustumPosition = ComputeScreenPos(clipPos);
+	frustumPosition.xy /= frustumPosition.w;
 
-    float4 cameraPos = ComputeScreenPos(clipPos);
-    cameraPos.xy /= cameraPos.w;
-    cameraPos.z = z;
+	// Perspective depth
+	FP perspectiveFrustumZ = -UnityObjectToViewPos(inVertex).z;
+	// Orthographic depth
+	FP orthographicFrustumZ = lerp(_ProjectionParams.y, _ProjectionParams.z, (1.0f - frustumPosition.z));
+	
+	frustumPosition.z = lerp(perspectiveFrustumZ, orthographicFrustumZ, unity_OrthoParams.w);
 
-    return cameraPos.xyz;
+    return frustumPosition;
 }
 
 //////////// Lighting
-float4 Aura2_SampleDataTexture(float3 position)
+FP4 Aura2_SampleDataTexture(FP3 position)
 {
     return SampleTexture3D(Aura_VolumetricDataTexture, position, Aura_BufferTexelSize);
 }
-float4 Aura2_GetData(float3 screenSpacePosition)
+FP4 Aura2_GetData(FP3 screenSpacePosition)
 {
-    return Aura2_SampleDataTexture(float3(screenSpacePosition.xy, Aura2_RescaleDepth(screenSpacePosition.z)));
+    return Aura2_SampleDataTexture(FP3(screenSpacePosition.xy, Aura2_RescaleDepth(screenSpacePosition.z)));
 }
 
-void Aura2_ApplyLighting(inout float3 colorToApply, float3 screenSpacePosition, float lightingFactor, float3 lightingValue)
+void Aura2_ApplyLighting(inout FP3 colorToApply, FP3 screenSpacePosition, FP lightingFactor, FP lightingValue)
 {
 	colorToApply *= lightingValue * lightingFactor;
 }
-void Aura2_ApplyLighting(inout float3 colorToApply, float3 screenSpacePosition, float lightingFactor)
+void Aura2_ApplyLighting(inout FP3 colorToApply, FP3 screenSpacePosition, FP lightingFactor)
 {
 	#if defined(AURA_USE_DITHERING)
     screenSpacePosition.xy += GetBlueNoise(screenSpacePosition.xy, 0).xy;
 	#endif
 
-    float3 lightingValue = Aura2_GetData(screenSpacePosition).xyz;
+	FP3 lightingValue = Aura2_GetData(screenSpacePosition).xyz;
 	Aura2_ApplyLighting(colorToApply, screenSpacePosition, lightingFactor, lightingValue);
 }
 
 //////////// Fog
-float4 Aura2_GetFogValue(float3 screenSpacePosition)
+FP4 Aura2_SampleFogTexture(FP3 position)
 {
-    return SampleTexture3D(Aura_VolumetricLightingTexture, float3(screenSpacePosition.xy, Aura2_RescaleDepth(screenSpacePosition.z)), Aura_BufferTexelSize);
+    return SampleTexture3D(Aura_VolumetricLightingTexture, position, Aura_BufferTexelSize);
 }
 
-void Aura2_ApplyFog(inout float3 colorToApply, float3 screenSpacePosition, float4 fogValue)
+FP4 Aura2_GetFogValue(FP3 screenSpacePosition)
+{
+    return Aura2_SampleFogTexture(FP3(screenSpacePosition.xy, Aura2_RescaleDepth(screenSpacePosition.z)));
+}
+
+void Aura2_ApplyFog(inout FP3 colorToApply, FP3 screenSpacePosition, FP4 fogValue)
+{
+	colorToApply = (colorToApply * fogValue.w) + fogValue.xyz;
+}
+void Aura2_ApplyFog(inout FP3 colorToApply, FP3 screenSpacePosition)
 {
 	#if defined(AURA_USE_DITHERING)
     screenSpacePosition.xyz += GetBlueNoise(screenSpacePosition.xy, 1).xyz;
 	#endif
 
-	colorToApply = (colorToApply * fogValue.w) + fogValue.xyz;
-}
-void Aura2_ApplyFog(inout float3 colorToApply, float3 screenSpacePosition)
-{
-    float4 fogValue = Aura2_GetFogValue(screenSpacePosition);
+    FP4 fogValue = Aura2_GetFogValue(screenSpacePosition);
     Aura2_ApplyFog(colorToApply, screenSpacePosition, fogValue);
 }
 
 // From https://github.com/Unity-Technologies/VolumetricLighting/blob/master/Assets/Scenes/Materials/StandardAlphaBlended-VolumetricFog.shader
-void Aura2_ApplyFog(inout float4 colorToApply, float3 screenSpacePosition, float4 fogValue)
+void Aura2_ApplyFog(inout FP4 colorToApply, FP3 screenSpacePosition, FP4 fogValue)
 {
-	#if defined(AURA_USE_DITHERING)
-    screenSpacePosition.xy += GetBlueNoise(screenSpacePosition.xy, 2).xy;
-	#endif
-
 	// Always apply fog attenuation - also in the forward add pass.
     colorToApply.xyz *= fogValue.w;
 
@@ -104,8 +115,12 @@ void Aura2_ApplyFog(inout float4 colorToApply, float3 screenSpacePosition, float
     colorToApply.xyz += fogValue.xyz;
 	#endif
 }
-void Aura2_ApplyFog(inout float4 colorToApply, float3 screenSpacePosition)
+void Aura2_ApplyFog(inout FP4 colorToApply, FP3 screenSpacePosition)
 {    
-    float4 fogValue = Aura2_GetFogValue(screenSpacePosition);
+	#if defined(AURA_USE_DITHERING)
+    screenSpacePosition.xy += GetBlueNoise(screenSpacePosition.xy, 2).xy;
+	#endif
+
+    FP4 fogValue = Aura2_GetFogValue(screenSpacePosition);
     Aura2_ApplyFog(colorToApply, screenSpacePosition, fogValue);
 } 

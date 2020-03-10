@@ -66,14 +66,30 @@ public class PlayerInput : MonoBehaviour
             normalAttack = Input.GetButtonDown(attackButtonName);
             comboAttack = Input.GetButtonDown(comboAttackButtonName);
             roll = Input.GetButtonDown(rollName);
+            IsJoyStickControll = false;
         }
-        else { IsJoyStickControll = false; }
+        else
+        {
+            jump = false;
+            normalAttack = false;
+            comboAttack = false;
+            roll = false;
+        }
 
         //플레이어의 클릭입력을 처리한다.
         if (Input.GetMouseButtonDown(0) && !GameManager.instance.PlayerControlPause && CameraManager.instance.playMode)
         {
             RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray;
+
+            if (Input.touchCount > 0)
+            {
+                ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            }
+            else
+            {
+                ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            }
 
             Physics.Raycast(ray, out hit);
             if (hit.collider != null && hit.collider.tag == "Npc")

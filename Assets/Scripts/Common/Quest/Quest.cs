@@ -199,7 +199,7 @@ public class BossHuntingQuest : Quest
     {
         if (QuestProgress == EQuestProgress.EQuestProgress_Proceeding)
         {
-            QuestTargetObjectName = DataManager.instance.BossInfo(TargetObject).BossName;
+            QuestTargetObjectName = DataManager.instance.BossInfo(TargetObject).Name;
             QuestExplanation = QuestTargetObjectName + (" 처치하기");
         }
         else if (QuestProgress == EQuestProgress.EQuestProgress_Completed)

@@ -2608,7 +2608,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -3183,11 +3183,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5df8fb30a765584998ffc8ff7472eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: http://127.0.0.1:80/
-  loginConnectionName: login
-  signupConnectionName: SignUp
-  saveConnectionName: Save
-  loadConnectionName: Load
   resultTextUI: {fileID: 0}
 --- !u!4 &886922622
 Transform:

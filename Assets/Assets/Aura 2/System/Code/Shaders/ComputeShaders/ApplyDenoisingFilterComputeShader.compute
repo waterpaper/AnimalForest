@@ -17,6 +17,12 @@
 // Disables warnings
 #pragma warning( disable : 4714 3571 3078 ) 
 
+// Intensity measurement functions are :
+//RGB_MEASURE_FUNCTION_UNSCALED_LUMINANCE
+//RGB_MEASURE_FUNCTION_LUMINANCE
+//RGB_MEASURE_FUNCTION_LENGTH
+//RGB_MEASURE_FUNCTION_SCALE
+
 #pragma kernel ApplyDenoisingFilter		RADIUS=1	MEDIAN_APPROXIMATION_REFINING_ITERATIONS=8		RGB_MEASURE_FUNCTION_SCALE
 #pragma kernel ApplyDenoisingFilter		RADIUS=2	MEDIAN_APPROXIMATION_REFINING_ITERATIONS=8		RGB_MEASURE_FUNCTION_SCALE
 #pragma kernel ApplyDenoisingFilter		RADIUS=3	MEDIAN_APPROXIMATION_REFINING_ITERATIONS=8		RGB_MEASURE_FUNCTION_SCALE
@@ -30,29 +36,39 @@
 #define SIZE (SIZE_1D * SIZE_1D * SIZE_1D)
 
 #include "../Includes/Common.cginc"
- 
-Texture3D<half4> sourceTexture;
-RWTexture3D<half4> destinationTexture;
 
-float GetRgbScale(float3 rgb)
+uniform StructuredBuffer<uint> dispatchSizeBuffer;			// size = 3 -> x, y, z
+uniform StructuredBuffer<uint> visibleCellsAmountBuffer;	// size = 1
+uniform StructuredBuffer<CellData> visibleCellsBuffer;		// size = visibleCellsAmountBuffer[0]
+uniform Texture3D<FP4> sourceTexture;
+uniform RWTexture3D<FP4> destinationTexture;
+
+FP GetRgbLength(FP3 rgb)
 {
-    return max(rgb.x, max(rgb.y, rgb.z));
+	return length(rgb);
 }
 
-float GetRgbLuminance(float3 rgb)
+FP GetRgbScale(FP3 rgb)
 {
-    return dot(rgb, float3(0.299f, 0.587f, 0.114f));
+	return max(rgb.x, max(rgb.y, rgb.z));
 }
 
-float GetRgbUnscaledLuminance(float3 rgb)
+FP GetRgbLuminance(FP3 rgb)
+{
+    return dot(rgb, FP3(0.299f, 0.587f, 0.114f));
+}
+
+FP GetRgbUnscaledLuminance(FP3 rgb)
 {
     return GetRgbLuminance(rgb / GetRgbScale(rgb));
 }
 
-float MeasureRgb(float3 rgb)
+FP MeasureRgb(FP3 rgb)
 {
 #if defined(RGB_MEASURE_FUNCTION_UNSCALED_LUMINANCE)
 	return GetRgbUnscaledLuminance(rgb);
+#elif defined(RGB_MEASURE_FUNCTION_LENGTH)
+	return GetRgbLength(rgb);
 #elif defined(RGB_MEASURE_FUNCTION_SCALE)
 	return GetRgbScale(rgb);
 #elif defined(RGB_MEASURE_FUNCTION_LUMINANCE)
@@ -60,10 +76,10 @@ float MeasureRgb(float3 rgb)
 #endif
 }
 
-int ApproximateMedianIndex(float values[SIZE])
+int ApproximateMedianIndex(FP values[SIZE])
 {
-	float topValue = values[0];
-	float bottomvalue = values[0];
+	FP topValue = values[0];
+	FP bottomvalue = values[0];
 	
 	UNROLLING(SIZE - 1)
 	for (int i = 1; i < SIZE; ++i)
@@ -72,8 +88,8 @@ int ApproximateMedianIndex(float values[SIZE])
 		bottomvalue = min(bottomvalue, values[i]);
 	}
 	
-	float medianValue = (topValue + bottomvalue) * 0.5f;
-	float interval = (topValue - bottomvalue) * 0.5f;
+	FP medianValue = (topValue + bottomvalue) * 0.5f;
+	FP interval = (topValue - bottomvalue) * 0.5f;
 	
 	UNROLLING(MEDIAN_APPROXIMATION_REFINING_ITERATIONS)
 	for (int i = 0; i < MEDIAN_APPROXIMATION_REFINING_ITERATIONS; ++i)
@@ -100,12 +116,12 @@ int ApproximateMedianIndex(float values[SIZE])
 		}
 	}
 	
-	float oldProximity = abs(values[0] - medianValue);
+	FP oldProximity = abs(values[0] - medianValue);
 	int middleIndex = 0;
 	UNROLLING(SIZE - 1)
 	for (int i = 1; i < SIZE; ++i)
 	{
-		float newProximity = abs(values[i] - medianValue);
+		FP newProximity = abs(values[i] - medianValue);
 		if (newProximity < oldProximity)
 		{
 			oldProximity = newProximity;
@@ -116,12 +132,25 @@ int ApproximateMedianIndex(float values[SIZE])
 	return middleIndex;
 }
 
-[numthreads(NUM_THREAD_X, NUM_THREAD_Y, NUM_THREAD_Z)]
+[numthreads(VISIBILITY_GROUPS_SIZE_X, VISIBILITY_GROUPS_SIZE_Y, VISIBILITY_GROUPS_SIZE_Z)]
 void ApplyDenoisingFilter(uint3 dispatchThreadID : SV_DispatchThreadID, uint3 groupID : SV_GroupID, uint3 groupThreadID : SV_GroupThreadID)
 {
-    float3 color[SIZE];
-    float rgbMeasure[SIZE];
-    float alpha[SIZE];
+	uint visibleCellsAmount = visibleCellsAmountBuffer[0];
+	uint3 totalDispatchsize = uint3(dispatchSizeBuffer[0], dispatchSizeBuffer[1], dispatchSizeBuffer[2]) * VISIBILITY_GROUPS_SIZE;
+	uint currentThreadIndex = GetFlattenedIndex(dispatchThreadID, totalDispatchsize);
+
+	if (currentThreadIndex >= visibleCellsAmount)
+	{
+		return;
+	}
+
+	CellData currentCell = visibleCellsBuffer[currentThreadIndex];
+
+	uint3 id = currentCell.id;
+
+    FP3 color[SIZE];
+    FP rgbMeasure[SIZE];
+    FP alpha[SIZE];
 	UNROLLING(SIZE_1D)
     for (int i = 0; i < SIZE_1D; ++i)
     {
@@ -135,7 +164,7 @@ void ApplyDenoisingFilter(uint3 dispatchThreadID : SV_DispatchThreadID, uint3 gr
             {
 				int offsetK = k - RADIUS;
 				
-                float4 texelColor = sourceTexture[clamp(int3(dispatchThreadID) + int3(offsetI, offsetJ, offsetK), int3(0,0,0), int3(Aura_BufferResolution.xyz))];
+                FP4 texelColor = sourceTexture[clamp(int3(id) + int3(offsetI, offsetJ, offsetK), int3(0,0,0), int3(Aura_BufferResolution.xyz))];
 
                 int index = k * SIZE_1D * SIZE_1D + j * SIZE_1D + i;
                 color[index] = texelColor.xyz;
@@ -145,8 +174,8 @@ void ApplyDenoisingFilter(uint3 dispatchThreadID : SV_DispatchThreadID, uint3 gr
         }
     }
 	
-    float3 medianColor = color[ApproximateMedianIndex(rgbMeasure)];
-	float medianAlpha = alpha[ApproximateMedianIndex(alpha)];
+    FP3 medianColor = color[ApproximateMedianIndex(rgbMeasure)]; /////////////////////////////////// TODO : handle occluded cells
+	FP medianAlpha = alpha[ApproximateMedianIndex(alpha)];
 
-    destinationTexture[dispatchThreadID] = float4(medianColor, medianAlpha);
+    destinationTexture[id] = FP4(medianColor, medianAlpha);
 }
