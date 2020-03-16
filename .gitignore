@@ -14,6 +14,14 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+/[Aa]ssets/Resources/Mtree/
+/[Aa]ssets/Resources/Skyboxes/
+/[Aa]ssets/Texture/
+/[Aa]ssets/Material/
+/[Aa]ssets/Physics Materials/
+/[Aa]ssets/Editor/
+/[Aa]ssets/Fonts/
+
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
@@ -31,6 +39,12 @@
 *.meta
 *.png
 *.FBX
+*.tga
+*.jpg
+*.mat
+*.mp3
+
+
 *.shader
 Thumbs.db
 
