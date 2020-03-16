@@ -43,6 +43,7 @@
 *.jpg
 *.mat
 *.mp3
+*.wav
 
 
 *.shader
