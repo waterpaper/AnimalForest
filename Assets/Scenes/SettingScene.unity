@@ -180,6 +180,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 13
       objectReference: {fileID: 0}
+    - target: {fileID: 4007429668853379675, guid: d66d62677d7022e42b9ef87673164f8c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4001896316402709249, guid: d66d62677d7022e42b9ef87673164f8c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -290,6 +295,11 @@ PrefabInstance:
       propertyPath: m_BackGroundColor.b
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6446924152711339075, guid: d66d62677d7022e42b9ef87673164f8c,
+        type: 3}
+      propertyPath: m_RenderingPath
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 950641988, guid: d66d62677d7022e42b9ef87673164f8c, type: 3}
       propertyPath: frustumSettings.baseSettings
       value: 
@@ -298,7 +308,23 @@ PrefabInstance:
       propertyPath: frustumSettings.qualitySettings
       value: 
       objectReference: {fileID: 1710966174}
-    m_RemovedComponents: []
+    - target: {fileID: 8652122635610157072, guid: d66d62677d7022e42b9ef87673164f8c,
+        type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8652122635610157072, guid: d66d62677d7022e42b9ef87673164f8c,
+        type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8652122635610157072, guid: d66d62677d7022e42b9ef87673164f8c,
+        type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 6375261857858518047, guid: d66d62677d7022e42b9ef87673164f8c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: d66d62677d7022e42b9ef87673164f8c, type: 3}
 --- !u!1 &425311439
 GameObject:
@@ -530,44 +556,6 @@ Transform:
   m_Father: {fileID: 457484649}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &936348660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8334a49e76cafef4da22976db1613959, type: 3}
-  m_Name: Default Aura Quality Settings
-  m_EditorClassIdentifier: 
-  displayVolumetricLightingBuffer: 0
-  frustumGridResolution: {x: 160, y: 88, z: 128}
-  enableAutomaticStereoResizing: 1
-  farClipPlaneDistance: 128
-  depthBiasCoefficient: 0.35
-  enableVolumes: 1
-  enableVolumesTexture2DMask: 1
-  enableVolumesTexture3DMask: 1
-  enableVolumesNoiseMask: 1
-  enableAmbientLighting: 1
-  enableDirectionalLights: 1
-  enableDirectionalLightsShadows: 1
-  enableSpotLights: 1
-  enableSpotLightsShadows: 1
-  enablePointLights: 1
-  enablePointLightsShadows: 1
-  enableLightsCookies: 1
-  enableDithering: 1
-  texture3DFiltering: 1
-  enableDenoisingFilter: 0
-  denoisingFilterRange: 0
-  enableTemporalReprojection: 1
-  temporalReprojectionFactor: 0.95
-  enableOcclusionCulling: 1
-  occlusionCullingAccuracy: 2
-  enableLightProbes: 0
 --- !u!1 &1046681026
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,17 +587,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9adbab8004d8d459d0d095407abeeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterTable_FileName: Character
-  enemyTable_FileName: Enemy
-  bossTable_FileName: Boss
-  ItemTable_FileName: Item
-  QuestTable_FileName: Quest
-  MapTable_FlieName: Map
-  ShopTable_FlieName: Shop
-  NpcTable_FileName: Npc
-  EnemyDropItemTable_FileName: EnemyDropItem
-  SingleConversationTable_FileName: SingleConversationData
-  PlayerLevelTable_FileName: PlayerLevel
 --- !u!114 &1046681028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -907,8 +884,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8334a49e76cafef4da22976db1613959, type: 3}
   m_Name: Default Aura Quality Settings
   m_EditorClassIdentifier: 
+  m_Name: Default Aura Quality Settings
+  m_EditorClassIdentifier: 
+  m_Name: Default Aura Quality Settings
+  m_EditorClassIdentifier: 
   displayVolumetricLightingBuffer: 0
-  frustumGridResolution: {x: 160, y: 88, z: 128}
+  frustumGridResolution: {x: 160, y: 90, z: 128}
   enableAutomaticStereoResizing: 1
   farClipPlaneDistance: 128
   depthBiasCoefficient: 0.35
@@ -926,10 +907,15 @@ MonoBehaviour:
   enableLightsCookies: 1
   enableDithering: 1
   texture3DFiltering: 1
-  enableDenoisingFilter: 0
-  denoisingFilterRange: 0
+  EXPERIMENTAL_enableDenoisingFilter: 0
+  EXPERIMENTAL_denoisingFilterRange: 0
+  EXPERIMENTAL_enableBlurFilter: 0
+  EXPERIMENTAL_blurFilterRange: 0
+  EXPERIMENTAL_blurFilterType: 0
+  EXPERIMENTAL_blurFilterGaussianDeviation: 0.0025
   enableTemporalReprojection: 1
   temporalReprojectionFactor: 0.95
   enableOcclusionCulling: 1
-  occlusionCullingAccuracy: 2
+  debugOcclusionCulling: 0
+  occlusionCullingAccuracy: 0
   enableLightProbes: 0
