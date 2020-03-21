@@ -2,44 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BGMSoundKind
-{
-    BGMSoundKind_Title,
-    BGMSoundKind_StartGame,
-    BGMSoundKind_Town,
-    BGMSoundKind_BeforeFelid,
-    BGMSoundKind_AfterFelid,
-    BGMSoundKind_Boss1,
-    BGMSoundKind_End
-}
-
-public enum EffectSoundKind
-{
-    //playerSound
-    EffectSoundKind_PlayerAttack = 0,
-    EffectSoundKind_PlayerRoll,
-    EffectSoundKind_PlayerJumpUP,
-    EffectSoundKind_PlayerJumpDowm,
-    EffectSoundKind_PlayerFootStep,
-    EffectSoundKind_PlayerLevelUP,
-    EffectSoundKind_PlayerPotion,
-
-    //enemySound
-    EffectSoundKind_EnemyHit = 100,
-
-    //BossSound
-    EffectSoundKind_Boss1_Hit = 1000,
-    EffectSoundKind_Boss1_Attack,
-    EffectSoundKind_Boss1_Skiil1_UP,
-    EffectSoundKind_Boss1_Skill1_Down,
-    EffectSoundKind_Boss1_Skill2,
-
-    //Environment
-    EffectSoundKind_Environment_Boxopen,
-
-    EffectSoundKind_End
-}
-
 [System.Serializable]
 public struct BgmSoundInfo
 {
@@ -66,7 +28,7 @@ public class EffectSound
     public AudioSource source;
 }
 
-public class SoundManager : MonoBehaviour
+public class SoundManager : SingletonMonoBehaviour<SoundManager>
 {
     [Header("SoundSetting")]
     //생성할 사운드 오브젝트입니다.
@@ -89,30 +51,12 @@ public class SoundManager : MonoBehaviour
     private Dictionary<BGMSoundKind, BgmSoundInfo> BGMSoundDictionary;
     private Dictionary<EffectSoundKind, EffectSoundInfo> EffectSoundDictionary;
 
-    //싱긅톤 객체입니다.
-    private static SoundManager m_instance;
-
-    //싱글톤 접근
-    public static SoundManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<SoundManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-
     void Awake()
     {
         //원하는 초기 데이터를 설정해줍니다.
-        //오브젝트가 하나 더 생성되었을시 싱글톤개념에 맞지 않기 때문에 파괴합니다.
         if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
 
         ClipSetting();

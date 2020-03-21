@@ -3,190 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[System.Serializable]
-public struct DropItemData
+public class DataManager : SingletonMonoBehaviour<DataManager>
 {
-    public int DropItemId;
-    public float DropItemPercent;
-}
-
-[System.Serializable]
-public struct NpcLocationData
-{
-    public int NpcID;
-    public Vector3 Location;
-    public Vector3 Rotation;
-}
-[System.Serializable]
-public struct BossLocationData
-{
-    public int BossID;
-    public Vector3 Location;
-}
-
-[System.Serializable]
-public class TableInfo
-{
-    public int ID;
-    public string Name;
-}
-
-[System.Serializable]
-public class CharacterTable : TableInfo
-{
-    public int Level;
-    public int Exp;
-    public int ExpMax;
-    public float Hp;
-    public float HpMax;
-    public float Mp;
-    public float MpMax;
-    public float Atk;
-    public float Def;
-}
-
-[System.Serializable]
-public class EnemyTable : TableInfo
-{
-    public string Explanation;
-    public int EnemyType;
-    public int Level;
-    public float Hp;
-    public float HpMax;
-    public float Mp;
-    public float MpMax;
-    public float Atk;
-    public float Def;
-    public int Exp;
-}
-
-[System.Serializable]
-public class BossTable : TableInfo
-{
-    public int Level;
-    public int Exp;
-    public int Hp;
-    public int HpMax;
-    public int Mp;
-    public int MpMax;
-    public float Atk;
-    public float Def;
-    public float TraceDist;
-    public float PatrolMoveSpeed;
-    public float TraceMoveSpeed;
-    public BossSkill BossAttack;
-    public BossSkill Skill_1;
-    public BossSkill Skill_2;
-}
-
-[System.Serializable]
-public class ItemTable : TableInfo
-{
-    public string Explanation;
-    public int Value;
-    public float AddHp;
-    public float AddMp;
-    public float AddAtk;
-    public float AddDef;
-    public float RecoveryHp;
-    public float RecoveryMp;
-    public int ItemKind;
-    public int DetailKind;
-}
-
-[System.Serializable]
-public class QuestTable : TableInfo
-{
-    public string OrderNpcConversation;
-    public string TargetNpcConversation;
-    public int MinLevel;
-    public int Kind;
-    public int OrderNpc;
-    public int TargetNpc;
-    public int TargetObject;
-    public int TargetCount;
-    public int RewardExp;
-    public int RewardMoney;
-    public List<int> RewardItem;
-}
-
-[System.Serializable]
-public class MapTable : TableInfo
-{
-    public int SpawnNum;
-    public List<Vector3> SpwanLocation;
-    public List<int> SpwanMonster;
-    public List<NpcLocationData> NpcLocation;
-    public List<BossLocationData> BossLocation;
-}
-
-[System.Serializable]
-public class ShopTable : TableInfo
-{
-    public int ShopKind;
-    public List<int> ShopItemID;
-}
-
-[System.Serializable]
-public class EnemyDropItemTable : TableInfo
-{
-    public int DropMoneyMin;
-    public int DropMoneyMax;
-    public List<DropItemData> EnemyDropItemDataList;
-}
-
-[System.Serializable]
-public class NpcTable : TableInfo
-{
-    public int Type;
-    public int Level;
-    public float Hp;
-    public float HpMax;
-    public float Mp;
-    public float MpMax;
-    public float Atk;
-    public float Def;
-    public int ShopKind;
-    public List<String> Conversations;
-    public List<int> NpcQuests;
-}
-
-[System.Serializable]
-public class SingleConversationTable : TableInfo
-{
-    public string Text;
-    public int Type;
-}
-
-[System.Serializable]
-public class PlayerLevelTable : TableInfo
-{
-    public int Level;
-    public int ExpMax;
-    public float AddHp;
-    public float AddMp;
-    public float AddAtk;
-    public float AddDef;
-}
-
-public class DataManager : MonoBehaviour
-{
-    private static DataManager _instance;
-
-    //싱글톤 접근
-    public static DataManager instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<DataManager>();
-                DontDestroyOnLoad(_instance);
-            }
-            return _instance;
-        }
-    }
-
     private const string _characterTable_FileName = "Character";
     private const string _enemyTable_FileName = "Enemy";
     private const string _bossTable_FileName = "Boss";
@@ -198,13 +16,14 @@ public class DataManager : MonoBehaviour
     private const string _EnemyDropItemTable_FileName = "EnemyDropItem";
     private const string _SingleConversationTable_FileName = "SingleConversationData";
     private const string _PlayerLevelTable_FileName = "PlayerLevel";
-    
+
     Dictionary<int, CharacterTable> CharacterInfoTable;
     Dictionary<int, EnemyTable> EnemyInfoTable;
     Dictionary<int, BossTable> BossInfoTable;
     Dictionary<int, ItemTable> ItemInfoTable;
     Dictionary<int, QuestTable> QuestInfoTable;
     Dictionary<string, MapTable> MapInfoTable;
+    //public Dictionary<string, MapTable> MapInfos { get { return MapInfoTable; } }
     Dictionary<int, ShopTable> ShopInfoTable;
     Dictionary<int, NpcTable> NpcInfoTable;
     Dictionary<int, EnemyDropItemTable> EnemyDropItemInfoTable;
@@ -218,7 +37,7 @@ public class DataManager : MonoBehaviour
     {
         if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
 
         CharacterInfoTable = new Dictionary<int, CharacterTable>();
@@ -282,12 +101,71 @@ public class DataManager : MonoBehaviour
     }
 
     /*
-    public table GetTableData<table>()
+    //원하는 데이터를 반환해주는 함수입니다.
+    public T GetTableData<T>(TableDataKind kind, int id = 0, string name = null)
     {
-        if(table.GetType())
-        { }
+        if(T.GetType())
+
+        switch (kind)
+        {
+            case TableDataKind.TableDataKind_Character:
+                return CharacterInfoTable[id];
+
+            case TableDataKind.TableDataKind_Enemy:
+                return EnemyInfoTable[id];
+
+            case TableDataKind.TableDataKind_Boss:
+                return BossInfoTable[id];
+
+            case TableDataKind.TableDataKind_Item:
+                return ItemInfoTable[id];
+
+            case TableDataKind.TableDataKind_Quest:
+                return QuestInfoTable[id];
+
+            case TableDataKind.TableDataKind_Map:
+                return MapInfoTable[name];
+
+            case TableDataKind.TableDataKind_Shop:
+                return ShopInfoTable[id];
+
+            case TableDataKind.TableDataKind_Npc:
+                return NpcInfoTable[id];
+
+            case TableDataKind.TableDataKind_EnemyDropItem:
+                return EnemyDropItemInfoTable[id];
+
+            case TableDataKind.TableDataKind_SingleConversation:
+                return SingleConversationInfoTable[id];
+
+            case TableDataKind.TableDataKind_PlayerLevel:
+                return PlayerLevelInfoTable[id];
+
+            default:
+                return null;
+        }
     }
     */
+
+    //원하는 아이콘을 가져온다
+    //이때 id에 맞춰 list에 저장되어 있기 때문에 id에서 -1한 값을 인덱스로 접근해 가져온다. 
+    public Sprite GetIconData(IconDataKind kind, int id)
+    {
+        int index = id - 1;
+
+        switch (kind)
+        {
+            case IconDataKind.IconDataKind_Character:
+                return CharacterIconData[index];
+
+            case IconDataKind.IconDataKind_Item:
+                return ItemIconData[index];
+
+            default:
+                return null;
+        }
+    }
+
 
     public CharacterTable CharacterInfo(int id)
     {
@@ -314,20 +192,11 @@ public class DataManager : MonoBehaviour
         return QuestInfoTable[id];
     }
 
-    public Sprite CharacterIcon(int id)
-    {
-        return CharacterIconData[id - 1];
-    }
-
-    public Sprite ItemIcon(int id)
-    {
-        return ItemIconData[id - 1];
-    }
-
     public MapTable MapInfo(string mapName)
     {
         return MapInfoTable[mapName];
     }
+
     public ShopTable ShopInfo(int id)
     {
         return ShopInfoTable[id];
@@ -356,8 +225,6 @@ public class DataManager : MonoBehaviour
     //아이템을 세팅해서 리턴합니다.
     public Item ItemSetting(int itemID)
     {
-        if (itemID < 0) return null;
-
         ItemTable itemTableTemp = ItemInfo(itemID);
 
         switch ((Item.ItemType)itemTableTemp.ItemKind)

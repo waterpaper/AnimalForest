@@ -6,14 +6,21 @@ using TMPro;
 
 public class SingleConversationUI : MonoBehaviour
 {
+    //초기 세팅상태인지 의미하는 변수입니다.
+    public bool isSetting = false;
+
     //현재 문장리스르를 저장하는 리스트입니다.
     public List<int> singleConversationList;
 
     public void OnEnable()
     {
-        if (PlayerManager.instance == null) return;
+        if (!isSetting)
+        {
+            isSetting = true;
+            return;
+        }
         //캐릭터와 맞는 이미지로 교체합니다.
-        transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = DataManager.instance.CharacterIcon(PlayerManager.instance.Kind);
+        transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = DataManager.instance.GetIconData(IconDataKind.IconDataKind_Character, PlayerManager.instance.Kind);
     }
     
     public void OkayButton()

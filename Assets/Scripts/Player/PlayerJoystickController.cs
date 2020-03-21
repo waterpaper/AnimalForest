@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class PlayerJoystickController : MonoBehaviour
 {
-    public Transform Stick;
-    public PlayerInput playerInput;
-    Vector3 axis;
+    public Transform stick;
+    public GameObject pad;
 
+    private PlayerInput _playerInput;
+
+    //움직인 거리입니다.
+    Vector3 axis;
+    //반지름
     float radius;
+    //이동후 돌아오는 센터자리입니다.
     Vector3 defaultCenter;
     
     void Start()
     {
         radius = GetComponent<RectTransform>().sizeDelta.y / 4;
-        defaultCenter = Stick.position;
-        playerInput = GameObject.Find("Player").GetComponent<PlayerInput>();
+        _playerInput = GameObject.Find("Player").GetComponent<PlayerInput>();
     }
 
     private void OnDisable()
@@ -25,6 +29,7 @@ public class PlayerJoystickController : MonoBehaviour
 
     public void Move()
     {
+        //패드에서 스틱을 움직인 방향을 단위벡터로 검출해 해당 방향으로 스피드 만큼 이동하게 합니다.
         Vector3 touchPos = Vector3.zero;
 
         if (Input.touchCount > 0)
@@ -44,24 +49,26 @@ public class PlayerJoystickController : MonoBehaviour
         float Distance = Vector3.Distance(touchPos, defaultCenter);
 
         if (Distance > radius)
-            Stick.position = defaultCenter + axis * radius;
+            stick.position = defaultCenter + axis * radius;
         else
-            Stick.position = defaultCenter + axis * Distance;
+            stick.position = defaultCenter + axis * Distance;
 
-        playerInput.vertical = axis.y;
-        playerInput.horizontal = axis.x;
+        _playerInput.vertical = axis.y;
+        _playerInput.horizontal = axis.x;
 
-        playerInput.IsJoyStickControll = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void End()
     {
+        //종료시 다시 윈위치로 복구합니다.
         axis = Vector3.zero;
-        Stick.position = defaultCenter;
+        defaultCenter = pad.transform.position;
+        stick.position = defaultCenter;
 
-        playerInput.vertical = axis.y;
-        playerInput.horizontal = axis.x;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.vertical = axis.y;
+        _playerInput.horizontal = axis.x;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void RotationStart()
@@ -85,50 +92,51 @@ public class PlayerJoystickController : MonoBehaviour
         float Distance = Vector3.Distance(touchPos, defaultCenter);
 
         if (Distance > radius)
-            Stick.position = defaultCenter + axis * radius;
+            stick.position = defaultCenter + axis * radius;
         else
-            Stick.position = defaultCenter + axis * Distance;
+            stick.position = defaultCenter + axis * Distance;
 
         CameraManager.instance.FixedTick(Time.deltaTime, axis.x, -axis.y);
 
-        playerInput.IsJoyStickControll = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void RotationEnd()
     {
         axis = Vector3.zero;
-        Stick.position = defaultCenter;
+        defaultCenter = pad.transform.position;
+        stick.position = defaultCenter;
 
-        playerInput.IsJoyStickControll = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void AttackButton()
     {
-        playerInput.normalAttack = true;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.normalAttack = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void RollButton()
     {
-        playerInput.roll = true;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.roll = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void JumpButton()
     {
-        playerInput.jump = true;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.jump = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void ComboAttackButton()
     {
-        playerInput.comboAttack = true;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.comboAttack = true;
+        _playerInput.IsJoyStickControll = true;
     }
 
     public void SprintButton()
     {
-        playerInput.sprint = true;
-        playerInput.IsJoyStickControll = true;
+        _playerInput.sprint = true;
+        _playerInput.IsJoyStickControll = true;
     }
 }

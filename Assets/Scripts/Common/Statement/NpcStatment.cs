@@ -4,15 +4,6 @@ using UnityEngine;
 
 public class NpcStatment : MonoBehaviour
 {
-    public enum NPCTYPE
-    {
-        NPCTYPE_General,
-        NPCTYPE_Quest,
-        NPCTYPE_WeaponShop,
-        NPCTYPE_VarietyShop,
-        NPCTYPE_End
-    }
-
     public int ID = -1;
     public NPCTYPE type;
     public string name;

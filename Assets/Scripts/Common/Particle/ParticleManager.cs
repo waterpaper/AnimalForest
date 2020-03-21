@@ -22,7 +22,7 @@ public enum ParticleName
     ParticleName_End
 }
 
-public class ParticleManager : MonoBehaviour
+public class ParticleManager : SingletonMonoBehaviour<ParticleManager>
 {
     [Header("ParticleLimitCount")]
     public int playerEffectParticleCount = 2;
@@ -37,28 +37,12 @@ public class ParticleManager : MonoBehaviour
     [Header("ParticlePool")]
     public List<GameObject> allParticlePrefab;
     public Dictionary<int, List<GameObject>> ParticleObjectPool;
-
-    private static ParticleManager m_instance;
-
-    //싱글톤 접근
-    public static ParticleManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<ParticleManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-
+    
     public void Awake()
     {
         if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
     }
 

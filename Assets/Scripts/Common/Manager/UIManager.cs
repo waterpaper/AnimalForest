@@ -4,30 +4,8 @@ using UnityEngine;
 
 public enum UiKind { UiKind_NormalUI, UiKind_CustomUI, UiKind_InventoryUI, UIKind_EquipmentUI, UiKind_ShopUI, UiKind_OptionUI, UiKind_GameUI, UIKind_ConversationUI, UIKind_SingleConversationUI, UIKind_SingleConversationPauseUI, UiKind_LoginUI, UIKind_SignUpUI, UiKind_AllUi,UiKind_End };
 
-public class UIManager : MonoBehaviour
+public class UIManager : SingletonMonoBehaviour<UIManager>
 {
-    private static UIManager m_instance;
-
-    //싱글톤 접근
-    public static UIManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<UIManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-
-    [Header("InputButtonString")]
-    //인벤토리
-    public string inventoryButtonName = "Inventory";
-    //옵션
-    public string optionButtonName = "Option";
-
     [Header("UIobject")]
     public GameObject normalUI;
     public GameObject customUI;
@@ -44,14 +22,17 @@ public class UIManager : MonoBehaviour
     [Header("TempStatment")]
     public BossStatement nowBossStatement;
     public NpcStatment nowNpcStatment = null;
+    
+    [Header("UIStack")]
+    public Stack<int> saveActiveUIStack;
 
-    [Header("GetItem")]
+    [Header("Prefab")]
     public GameObject GetItemContentPrefabs;
     public GameObject GetItemViewerContentLoaction;
 
-    [Header("UIStack")]
-    public Stack<int> saveActiveUIStack;
-    
+    public GameObject TextMessageUIPrefab;
+    private Canvas GameUICanvas;
+
     public bool IsNormalUI { get; private set; }
     public bool IsCustomUI { get; private set; }
     public bool IsInventoryUI { get; private set; }
@@ -65,13 +46,11 @@ public class UIManager : MonoBehaviour
     public bool IsSignUpUI { get; private set; }
     public bool IsBossUI { get; private set; }
 
-
-    private void Awake()
+    public void Awake()
     {
-        if (instance != this)
+        if(instance != this)
         {
-            Destroy(gameObject);
-            return;
+            Destroy(this.gameObject);
         }
     }
 
@@ -80,17 +59,14 @@ public class UIManager : MonoBehaviour
         FirstSetting();
 
         saveActiveUIStack = new Stack<int>();
-
+        GameUICanvas = gameUI.GetComponent<Canvas>();
         SceneSetting();
     }
 
-    public void SceneSetting()
+    private void SceneSetting()
     {
-        if (SceneLoader.instance.NowSceneKind() == SceneKind.Title)
-        {
-
-        }
-        else if (SceneLoader.instance.NowSceneKind() == SceneKind.Custom)
+        //씬에 맞게 UI를 조정합니다
+        if (SceneLoader.instance.NowSceneKind() == SceneKind.Custom)
         {
             if(!IsLoginUI)
                 UISetting(UiKind.UiKind_LoginUI);
@@ -103,18 +79,6 @@ public class UIManager : MonoBehaviour
                 UISetting(UiKind.UiKind_NormalUI);
         }
 
-    }
-
-    private void FixedUpdate()
-    {
-        SceneKind kindTemp = SceneLoader.instance.NowSceneKind();
-        if(kindTemp != SceneKind.Title && kindTemp != SceneKind.Custom)
-        {
-            if (Input.GetButtonDown(inventoryButtonName))
-                UISetting(UiKind.UiKind_InventoryUI);
-            else if (Input.GetButtonDown(optionButtonName))
-                UISetting(UiKind.UiKind_OptionUI);
-        }
     }
 
     public void UseUI(UiKind kind)
@@ -379,7 +343,7 @@ public class UIManager : MonoBehaviour
 
     public void BossUISetting(BossStatement bossStatementTemp)
     {
-        //맵에 보스를 찾습니다.
+        //보스데이터를 받아와 저장합니다.
         if (bossStatementTemp != null)
         {
             nowBossStatement = bossStatementTemp;
@@ -450,5 +414,13 @@ public class UIManager : MonoBehaviour
         singleConversationUI.SetActive(false);
         loginUI.SetActive(false);
         signUpUI.SetActive(false);
+    }
+
+    public void PrintGameText(string text, Transform transform, Vector3 pivot, Color color)
+    {
+        //데미지 ui를 출력합니다
+        var damageUITemp = Instantiate<GameObject>(TextMessageUIPrefab, GameUICanvas.transform);
+        damageUITemp.name = "Damage";
+        damageUITemp.GetComponent<TextMessageUI>().Setting(text, new Color(128, 128, 0), transform.position, new Vector3(0.0f, 0.5f, 0.0f), GameUICanvas);
     }
 }

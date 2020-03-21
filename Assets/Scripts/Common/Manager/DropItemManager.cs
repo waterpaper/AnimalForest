@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DropItemManager : MonoBehaviour
+public class DropItemManager : SingletonMonoBehaviour<DropItemManager>
 {
-    private static DropItemManager m_instance;
     //드랍 아이템박스 프리팹입니다.
     public GameObject dropItemBoxPrefab;
     //드랍 아이템 박스를 저장할 위치
@@ -14,25 +13,11 @@ public class DropItemManager : MonoBehaviour
     //미리 선언할 드랍 아이템 박스의 갯수입니다.
     public int maxDropItem;
 
-    //싱글톤 접근
-    public static DropItemManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<DropItemManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-    
     void Awake()
     {
         if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
 
         //상자를 on, off하지 않기 위해 미리 세팅합니다
@@ -67,15 +52,15 @@ public class DropItemManager : MonoBehaviour
 
                 for (int j = 0; j < dropItemTableTemp.EnemyDropItemDataList.Count; j++)
                 {
-                    
+
                     if (randIdx < dropItemTableTemp.EnemyDropItemDataList[j].DropItemPercent)
                     {
                         Item itemTemp = DataManager.instance.ItemSetting(dropItemTableTemp.EnemyDropItemDataList[j].DropItemId);
 
                         if (itemTemp == null) continue;
-                            dropItemListTemp.Add(itemTemp);
+                        dropItemListTemp.Add(itemTemp);
                     }
-                    
+
                 }
 
                 dropItemBoxPoolList[i].GetComponent<DropItem>().ItemSetting(dropMoney, dropItemListTemp);

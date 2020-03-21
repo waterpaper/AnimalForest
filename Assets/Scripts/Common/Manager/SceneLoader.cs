@@ -5,30 +5,22 @@ using UnityEngine.SceneManagement;
 
 public enum SceneKind { Null, Title, Custom, Start, Town, Field1, Field1_Boss, End };
 
-public class SceneLoader : MonoBehaviour
+public class SceneLoader : SingletonMonoBehaviour<SceneLoader>
 {
-    private static SceneLoader m_instance;
-
     public Vector3 playerLocationTemp;
     private bool startSetting = false;
-
-    //싱글톤 접근
-    public static SceneLoader instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<SceneLoader>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
 
     public Dictionary<string, LoadSceneMode> loadScenes = new Dictionary<string, LoadSceneMode>();
 
     private SceneKind nowSceneKind = SceneKind.Title;
+
+    public void Awake()
+    {
+        if (instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+    }
 
     public SceneKind NowSceneKind()
     {

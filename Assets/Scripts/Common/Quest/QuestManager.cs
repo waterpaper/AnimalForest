@@ -2,30 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestManager : MonoBehaviour
+public class QuestManager : SingletonMonoBehaviour<QuestManager>
 {
     private List<Quest> QuestList;
 
     public int nowQuestCount = 0;
 
-    private static QuestManager m_instance;
-
-    //싱글톤 접근
-    public static QuestManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<QuestManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-
     private void Awake()
     {
+        if (instance != this)
+        {
+            Destroy(this.gameObject);
+        }
         QuestList = new List<Quest>();
     }
 

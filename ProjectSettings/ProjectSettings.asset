@@ -244,7 +244,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: "C:/Users/Lee/Desktop/\uACBD\uC77C \uD3EC\uD2B8\uD3F4\uB9AC\uC624/AnimalForest/animalforest.keystore"
+  AndroidKeystoreName: C:/Users/Lee/Desktop/test/AnimalForest/animalforest.keystore
   AndroidKeyaliasName: animalforest
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 1

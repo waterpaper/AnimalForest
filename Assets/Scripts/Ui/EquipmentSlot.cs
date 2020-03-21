@@ -10,16 +10,6 @@ public class EquipmentSlot : MonoBehaviour
     public TextMeshProUGUI itemNumText;
     public GameObject releaseButton;
 
-    public enum EquipmentSlotType
-    {
-        EquipmentSlotType_Weapon,
-        EquipmentSlotType_Armor,
-        EquipmentSlotType_Shield,
-        EquipmentSlotType_HpPotion,
-        EquipmentSlotType_MpPotion,
-        EquipmentSlotType_End
-    }
-
     public EquipmentSlotType type = EquipmentSlotType.EquipmentSlotType_End;
 
     private void Awake()
@@ -71,7 +61,7 @@ public class EquipmentSlot : MonoBehaviour
         {
             //빈칸을 출력하지 않기 위해 꺼두던 아이템이미지 컴포넌트틀 켜줍니다.
             itemImage.enabled = true;
-            itemImage.sprite = DataManager.instance.ItemIcon(itemTemp.itemInfomation.ID);
+            itemImage.sprite = DataManager.instance.GetIconData(IconDataKind.IconDataKind_Item, itemTemp.itemInfomation.ID);
 
             if (itemTemp.count == 1)
             {

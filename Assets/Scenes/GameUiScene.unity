@@ -699,8 +699,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ed4eb05020f974f9f328f47ad019fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Stick: {fileID: 720242490}
-  playerInput: {fileID: 0}
+  stick: {fileID: 720242490}
+  pad: {fileID: 40898282}
 --- !u!114 &40898285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8680,8 +8680,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ed4eb05020f974f9f328f47ad019fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Stick: {fileID: 2043850777}
-  playerInput: {fileID: 0}
+  stick: {fileID: 2043850777}
+  pad: {fileID: 775515281}
 --- !u!114 &775515284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13267,7 +13267,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 731792668}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9880381
+  m_Size: 0.9823019
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14188,8 +14188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff37a7ca2560334c8c214afe68066a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryButtonName: Inventory
-  optionButtonName: Option
   normalUI: {fileID: 1122115032}
   customUI: {fileID: 891817603}
   inventoryUI: {fileID: 256746847}
@@ -14206,6 +14204,8 @@ MonoBehaviour:
   GetItemContentPrefabs: {fileID: 7114399434646275578, guid: 9229f1f7b0c28ca429720dba3e6201c2,
     type: 3}
   GetItemViewerContentLoaction: {fileID: 1505495063}
+  TextMessageUIPrefab: {fileID: 7628532264470776429, guid: e20dae3dbd801894dab73abd6dcd98ea,
+    type: 3}
 --- !u!4 &1146657223
 Transform:
   m_ObjectHideFlags: 0
@@ -18505,7 +18505,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.000014846628, y: 0}
+  m_AnchoredPosition: {x: 0.000013641612, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1505495065
@@ -21735,7 +21735,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -89, y: 149.98225}
+  m_AnchoredPosition: {x: -89, y: 149.97275}
   m_SizeDelta: {x: 184, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1731028366
@@ -25338,6 +25338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78fd84f1ded06074dba535eff9d4f0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isSetting: 0
   singleConversationList: 
 --- !u!1 &2123531296
 GameObject:

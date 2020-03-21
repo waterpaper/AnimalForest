@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PoolManager : MonoBehaviour
+public class PoolManager : SingletonMonoBehaviour<PoolManager>
 {
-    private static PoolManager m_instance;
-
     [Header("Enemy Pool")]
     //적 캐릭터를 저장할 위치
     public GameObject enemyPoolLocation;
@@ -49,28 +47,16 @@ public class PoolManager : MonoBehaviour
     //오브젝트 풀에 저장할 npc들을 가지고 있는 딕셔너리입니다.
     public Dictionary<int, GameObject> npcDictionary;
 
-    //싱글톤 접근
-    public static PoolManager instance
+    public void Awake()
     {
-        get
+        if (instance != this)
         {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<PoolManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
+            Destroy(this.gameObject);
         }
     }
 
     public void Start()
     {
-        //싱글톤 구현입니다.
-        if (instance != this)
-        {
-            Destroy(gameObject);
-        }
-
         //오브젝트 풀을 구현하기 위해 리스트에 입력받은 프리팹들을 딕셔너리로 바꿔 저장해 줍니다.
         nowEnemyIDList = new List<int>();
         nowBossIDList = new List<int>();

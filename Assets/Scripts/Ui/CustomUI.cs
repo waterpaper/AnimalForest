@@ -11,7 +11,7 @@ public class CustomUI : MonoBehaviour
     public TMP_InputField nameTextUI;
     public TextMeshProUGUI kindTextUI;
 
-    private void Awake()
+    private void Start()
     {
         nameTextUI = transform.GetChild(0).GetChild(0).GetChild(2).GetComponent<TMP_InputField>();
         kindTextUI = transform.GetChild(0).GetChild(0).GetChild(6).GetComponent<TextMeshProUGUI>();
@@ -27,16 +27,16 @@ public class CustomUI : MonoBehaviour
         {
             CameraManager.instance.PauseCamaraChangeON(PlayerManager.instance.transform.gameObject);
 
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalKind, PlayerManager.instance.Kind);
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalWeapon, 0);
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalArmor, 0);
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalShield, 0);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalKind, PlayerManager.instance.Kind);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalWeapon, 0);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalArmor, 0);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalShield, 0);
         }
     }
 
     public void BeforeButton()
     {
-        if (PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalKind, kindIndex - 1) == true)
+        if (PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalKind, kindIndex - 1) == true)
         {
             kindIndex -= 1;
             kindTextUI.text = kindIndex.ToString();
@@ -45,7 +45,7 @@ public class CustomUI : MonoBehaviour
 
     public void NextButton()
     {
-        if (PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalKind, kindIndex + 1) == true)
+        if (PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalKind, kindIndex + 1) == true)
         {
             kindIndex += 1;
             kindTextUI.text = kindIndex.ToString();

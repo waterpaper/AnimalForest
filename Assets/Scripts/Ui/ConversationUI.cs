@@ -50,17 +50,17 @@ public class ConversationUI : MonoBehaviour
             int rand = Random.Range(0, 2);
             textUI.text = nowNpcStatment.Conversations[rand];
 
-            if (nowNpcStatment.type == NpcStatment.NPCTYPE.NPCTYPE_General)
+            if (nowNpcStatment.type == NPCTYPE.NPCTYPE_General)
             {
                 questButton.SetActive(false);
                 shopButton.SetActive(false);
             }
-            else if (nowNpcStatment.type == NpcStatment.NPCTYPE.NPCTYPE_Quest)
+            else if (nowNpcStatment.type == NPCTYPE.NPCTYPE_Quest)
             {
                 questButton.SetActive(true);
                 shopButton.SetActive(false);
             }
-            else if (nowNpcStatment.type == NpcStatment.NPCTYPE.NPCTYPE_WeaponShop || nowNpcStatment.type == NpcStatment.NPCTYPE.NPCTYPE_VarietyShop)
+            else if (nowNpcStatment.type == NPCTYPE.NPCTYPE_WeaponShop || nowNpcStatment.type == NPCTYPE.NPCTYPE_VarietyShop)
             {
                 questButton.SetActive(true);
                 shopButton.SetActive(true);

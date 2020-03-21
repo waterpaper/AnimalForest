@@ -3,30 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryManager : MonoBehaviour
+public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
 {
     private Inventory _inventory;
     private Equipment _equipment;
-    private static InventoryManager m_instance;
 
     //부모가 될 canvas 객체
     private Canvas uiCanvas;
     //회복시에 띄우는 ui를 저정합니다.
     public GameObject TextMessageUIPrefab;
 
-    //싱글톤 접근
-    public static InventoryManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<InventoryManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
 
     public Inventory GetInventory()
     {
@@ -132,6 +118,8 @@ public class InventoryManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        else
+            DontDestroyOnLoad(this.gameObject);
 
         _inventory = GetComponent<Inventory>();
         _equipment = GetComponent<Equipment>();

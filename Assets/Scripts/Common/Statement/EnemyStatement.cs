@@ -1,18 +1,11 @@
 ﻿using UnityEngine;
 
-public enum EnemyType{
-    EnemyType_General,
-    EnemyType_Boss,
-    EnemyType_End
-}
-
 public class EnemyStatement : MonoBehaviour
 {
     //에너미의 스텟을 저장합니다.
     public int id = 0;
     public string name = "";
     public string explanation = "";
-    public EnemyType enemyType = EnemyType.EnemyType_End;
     public int level = 1;
     public float hp = 100.0f;
     public float hpMax = 100.0f;
@@ -41,7 +34,6 @@ public class EnemyStatement : MonoBehaviour
     {
         name = temp.Name;
         explanation = temp.Explanation;
-        enemyType = (EnemyType)temp.EnemyType;
         level = temp.Level;
         hp = temp.Hp;
         hpMax = temp.HpMax;

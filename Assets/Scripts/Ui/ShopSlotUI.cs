@@ -34,7 +34,7 @@ public class ShopSlotUI : MonoBehaviour
 
         ItemTable itemTemp = DataManager.instance.ItemInfo(itemID);
 
-        itemImage.sprite = DataManager.instance.ItemIcon(itemID);
+        itemImage.sprite = DataManager.instance.GetIconData(IconDataKind.IconDataKind_Item, itemID);
         itemNameUI.text = itemTemp.Name;
         itemTypeUI.text = ItemKindString(itemTemp);
         itemExplanationUI.text = itemTemp.Explanation;
