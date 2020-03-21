@@ -54,38 +54,5 @@ public class SignUpUI : MonoBehaviour
         UIManager.instance.UISetting(UiKind.UiKind_LoginUI);
         UIManager.instance.UISetting(UiKind.UIKind_SignUpUI);
     }
-
-    /*
-    IEnumerator SignUpCo()
-    {
-        //회원가입을 수행합니다.
-        List<IMultipartFormSection> loginForm = new List<IMultipartFormSection>();
-
-        loginForm.Add(new MultipartFormDataSection("ID", NewIDFelid.text));
-        loginForm.Add(new MultipartFormDataSection("Passward", NewPasswardFelid.text));
-
-        UnityWebRequest WebRequest = UnityWebRequest.Post(string.Format("{00}{01}.php", url, login), loginForm);
-
-        yield return WebRequest.SendWebRequest();
-
-        if (WebRequest != null)
-        {
-            string result = WebRequest.downloadHandler.text;
-
-            if (string.Equals(result, "Success"))
-            {
-                LoginAlramText.text = "로그인에 성공하였습니다. 게임을 접속합니다.";
-                LoginAlramText.gameObject.SetActive(true);
-            }
-            else if (string.Equals(result, "ID") || string.Equals(result, "Passward"))
-            {
-                LoginAlramText.text = "아이디나 비밀번호가 틀렸습니다. 확인해 주세요";
-                LoginAlramText.gameObject.SetActive(true);
-            }
-
-            Debug.Log(result);
-        }
-    }
-    */
-
+ 
 }

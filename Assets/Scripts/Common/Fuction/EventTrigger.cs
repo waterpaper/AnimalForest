@@ -4,20 +4,6 @@ using UnityEngine;
 
 public class EventTrigger : MonoBehaviour
 {
-    public enum EventAccess
-    {
-        EventAccess_Player,
-        EventAccess_Target,
-        EventAccess_Not,
-        EventAccess_Null
-    }
-
-    public enum EventKind
-    {
-        EventKind_BlueLight,
-        EventKind_ChoiceTerrain
-    }
-
     [Header("EvnetTrigger Infomation")]
     public int eventID;
     public float triggerActiveDistance =3.0f;

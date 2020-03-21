@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boss1_Skill_2 : MonoBehaviour
+public class Boss1_Skill_2 : BossSkillMono, IBossAttack
 {
-    public float Atk { get; private set; }
-    public float Factor { get; private set; }
-    public float Range { get; private set; }
-    public bool IsAttacking { get; private set; }
+    //보스 1의 스킬 2을 처리하는 클래스입니다.
+    [Header("Skill_Prefab")]
+    public GameObject skill_Prefab;
 
-    public GameObject Skill_Prefab;
-    public GameObject Skill_ReadyImage;
+    [Header("Skill_ReadyImage")]
+    public GameObject skill_ReadyImage;
 
     private void OnEnable()
     {
-        StartCoroutine(StartSkill());
+        StartCoroutine(StartAttack());
     }
 
     public void Setting(float bossAtk, float factor, float range)
@@ -25,30 +24,30 @@ public class Boss1_Skill_2 : MonoBehaviour
         Range = range;
     }
 
-    IEnumerator StartSkill()
+    public IEnumerator StartAttack()
     {
         //범위를 띄워줍니다.
-        Skill_ReadyImage.SetActive(true);
+        skill_ReadyImage.SetActive(true);
         IsAttacking = true;
 
         yield return new WaitForSeconds(3.0f);
 
-        Skill_ReadyImage.SetActive(false);
+        skill_ReadyImage.SetActive(false);
 
         //8개의 객체를 만들어 공격을 처리합니다.
         for (int i = 0; i <8; i++)
         {
-            var temp = Instantiate<GameObject>(Skill_Prefab, GameManager.instance.transform);
+            var temp = Instantiate<GameObject>(skill_Prefab, GameManager.instance.transform);
             temp.transform.position = transform.position;
 
             temp.transform.Rotate(transform.up, 45.0f * i);
             temp.GetComponent<Boss1_Skill2_Chlid>().Setting(Atk * Factor, Range, 200.0f);
         }
 
-        StartCoroutine(DisableSkill());
+        StartCoroutine(DisableAttack());
     }
 
-    IEnumerator DisableSkill()
+    public IEnumerator DisableAttack()
     {
         //스킬 공격상태를 종료합니다.
         yield return new WaitForSeconds(2.0f);

@@ -57,8 +57,7 @@ public class PlayerController : MonoBehaviour
         IsRoll = false;
         sprintSetting = false;
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         // 게임오버상태에서 상태값을 초기화한다.

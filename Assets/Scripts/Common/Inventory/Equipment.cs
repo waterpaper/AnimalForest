@@ -14,17 +14,17 @@ public class Equipment : MonoBehaviour
         if (item.equipType == EquipItem.EquipItemType.Weapon)
         {
             weapon = equipItemTemp;
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalWeapon, item.itemInfomation.ID);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalWeapon, item.itemInfomation.ID);
         }
         else if (item.equipType == EquipItem.EquipItemType.Armor)
         {
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalArmor, item.itemInfomation.ID);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalArmor, item.itemInfomation.ID);
             armor = equipItemTemp;
         }
         else if (item.equipType == EquipItem.EquipItemType.Shield)
         {
             shield = equipItemTemp;
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalShield, item.itemInfomation.ID);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalShield, item.itemInfomation.ID);
         }
 
         playerOption(true, (Item)equipItemTemp);
@@ -39,7 +39,7 @@ public class Equipment : MonoBehaviour
             if (weapon == null) return null;
 
 
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalWeapon, -1);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalWeapon, -1);
             itemTemp = (Item)weapon;
             weapon = null;
         }
@@ -48,7 +48,7 @@ public class Equipment : MonoBehaviour
             if (armor == null) return null;
 
 
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalArmor, -1);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalArmor, -1);
             itemTemp = (Item)armor;
             armor = null;
         }
@@ -57,7 +57,7 @@ public class Equipment : MonoBehaviour
             if (shield == null) return null;
 
 
-            PlayerManager.instance.CustomSetting(PlayerManager.PlayerCustomKind.PlayerCustomKind_AnimalShield, -1);
+            PlayerManager.instance.CustomSetting(PlayerCustomKind.PlayerCustomKind_AnimalShield, -1);
             itemTemp = (Item)shield;
             shield = null;
         }

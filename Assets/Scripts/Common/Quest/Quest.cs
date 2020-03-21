@@ -1,23 +1,8 @@
 ﻿using System.Collections.Generic;
 
-public enum EQuestKind
-{
-    EQuestKind_Hunting,
-    EQuestKind_Collection,
-    EQuestKind_Relay,
-    EQuestKind_BossHunting,
-    EQuestKind_End
-}
-
-public enum EQuestProgress
-{
-    EQuestProgress_Proceeding,
-    EQuestProgress_Completed,
-    EQuestProgress_End
-}
-
 abstract public class Quest
 {
+    //퀘스트 정보를 가지고 있는 추상 클래스
     public int QuestID { get; protected set; }
     public int MinLevel { get; protected set; }
     public int OrderNpc { get; protected set; }

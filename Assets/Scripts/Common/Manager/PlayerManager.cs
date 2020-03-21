@@ -2,63 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public struct SaveItemData
+public class PlayerManager : SingletonMonoBehaviour<PlayerManager>
 {
-    public int ItemID;
-    public int ItemCount;
-    public int InventoryNum;
-}
-
-[System.Serializable]
-public struct SaveQuestData
-{
-    public int QuestID;
-    public int TargetNowCount;
-}
-
-[System.Serializable]
-public class PlayerSaveData
-{
-    public string ID;
-    public string Name;
-    public int Kind;
-    public int Money;
-    public int Level;
-    public int Exp;
-    public float Hp;
-    public float HpMax;
-    public float Mp;
-    public float MpMax;
-    public float Atk;
-    public float Def;
-
-    public int MapNumber;
-    public Vector3 MapPosition;
-
-    public int EquipWeaponItem;
-    public int EquipArmorItem;
-    public int EquipShieldItem;
-    public int EquipHpPotion;
-    public int EquipMpPotion;
-
-    public string ClearQuest;
-    public string ClearEvent;
-    public List<SaveItemData> ItemList;
-    public List<SaveQuestData> QuestList;
-}
-
-public class PlayerManager : MonoBehaviour
-{
-    public enum PlayerCustomKind
-    {
-        PlayerCustomKind_AnimalKind,
-        PlayerCustomKind_AnimalWeapon,
-        PlayerCustomKind_AnimalArmor,
-        PlayerCustomKind_AnimalShield,
-        PlayerCustomKind_End,
-    }
-
     private PlayerState _playerState = null;
     private PlayerCustom _playerCustom = null;
     private Rigidbody _rigidbody;
@@ -69,35 +14,19 @@ public class PlayerManager : MonoBehaviour
     //로드 아이템 정보 세팅시 statement의 기본 값을 건들이지 않기 위한 변수입니다.(데이터베이스에 저장되어 있음)
     private bool _isLoad = false;
 
-    private static PlayerManager m_instance;
-
     [Header("PlayerSaveFile")]
     public string playerData_FileName = "Player";
 
-    //싱글톤 접근
-    public static PlayerManager instance
+    public void Awake()
     {
-        get
+        if (instance != this)
         {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<PlayerManager>();
-                DontDestroyOnLoad(m_instance);
-
-                if (m_instance._playerState == null)
-                {
-                    return null;
-                }
-            }
-            else if (m_instance._playerState == null)
-            {
-                return null;
-            }
-
-            return m_instance;
+            Destroy(this.gameObject);
         }
+        else
+            DontDestroyOnLoad(this.gameObject);
     }
-    
+
     void Start()
     {
         _playerState = GetComponent<PlayerState>();

@@ -47,37 +47,35 @@ public class BossDamage : MonoBehaviour
             PlayerAttackCollider playerAttackColliderTemp = other.gameObject.GetComponent<PlayerAttackCollider>();
 
             //같은 공격 상태이면 데미지 처리를 하지 않습니다.
-            if (beforDamageNumber == playerAttackColliderTemp.attackNumber)
-                return;
-
-            beforDamageNumber = playerAttackColliderTemp.attackNumber;
+            if (beforDamageNumber == playerAttackColliderTemp.attackNumber) return;
+            else
+                beforDamageNumber = playerAttackColliderTemp.attackNumber;
 
             //공격력에 맞는 데미지를 감소시킵니다.
             _bossStatement.hp -= (int)playerAttackColliderTemp.Damage;
 
             if (_bossStatement.hp <= 0.0f)
-            {
-                //boss 사망을 처리합니다.
-                _bossAI.isDeath = true;
-                //capsule Collider컴포넌트를 비활성화
-                _bossHitCollider.enabled = false;
-
-                //데미지 ui를 출력합니다
-                var ExpUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
-                ExpUITemp.name = "Exp";
-                ExpUITemp.GetComponent<TextMessageUI>().Setting(string.Format("Exp + {00}", _bossStatement.exp), new Color(255, 255, 255), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
-            }
+                Death();
 
             //데미지 ui를 출력합니다
-            var damageUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
-            damageUITemp.name = "Damage";
-            damageUITemp.GetComponent<TextMessageUI>().Setting(playerAttackColliderTemp.Damage.ToString(), new Color(128, 128, 0), gameObject.transform.position, new Vector3(0.0f, 0.5f, 0.0f), uiCanvas);
-
-            StartCoroutine(IEHitParticle());
+            UIManager.instance.PrintGameText(playerAttackColliderTemp.Damage.ToString(), gameObject.transform, new Vector3(0.0f, 0.5f, 0.0f), new Color(128, 128, 0));
+            
+            StartCoroutine(IEHitEffect());
         }
     }
 
-    IEnumerator IEHitParticle()
+    private void Death()
+    {
+        //boss 사망을 처리합니다.
+        _bossAI.IsDeath = true;
+        //capsule Collider컴포넌트를 비활성화
+        _bossHitCollider.enabled = false;
+
+        //경험치 ui를 출력합니다
+        UIManager.instance.PrintGameText(string.Format("Exp + {00}", _bossStatement.exp), gameObject.transform, new Vector3(0.0f, 0.5f, 0.0f), new Color(255, 255, 255));
+    }
+
+    IEnumerator IEHitEffect()
     {
         SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Hit);
         ParticleManager.instance.Play(ParticleName.ParticleName_Battle_Boss1Hit, transform, hitEffectOffset);

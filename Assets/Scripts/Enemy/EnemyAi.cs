@@ -5,17 +5,6 @@ using UnityEngine.AI;
 
 public class EnemyAi : MonoBehaviour
 {
-    public enum EnemyAction
-    {
-        Idle,
-        Patrol,
-        Trace,
-        Attack,
-        Hit,
-        Die,
-        End
-    }
-
     public EnemyAction action = EnemyAction.Patrol;
 
     //적 캐릭터의 위치를 저장할 변수

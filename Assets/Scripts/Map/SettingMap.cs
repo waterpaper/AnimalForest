@@ -69,7 +69,6 @@ public class SettingMap : MonoBehaviour
 
             case SceneKind.Field1_Boss:
                 return DataManager.instance.MapInfo("Field1_Boss");
-
             default:
                 return null;
         }

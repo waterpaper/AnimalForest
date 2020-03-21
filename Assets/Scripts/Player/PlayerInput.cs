@@ -19,7 +19,6 @@ public class PlayerInput : MonoBehaviour
     //구르기
     public string rollName = "Roll";
 
-
     //[Header("NowCondition")]
     //할당은 내부에서만 가능
     public float vertical { get; set; }

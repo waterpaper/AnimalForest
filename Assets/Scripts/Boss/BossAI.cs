@@ -18,7 +18,13 @@ public enum BossAction
 
 public class BossAI : MonoBehaviour
 {
+    [Header("AI attribute")]
+    //타겟 캐릭터
+    public GameObject targetPlayer = null;
+    //현재 보스의 액션입니다.
     public BossAction action = BossAction.Patrol;
+    //죽엇는지 여부를 판단해주는 변수입니다.
+    public bool IsDeath { get; set; }
 
     //보스 캐릭터의 위치를 저장할 변수
     private Transform _bossTrans;
@@ -32,19 +38,11 @@ public class BossAI : MonoBehaviour
     private Rigidbody _bossRigidbody;
     //적 캐릭터의 네브
     private NavMeshAgent _enemyNavAgent;
-
     //시야각 및 추적 반경을 제어하는 enemyFov클래스를 저장할 변수
     private BossFov _bossFov;
     //공격루티을 처리하는 클래스를 저장하는 변수
     private BossAttack _bossAttack;
-    //처음 세팅여부를 판단해주는 변수입니다.
-    private bool _bossSetting = false;
-    //죽엇는지 여부를 판단해주는 변수입니다.
-    public bool isDeath = false;
-
-    //타겟 캐릭터
-    public GameObject targetPlayer;
-
+    
     //애니메이션 입력 데이터입니다.
     private readonly int hashMove = Animator.StringToHash("IsMove");
     private readonly int hashAttack = Animator.StringToHash("IsAttack");
@@ -65,34 +63,25 @@ public class BossAI : MonoBehaviour
         _bossAttack = GetComponent<BossAttack>();
         _enemyNavAgent = GetComponent<NavMeshAgent>();
         _bossRigidbody = GetComponent<Rigidbody>();
-
-        targetPlayer = null;
     }
 
     private void OnEnable()
     {
-        //보스가 재 생성할때 마다 초기화 해줍니다.
+        //보스가 재 생성할때 마다 초기화후 코루틴을 통해 ai상태를 판단합니다.
         Initialize();
+        StartCoroutine(IECheckState());
 
-        if (_bossSetting == true)
-        {
-            StartCoroutine(IECheckState());
-
-            //보스 UI를 출력합니다.
-            UIManager.instance.BossUISetting(_bossState);
-        }
-        else
-            _bossSetting = true;
+        //보스 UI를 출력합니다.
+        UIManager.instance.BossUISetting(_bossState);
     }
-
 
     private void Initialize()
     {
         //보스 상태를 초기화할때 사용합니다
         action = BossAction.Idle;
-
         targetPlayer = null;
-        isDeath = false;
+        IsDeath = false;
+
         _bossFov.Setting(_bossState.traceDist);
 
         Ani_Initialize();
@@ -133,25 +122,25 @@ public class BossAI : MonoBehaviour
                 break;
             case BossAction.Attack:
                 _bossMovement.Stop();
-                Ani_Initialize();
+                //Ani_Initialize();
                 _bossAni.SetBool(hashAttack, true);
                 SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Attack);
                 break;
             case BossAction.Skill1:
                 _bossMovement.Stop();
-                Ani_Initialize();
+                //Ani_Initialize();
                 _bossAni.SetBool(hashSkill_1, true);
                 SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Skiil1_UP);
                 break;
             case BossAction.Skill2:
                 _bossMovement.Stop();
-                Ani_Initialize();
+                //Ani_Initialize();
                 _bossAni.SetBool(hashSkill_2, true);
                 SoundManager.instance.EffectSoundPlay(EffectSoundKind.EffectSoundKind_Boss1_Skill2);
                 break;
             case BossAction.Die:
                 _bossMovement.Stop();
-                Ani_Initialize();
+                //Ani_Initialize();
                 _bossAni.SetBool(hashDeath, true);
                 break;
         }
@@ -164,7 +153,7 @@ public class BossAI : MonoBehaviour
         //유한상태기계를 이용하기 위해 각 상태를 체크, 설정합니다.
         //죽지 않았을시 0.3초 마다 반복합니다.
 
-        while (isDeath != true)
+        while (IsDeath != true)
         {
             //애니메이터에 현재 이동속도를 입력합니다.
             _bossAni.SetFloat(hashSpeed, _enemyNavAgent.speed);
@@ -240,7 +229,7 @@ public class BossAI : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
 
-        if (isDeath == true)
+        if (IsDeath == true)
         {
             //죽엇을시 상태를 die로 변화후 상태 설정과 죽었을 때 처리하는 함수를 실행합니다.
             action = BossAction.Die;

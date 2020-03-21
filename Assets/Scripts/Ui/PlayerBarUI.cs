@@ -1,14 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public enum PlayerBarKind
-{
-    PlayerBarKind_HP,
-    PlayerBarKind_MP,
-    PlayerBarKind_EXP,
-    PlayerBarKind_End
-}
-
 public class PlayerBarUI : MonoBehaviour
 {
     //수치에 따라 fillAmount속성을 변경할 image
@@ -30,17 +22,17 @@ public class PlayerBarUI : MonoBehaviour
         if (kind == PlayerBarKind.PlayerBarKind_HP)
         {
             _barImage.fillAmount = PlayerManager.instance.Hp / PlayerManager.instance.HpMax;
-            _textUI.GetComponent<TextUI>().kind = TextUI.TEXTKIND.TEXTKIND_PlayerHp;
+            _textUI.GetComponent<TextUI>().kind = TEXTKIND.TEXTKIND_PlayerHp;
         }
         else if (kind == PlayerBarKind.PlayerBarKind_MP)
         {
             _barImage.fillAmount = PlayerManager.instance.Mp / PlayerManager.instance.MpMax;
-            _textUI.GetComponent<TextUI>().kind = TextUI.TEXTKIND.TEXTKIND_PlayerMp;
+            _textUI.GetComponent<TextUI>().kind = TEXTKIND.TEXTKIND_PlayerMp;
         }
         else if (kind == PlayerBarKind.PlayerBarKind_EXP)
         {
             _barImage.fillAmount = (float)PlayerManager.instance.Exp / PlayerManager.instance.ExpMax;
-            _textUI.GetComponent<TextUI>().kind = TextUI.TEXTKIND.TEXTKIND_PlayerExp;
+            _textUI.GetComponent<TextUI>().kind = TEXTKIND.TEXTKIND_PlayerExp;
         }
     }
 

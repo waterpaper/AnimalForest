@@ -6,23 +6,6 @@ using System.Text;
 
 public class TextUI : MonoBehaviour
 {
-    public enum TEXTKIND
-    {
-        TEXTKIND_PlayerName,
-        TEXTKIND_PlayerMoney,
-        TEXTKIND_PlayerLevel,
-        TEXTKIND_PlayerExp,
-        TEXTKIND_PlayerHp,
-        TEXTKIND_PlayerAddHp,
-        TEXTKIND_PlayerMp,
-        TEXTKIND_PlayerAddMp,
-        TEXTKIND_PlayerAtk,
-        TEXTKIND_PlayerAddAtk,
-        TEXTKIND_PlayerDef,
-        TEXTKIND_PlayerAddDef,
-        TEXTKIND_End
-    }
-
     public TextMeshProUGUI textUI;
     public TEXTKIND kind = TEXTKIND.TEXTKIND_End;
 

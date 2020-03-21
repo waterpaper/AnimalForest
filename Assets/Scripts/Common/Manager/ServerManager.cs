@@ -13,7 +13,7 @@ enum ServerConnectionKind
     ServerConnectionKind_End
 }
 
-public class ServerManager : MonoBehaviour
+public class ServerManager : SingletonMonoBehaviour<ServerManager>
 {
     [Header("Server")]
     public const string url = "http://127.0.0.1:80/";
@@ -29,35 +29,18 @@ public class ServerManager : MonoBehaviour
 
     public TextMeshProUGUI resultTextUI;
 
-    private static ServerManager m_instance;
-
-    //싱글톤 접근
-    public static ServerManager instance
-    {
-        get
-        {
-            if (m_instance == null)
-            {
-                m_instance = FindObjectOfType<ServerManager>();
-                DontDestroyOnLoad(m_instance);
-            }
-            return m_instance;
-        }
-    }
-
     public static void Function<T>(T id, T data, ServerDelegate<T> dele)
     {
         dele(id, data);
     }
-
-    private void Awake()
+    
+    public void Awake()
     {
         if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
     }
-
     public void Login(string id, string passward, TextMeshProUGUI textUI = null)
     {
         if (textUI != null)

@@ -19,7 +19,7 @@ public class NormalUI : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        playerImage.sprite = DataManager.instance.CharacterIcon(PlayerManager.instance.Kind);
+        playerImage.sprite = DataManager.instance.GetIconData(IconDataKind.IconDataKind_Character, PlayerManager.instance.Kind);
 
         if(QuestManager.instance.nowQuestCount > 1)
         {

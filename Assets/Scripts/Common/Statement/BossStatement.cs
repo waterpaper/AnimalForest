@@ -2,17 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public struct BossSkill
-{
-    public string Name;
-    public int Mp;
-    public float Factor;
-    public float Range;
-    public float Time;
-}
-
-
 public class BossStatement : MonoBehaviour
 {
     public int ID;

@@ -2,19 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boss1_Attack : MonoBehaviour
+public class Boss1_Attack : BossSkillMono, IBossAttack
 {
     //보스 1의 공격을 처리하는 클래스입니다.
-    public float Atk { get; private set; }
-    public float Factor { get; private set; }
-    public float Range { get; private set; }
-    public bool IsAttacking { get; private set; }
-
-    public AttackCollider attackCollider;
+    private AttackCollider _attackCollider;
 
     private void Awake()
     {
-        attackCollider = transform.GetChild(0).GetComponent<AttackCollider>();
+        _attackCollider = transform.GetChild(0).GetComponent<AttackCollider>();
     }
 
     private void OnEnable()
@@ -29,21 +24,21 @@ public class Boss1_Attack : MonoBehaviour
         Factor = factor;
         Atk = bossAtk;
         Range = range;
-        
-        attackCollider.Setting(bossAtk * factor, range);
+
+        _attackCollider.Setting(bossAtk * factor, range);
     }
 
-    IEnumerator StartAttack()
+    public IEnumerator StartAttack()
     {
         //일정시간이 지나면 공격상태를 on로 바꿔줍니다.
         yield return new WaitForSeconds(0.3f);
 
         IsAttacking = true;
-        attackCollider.gameObject.SetActive(true);
+        _attackCollider.gameObject.SetActive(true);
         StartCoroutine(DisableAttack());
     }
 
-    IEnumerator DisableAttack()
+    public IEnumerator DisableAttack()
     {
         //일정시간이 지나면 공격중 상태를 false로 바꿔 끝난 상태로 변경해주는 함수입니다.
         yield return new WaitForSeconds(1.5f);

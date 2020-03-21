@@ -27,6 +27,8 @@ public class BossFov : MonoBehaviour
     //시야각에 플레이어가 들어왓는지 확인하는 함수입니다.
     public GameObject tracePlayer()
     {
+        if (layerMask == 0) return null;
+
         int index = 0;
         float minDist = detectRange;
         bool isTrace = false;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Load : MonoBehaviour
+public class Load
 {
     public static PlayerSaveData saveDataTemp;
     public ServerDelegate<string> loadDele = new ServerDelegate<string>(LoadData);

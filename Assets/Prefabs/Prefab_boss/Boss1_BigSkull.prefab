@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43de0c2c41dd3b84b9e529f5ed1a4a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCollider: {fileID: 0}
 --- !u!1 &2927229092927017716
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,9 +188,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bea4feb4bcbdd3742a44e16f0e6b430d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Skill_Prefab: {fileID: 955773270199022753, guid: f7fcbd63b21395545a6e9f90fa31505e,
+  skill_Prefab: {fileID: 955773270199022753, guid: f7fcbd63b21395545a6e9f90fa31505e,
     type: 3}
-  Skill_ReadyImage: {fileID: 2927229092927017716}
+  skill_ReadyImage: {fileID: 2927229092927017716}
 --- !u!1 &5003043803553362050
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,6 +553,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bossStatement: {fileID: 0}
+  _bossAI: {fileID: 0}
+  _bossHitCollider: {fileID: 0}
   TextMessageUIPrefab: {fileID: 7628532264470776429, guid: e20dae3dbd801894dab73abd6dcd98ea,
     type: 3}
   hitEffectOffset: {x: 0, y: 1, z: 0}
@@ -882,7 +883,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCollider: {fileID: 0}
-  particle: {fileID: 100008, guid: 09e25258800096f4c972f10564686f79, type: 3}
 --- !u!1 &6396297708155543408
 GameObject:
   m_ObjectHideFlags: 0
@@ -1090,9 +1090,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f139b5d7f8d5e546b24726e89133664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action: 1
-  isDeath: 0
   targetPlayer: {fileID: 0}
+  action: 1
 --- !u!114 &1434286085737539394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,10 +1104,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9deca1e7285da04ca481645c276058e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsSetting: 0
-  IsAttacking: 0
-  statement: {fileID: 0}
-  movement: {fileID: 0}
   Attack: {fileID: 0}
   Skill_1: {fileID: 0}
   Skill_2: {fileID: 0}
@@ -1214,7 +1209,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCollider: {fileID: 0}
-  particle: {fileID: 0}
 --- !u!1 &7988135034456410160
 GameObject:
   m_ObjectHideFlags: 0
@@ -1261,9 +1255,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef46baff741d664f8f7e12fc89c21e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRectProjector: {fileID: 0}
-  navAgent: {fileID: 0}
-  attackCollider: {fileID: 0}
 --- !u!135 &3749565102754546098
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1286,7 +1277,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
       propertyPath: m_Name
-      value: Boss1_Skill3
+      value: Boss1_Skill2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: d464cfd295013264b9ceef6a1566da0b, type: 3}
       propertyPath: m_LocalPosition.x

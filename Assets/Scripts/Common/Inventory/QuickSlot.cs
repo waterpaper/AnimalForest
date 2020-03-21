@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum QuickSlot_Kind { QuickSlot_Kind_HP, QuickSlot_kind_MP, QuickSlot_kind_END }
-
 public class QuickSlot : MonoBehaviour
 {
     [Header("QuickSlotKind")]
