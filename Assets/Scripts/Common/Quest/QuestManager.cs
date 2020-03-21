@@ -34,7 +34,7 @@ public class QuestManager : SingletonMonoBehaviour<QuestManager>
     public void AddQuest(int questNum, int targetCount = 0)
     {
         Quest newQuest = null;
-        QuestTable temp = DataManager.instance.QuestInfo(questNum);
+        QuestTable temp = DataManager.instance.GetTableData<QuestTable>(TableDataKind.TableDataKind_Quest ,questNum);
 
         if ((EQuestKind)temp.Kind == EQuestKind.EQuestKind_Hunting)
         {

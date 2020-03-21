@@ -77,7 +77,7 @@ public class ConversationUI : MonoBehaviour
                 }
                 else
                 {
-                    int questMinLevel = DataManager.instance.QuestInfo(nowNpcStatment.NpcQuestData[0]).MinLevel;
+                    int questMinLevel = DataManager.instance.GetTableData<QuestTable>(TableDataKind.TableDataKind_Quest, nowNpcStatment.NpcQuestData[0]).MinLevel;
 
                     if (questMinLevel > PlayerManager.instance.Level)
                         questButton.SetActive(false);
@@ -143,7 +143,7 @@ public class ConversationUI : MonoBehaviour
 
         StringBuilder stringTemp = new StringBuilder("Reward\n");
 
-        QuestTable questTemp = DataManager.instance.QuestInfo(questID);
+        QuestTable questTemp = DataManager.instance.GetTableData<QuestTable>(TableDataKind.TableDataKind_Quest, questID);
 
         if (completed == false)
         {
@@ -164,7 +164,7 @@ public class ConversationUI : MonoBehaviour
             if(i==0)
                 stringTemp.AppendFormat("\nItem : ");
 
-            stringTemp.AppendFormat("\t{0}\n\t", DataManager.instance.ItemInfo(questTemp.RewardItem[i]).Name);
+            stringTemp.AppendFormat("\t{0}\n\t", DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, questTemp.RewardItem[i]).Name);
         }
 
         questRewardTextUI.text = stringTemp.ToString();

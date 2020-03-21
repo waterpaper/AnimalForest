@@ -121,37 +121,46 @@ public class PoolManager : SingletonMonoBehaviour<PoolManager>
     //적 캐릭터를 생성하는 코루틴함수
     IEnumerator IEEnableEnemy(int id, bool isAllActive = false)
     {
+        bool isEnable = false;
+
         //적 캐릭터의 생성 주기 시간만큼 대기합니다.
         if (!isAllActive)
             yield return new WaitForSeconds(createTime);
 
-        for (int i = 0; i < maxEnemy; i++)
+        //만약 적이 현재 맵에 없는 몬스터면 리스폰 하지 않고 넘어갑니다.
+        if (nowEnemyIDList.Count > 0)
         {
-            //적이 현재 맵에 있는 몬스터면 리스폰을 합니다.
-            if (nowEnemyIDList[i] == id)
-                break;
-
-            //만약 적이 현재 맵에 없는 몬스터면 리스폰 하지 않고 넘어갑니다.
-            if (nowEnemyIDList.Count - 1 == i)
-                yield return null;
-        }
-
-        for (int i = 0; i < maxEnemy; i++)
-        {
-            //비황성화 여부로 사용 가능한 오브젝트인지를 판단
-            if (enemyPool[id][i].activeSelf == false)
+            for (int i = 0; i < nowEnemyIDList.Count; i++)
             {
-                //불 규칙적인 위치 산출
-                int idx = Random.Range(0, spwanPointList.Count);
-                //적 캐릭터를 재 위치시킨다.
-                enemyPool[id][i].transform.position = new Vector3(spwanPointList[idx].x, 3.0f, spwanPointList[idx].z);
-
-                enemyPool[id][i].SetActive(true);
-
-                if (!isAllActive)
+                //적이 현재 맵에 있는 몬스터면 리스폰을 합니다.
+                if (nowEnemyIDList[i] == id)
+                {
+                    isEnable = true;
                     break;
+                }
             }
         }
+
+        //적이 현재 맵에 존재할 경우만 리스폰합니다.
+        if(isEnable)
+        { 
+            for (int i = 0; i < maxEnemy; i++)
+            {
+                if (enemyPool[id][i].activeSelf == false)
+                {
+                    //불 규칙적인 위치 산출
+                    int idx = Random.Range(0, spwanPointList.Count);
+                    //적 캐릭터를 재 위치시킨다.
+                    enemyPool[id][i].transform.position = new Vector3(spwanPointList[idx].x, 3.0f, spwanPointList[idx].z);
+
+                    enemyPool[id][i].SetActive(true);
+
+                    if (!isAllActive)
+                        break;
+                }
+            }
+        }
+
         yield return null;
     }
 
@@ -276,7 +285,7 @@ public class PoolManager : SingletonMonoBehaviour<PoolManager>
         monsterIDList.ForEach((monsterID) =>
         {
             nowEnemyIDList.Add(monsterID);
-            CreateEnemyPooling(DataManager.instance.EnemyInfo(monsterID));
+            CreateEnemyPooling(DataManager.instance.GetTableData<EnemyTable>(TableDataKind.TableDataKind_Enemy, monsterID));
         });
     }
 

@@ -21,7 +21,7 @@ public class NpcStatment : MonoBehaviour
     //npc정보를 세팅합니다.
     public void Awake()
     {
-        Setting(DataManager.instance.NpcInfo(ID));
+        Setting(DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc ,ID));
     }
 
     //키고 끌때 제거되지 않은 완료 퀘스트목록을 지워줍니다.

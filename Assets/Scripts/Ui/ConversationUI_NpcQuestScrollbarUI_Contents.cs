@@ -16,7 +16,7 @@ public class ConversationUI_NpcQuestScrollbarUI_Contents : MonoBehaviour
 
     public void Setting()
     {
-        QuestName.text = DataManager.instance.QuestInfo(questID).Name;
+        QuestName.text = DataManager.instance.GetTableData<QuestTable>(TableDataKind.TableDataKind_Quest, questID).Name;
     }
 
     public void Click()

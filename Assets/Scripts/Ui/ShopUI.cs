@@ -28,7 +28,7 @@ public class ShopUI : MonoBehaviour
 
         if (nowNpcStatmentTemp != null)
         {
-            ShopTable shopTemp = DataManager.instance.ShopInfo(nowNpcStatmentTemp.shopKind);
+            ShopTable shopTemp = DataManager.instance.GetTableData<ShopTable>(TableDataKind.TableDataKind_Shop, nowNpcStatmentTemp.shopKind);
             _shop.Setting(shopTemp.ShopItemID);
             ActiveSlot();
         }

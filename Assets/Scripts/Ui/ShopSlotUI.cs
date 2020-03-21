@@ -32,7 +32,7 @@ public class ShopSlotUI : MonoBehaviour
         //상점 데이터의 아이템 정보를 가지고 아이템들을 세팅합니다.
         itemID = number;
 
-        ItemTable itemTemp = DataManager.instance.ItemInfo(itemID);
+        ItemTable itemTemp = DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, itemID);
 
         itemImage.sprite = DataManager.instance.GetIconData(IconDataKind.IconDataKind_Item, itemID);
         itemNameUI.text = itemTemp.Name;
