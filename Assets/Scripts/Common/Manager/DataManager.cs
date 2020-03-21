@@ -3,6 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public class TableDataDictionary<T, Table>
+     where Table : TableInfo
+{
+    Dictionary<T, Table> _dictionary;
+
+    public TableDataDictionary()
+    {
+        _dictionary = new Dictionary<T, Table>();
+    }
+
+    public void SetTableData(T key, Table value)
+    {
+        _dictionary.Add(key, value);
+    }
+
+    public Table GetTableData(T search)
+    {
+        return _dictionary[search];
+    }
+
+    public int Count()
+    {
+        return _dictionary.Count;
+    }
+}
+
 public class DataManager : SingletonMonoBehaviour<DataManager>
 {
     private const string _characterTable_FileName = "Character";
@@ -17,18 +43,17 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
     private const string _SingleConversationTable_FileName = "SingleConversationData";
     private const string _PlayerLevelTable_FileName = "PlayerLevel";
 
-    Dictionary<int, CharacterTable> CharacterInfoTable;
-    Dictionary<int, EnemyTable> EnemyInfoTable;
-    Dictionary<int, BossTable> BossInfoTable;
-    Dictionary<int, ItemTable> ItemInfoTable;
-    Dictionary<int, QuestTable> QuestInfoTable;
-    Dictionary<string, MapTable> MapInfoTable;
-    //public Dictionary<string, MapTable> MapInfos { get { return MapInfoTable; } }
-    Dictionary<int, ShopTable> ShopInfoTable;
-    Dictionary<int, NpcTable> NpcInfoTable;
-    Dictionary<int, EnemyDropItemTable> EnemyDropItemInfoTable;
-    Dictionary<int, SingleConversationTable> SingleConversationInfoTable;
-    Dictionary<int, PlayerLevelTable> PlayerLevelInfoTable;
+    TableDataDictionary<int, CharacterTable> CharacterInfoTable;
+    TableDataDictionary<int, EnemyTable> EnemyInfoTable;
+    TableDataDictionary<int, BossTable> BossInfoTable;
+    TableDataDictionary<int, ItemTable> ItemInfoTable;
+    TableDataDictionary<int, QuestTable> QuestInfoTable;
+    TableDataDictionary<string, MapTable> MapInfoTable;
+    TableDataDictionary<int, ShopTable> ShopInfoTable;
+    TableDataDictionary<int, NpcTable> NpcInfoTable;
+    TableDataDictionary<int, EnemyDropItemTable> EnemyDropItemInfoTable;
+    TableDataDictionary<int, SingleConversationTable> SingleConversationInfoTable;
+    TableDataDictionary<int, PlayerLevelTable> PlayerLevelInfoTable;
 
     Sprite[] CharacterIconData;
     Sprite[] ItemIconData;
@@ -40,17 +65,17 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
             Destroy(this.gameObject);
         }
 
-        CharacterInfoTable = new Dictionary<int, CharacterTable>();
-        EnemyInfoTable = new Dictionary<int, EnemyTable>();
-        BossInfoTable = new Dictionary<int, BossTable>();
-        ItemInfoTable = new Dictionary<int, ItemTable>();
-        QuestInfoTable = new Dictionary<int, QuestTable>();
-        MapInfoTable = new Dictionary<string, MapTable>();
-        ShopInfoTable = new Dictionary<int, ShopTable>();
-        NpcInfoTable = new Dictionary<int, NpcTable>();
-        EnemyDropItemInfoTable = new Dictionary<int, EnemyDropItemTable>();
-        SingleConversationInfoTable = new Dictionary<int, SingleConversationTable>();
-        PlayerLevelInfoTable = new Dictionary<int, PlayerLevelTable>();
+        CharacterInfoTable = new TableDataDictionary<int, CharacterTable>();
+        EnemyInfoTable = new TableDataDictionary<int, EnemyTable>();
+        BossInfoTable = new TableDataDictionary<int, BossTable>();
+        ItemInfoTable = new TableDataDictionary<int, ItemTable>();
+        QuestInfoTable = new TableDataDictionary<int, QuestTable>();
+        MapInfoTable = new TableDataDictionary<string, MapTable>();
+        ShopInfoTable = new TableDataDictionary<int, ShopTable>();
+        NpcInfoTable = new TableDataDictionary<int, NpcTable>();
+        EnemyDropItemInfoTable = new TableDataDictionary<int, EnemyDropItemTable>();
+        SingleConversationInfoTable = new TableDataDictionary<int, SingleConversationTable>();
+        PlayerLevelInfoTable = new TableDataDictionary<int, PlayerLevelTable>();
 
         AllLoadData();
     }
@@ -76,7 +101,7 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
     }
 
     //딕셔너리 내부의 데이터를 저장해주는 함수입니다.
-    public void LoadDictionaryData<Table>(Dictionary<int, Table> dictionary, string path)
+    public void LoadDictionaryData<Table>(TableDataDictionary<int, Table> dictionary, string path)
         where Table : TableInfo
     {
         TextAsset strings = Resources.Load<TextAsset>(path);
@@ -84,11 +109,11 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
 
         foreach (var info in data)
         {
-            dictionary.Add(info.ID, info);
+            dictionary.SetTableData(info.ID, info);
         }
     }
 
-    public void LoadDictionaryData<Table>(Dictionary<string, Table> dictionary, string path)
+    public void LoadDictionaryData<Table>(TableDataDictionary<string, Table> dictionary, string path)
         where Table : TableInfo
     {
         TextAsset strings = Resources.Load<TextAsset>(path);
@@ -96,56 +121,64 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
 
         foreach (var info in data)
         {
-            dictionary.Add(info.Name, info);
+            dictionary.SetTableData(info.Name, info);
         }
     }
 
-    /*
-    //원하는 데이터를 반환해주는 함수입니다.
-    public T GetTableData<T>(TableDataKind kind, int id = 0, string name = null)
+    //원하는 데이터를 가져온다 
+    public T GetTableData<T>(TableDataKind kind, int key)
+        where T : TableInfo
     {
-        if(T.GetType())
-
         switch (kind)
         {
             case TableDataKind.TableDataKind_Character:
-                return CharacterInfoTable[id];
+                return CharacterInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Enemy:
-                return EnemyInfoTable[id];
+                return EnemyInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Boss:
-                return BossInfoTable[id];
+                return BossInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Item:
-                return ItemInfoTable[id];
+                return ItemInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Quest:
-                return QuestInfoTable[id];
-
-            case TableDataKind.TableDataKind_Map:
-                return MapInfoTable[name];
+                return QuestInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Shop:
-                return ShopInfoTable[id];
+                return ShopInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_Npc:
-                return NpcInfoTable[id];
+                return NpcInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_EnemyDropItem:
-                return EnemyDropItemInfoTable[id];
+                return EnemyDropItemInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_SingleConversation:
-                return SingleConversationInfoTable[id];
+                return SingleConversationInfoTable.GetTableData(key) as T;
 
             case TableDataKind.TableDataKind_PlayerLevel:
-                return PlayerLevelInfoTable[id];
+                return PlayerLevelInfoTable.GetTableData(key) as T;
 
             default:
                 return null;
         }
     }
-    */
+
+    //원하는 데이터를 가져온다 
+    public T GetTableData<T>(TableDataKind kind, string key)
+         where T : TableInfo
+    {
+        switch (kind)
+        {
+            case TableDataKind.TableDataKind_Map:
+                return MapInfoTable.GetTableData(key) as T; ;
+
+            default:
+                return null;
+        }
+    }
 
     //원하는 아이콘을 가져온다
     //이때 id에 맞춰 list에 저장되어 있기 때문에 id에서 -1한 값을 인덱스로 접근해 가져온다. 
@@ -166,66 +199,15 @@ public class DataManager : SingletonMonoBehaviour<DataManager>
         }
     }
 
-
-    public CharacterTable CharacterInfo(int id)
-    {
-        return CharacterInfoTable[id];
-    }
-
-    public EnemyTable EnemyInfo(int id)
-    {
-        return EnemyInfoTable[id];
-    }
-
-    public BossTable BossInfo(int id)
-    {
-        return BossInfoTable[id];
-    }
-
-    public ItemTable ItemInfo(int id)
-    {
-        return ItemInfoTable[id];
-    }
-
-    public QuestTable QuestInfo(int id)
-    {
-        return QuestInfoTable[id];
-    }
-
-    public MapTable MapInfo(string mapName)
-    {
-        return MapInfoTable[mapName];
-    }
-
-    public ShopTable ShopInfo(int id)
-    {
-        return ShopInfoTable[id];
-    }
-    public NpcTable NpcInfo(int id)
-    {
-        return NpcInfoTable[id];
-    }
-    public EnemyDropItemTable EnmeyDropItemInfo(int id)
-    {
-        return EnemyDropItemInfoTable[id];
-    }
-    public SingleConversationTable SingleConversationInfo(int id)
-    {
-        return SingleConversationInfoTable[id];
-    }
-    public PlayerLevelTable PlayerLevelInfo(int level)
-    {
-        return PlayerLevelInfoTable[level];
-    }
-
     public int EnemyDictionaryCount()
     {
-        return EnemyInfoTable.Count;
+        return EnemyInfoTable.Count();
     }
+
     //아이템을 세팅해서 리턴합니다.
     public Item ItemSetting(int itemID)
     {
-        ItemTable itemTableTemp = ItemInfo(itemID);
+        ItemTable itemTableTemp = ItemInfoTable.GetTableData(itemID);
 
         switch ((Item.ItemType)itemTableTemp.ItemKind)
         {

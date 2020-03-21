@@ -65,7 +65,7 @@ public class PlayerState : MonoBehaviour
         level = info.Level;
         exp = info.Exp;
         money = info.Money;
-        expMax = DataManager.instance.PlayerLevelInfo(level).ExpMax;
+        expMax = DataManager.instance.GetTableData<PlayerLevelTable>(TableDataKind.TableDataKind_PlayerLevel, level).ExpMax;
 
         for(int i=0;i < info.ClearEvent.Length;i++)
         {

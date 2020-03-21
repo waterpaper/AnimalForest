@@ -275,7 +275,7 @@ public class PlayerManager : SingletonMonoBehaviour<PlayerManager>
         Level++;
         Exp -= ExpMax;
 
-        PlayerLevelTable temp = DataManager.instance.PlayerLevelInfo(Level);
+        PlayerLevelTable temp = DataManager.instance.GetTableData<PlayerLevelTable>(TableDataKind.TableDataKind_PlayerLevel, Level);
 
         ExpMax = temp.ExpMax;
         Hp += temp.AddHp;

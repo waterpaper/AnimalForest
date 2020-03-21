@@ -20,7 +20,7 @@ public class EnemyStatement : MonoBehaviour
 
     public void Start()
     {
-        EnemyTable temp = DataManager.instance.EnemyInfo(id);
+        EnemyTable temp = DataManager.instance.GetTableData<EnemyTable>(TableDataKind.TableDataKind_Enemy, id);
         Setting(temp);
     }
 

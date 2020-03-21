@@ -78,12 +78,12 @@ public class HuntingQuest : Quest
     {
         if (QuestProgress == EQuestProgress.EQuestProgress_Proceeding)
         {
-            QuestTargetObjectName = DataManager.instance.EnemyInfo(TargetObject).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<EnemyTable>(TableDataKind.TableDataKind_Enemy ,TargetObject).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" ( {0} / {1} )", TargetObject_NowCount, TargetObject_TargetCount);
         }
         else if (QuestProgress == EQuestProgress.EQuestProgress_Completed)
         {
-            QuestTargetObjectName = DataManager.instance.NpcInfo(TargetNpc).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc ,TargetNpc).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" 에게 찾아가기");
         }
     }
@@ -124,12 +124,13 @@ public class CollectionQuest : Quest
     {
         if (QuestProgress == EQuestProgress.EQuestProgress_Proceeding)
         {
-            QuestTargetObjectName = DataManager.instance.ItemInfo(TargetObject).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, TargetObject).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" ( {0} / {1} )", TargetObject_NowCount, TargetObject_TargetCount);
         }
         else if (QuestProgress == EQuestProgress.EQuestProgress_Completed)
         {
-            QuestTargetObjectName = DataManager.instance.NpcInfo(TargetNpc).Name;
+
+            QuestTargetObjectName = DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc, TargetObject).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" 에게 찾아가기");
         }
     }
@@ -154,12 +155,12 @@ public class RelayQuest : Quest
     {
         if (QuestProgress == EQuestProgress.EQuestProgress_Proceeding)
         {
-            QuestTargetObjectName = DataManager.instance.NpcInfo(TargetNpc).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc,TargetNpc).Name;
             QuestExplanation = QuestTargetObjectName + (" 에게 찾아가기");
         }
         else if (QuestProgress == EQuestProgress.EQuestProgress_Completed)
         {
-            QuestTargetObjectName = DataManager.instance.NpcInfo(TargetNpc).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc, TargetNpc).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" 에게 찾아가기");
         }
     }
@@ -184,12 +185,12 @@ public class BossHuntingQuest : Quest
     {
         if (QuestProgress == EQuestProgress.EQuestProgress_Proceeding)
         {
-            QuestTargetObjectName = DataManager.instance.BossInfo(TargetObject).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<BossTable>(TableDataKind.TableDataKind_Boss,TargetObject).Name;
             QuestExplanation = QuestTargetObjectName + (" 처치하기");
         }
         else if (QuestProgress == EQuestProgress.EQuestProgress_Completed)
         {
-            QuestTargetObjectName = DataManager.instance.NpcInfo(TargetNpc).Name;
+            QuestTargetObjectName = DataManager.instance.GetTableData<NpcTable>(TableDataKind.TableDataKind_Npc, TargetNpc).Name;
             QuestExplanation = QuestTargetObjectName + string.Format(" 에게 찾아가기");
         }
     }

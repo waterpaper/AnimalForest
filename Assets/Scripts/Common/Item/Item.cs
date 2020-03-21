@@ -19,7 +19,7 @@ public class EquipItem : Item
     {
         itemType = ItemType.EquipItem;
         equipType = (EquipItemType)equipTypeTemp;
-        itemInfomation = DataManager.instance.ItemInfo(id);
+        itemInfomation = DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, id);
         count = num;
     }
 }
@@ -32,7 +32,7 @@ public class UseItem : Item
     {
         itemType = ItemType.UseItem;
         useItemType = (UseItemType)useTypeTemp;
-        itemInfomation = DataManager.instance.ItemInfo(id);
+        itemInfomation = DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, id);
         count = num;
     }
 }
@@ -45,7 +45,7 @@ public class EtcItem: Item
     {
         itemType = ItemType.EtcItem;
         etcItemType = (EtcItemType)etcTypeTemp;
-        itemInfomation = DataManager.instance.ItemInfo(id);
+        itemInfomation = DataManager.instance.GetTableData<ItemTable>(TableDataKind.TableDataKind_Item, id);
         count = num;
     }
 }

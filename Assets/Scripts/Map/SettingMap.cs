@@ -59,16 +59,16 @@ public class SettingMap : MonoBehaviour
         switch (kind)
         {
             case SceneKind.Town:
-                return DataManager.instance.MapInfo("Town");
+                return DataManager.instance.GetTableData<MapTable>(TableDataKind.TableDataKind_Map, "Town");
 
             case SceneKind.Start:
-                return DataManager.instance.MapInfo("Start");
+                return DataManager.instance.GetTableData<MapTable>(TableDataKind.TableDataKind_Map, "Start");
 
             case SceneKind.Field1:
-                return DataManager.instance.MapInfo("Field1");
+                return DataManager.instance.GetTableData<MapTable>(TableDataKind.TableDataKind_Map, "Field1");
 
             case SceneKind.Field1_Boss:
-                return DataManager.instance.MapInfo("Field1_Boss");
+                return DataManager.instance.GetTableData<MapTable>(TableDataKind.TableDataKind_Map, "Field1_Boss");
             default:
                 return null;
         }

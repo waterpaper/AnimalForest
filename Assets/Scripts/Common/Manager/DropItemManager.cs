@@ -43,7 +43,7 @@ public class DropItemManager : SingletonMonoBehaviour<DropItemManager>
         {
             if (dropItemBoxPoolList[i].activeSelf == true) continue;
 
-            dropItemTableTemp = DataManager.instance.EnmeyDropItemInfo(enemyID);
+            dropItemTableTemp = DataManager.instance.GetTableData<EnemyDropItemTable>(TableDataKind.TableDataKind_EnemyDropItem, enemyID);
 
             if (dropItemTableTemp != null)
             {

@@ -22,7 +22,7 @@ public class SingleConversationTrigger : MonoBehaviour
                     UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);
 
 
-                if (DataManager.instance.SingleConversationInfo(conversationList[0]).Type == 0)
+                if (DataManager.instance.GetTableData<SingleConversationTable>(TableDataKind.TableDataKind_SingleConversation, conversationList[0]).Type == 0)
                     UIManager.instance.UISetting(UiKind.UIKind_SingleConversationUI);
                 else
                     UIManager.instance.UISetting(UiKind.UIKind_SingleConversationPauseUI);

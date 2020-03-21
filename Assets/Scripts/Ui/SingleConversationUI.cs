@@ -32,7 +32,7 @@ public class SingleConversationUI : MonoBehaviour
 
         if (singleConversationList.Count == 0) return;
 
-        SingleConversationTable temp = DataManager.instance.SingleConversationInfo(singleConversationList[0]);
+        SingleConversationTable temp = DataManager.instance.GetTableData<SingleConversationTable>(TableDataKind.TableDataKind_SingleConversation, singleConversationList[0]);
 
         if (temp == null) return;
 
@@ -55,7 +55,7 @@ public class SingleConversationUI : MonoBehaviour
             singleConversationList.Add(listIndex);
         });
 
-        SingleConversationTable temp = DataManager.instance.SingleConversationInfo(singleConversationList[0]);
+        SingleConversationTable temp = DataManager.instance.GetTableData<SingleConversationTable>(TableDataKind.TableDataKind_SingleConversation ,singleConversationList[0]);
 
         if (temp == null) return;
 

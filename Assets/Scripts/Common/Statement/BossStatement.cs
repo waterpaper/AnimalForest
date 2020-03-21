@@ -29,7 +29,7 @@ public class BossStatement : MonoBehaviour
 
     public void Awake()
     {
-        BossTable temp = DataManager.instance.BossInfo(ID);
+        BossTable temp = DataManager.instance.GetTableData<BossTable>(TableDataKind.TableDataKind_Boss, ID);
         Setting(temp);
     }
 
