@@ -8,12 +8,6 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
     private Inventory _inventory;
     private Equipment _equipment;
 
-    //부모가 될 canvas 객체
-    private Canvas uiCanvas;
-    //회복시에 띄우는 ui를 저정합니다.
-    public GameObject TextMessageUIPrefab;
-
-
     public Inventory GetInventory()
     {
         //인벤토리 클래스를 반환합니다.
@@ -81,17 +75,13 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
     {
         //현재 장비하고 있는 장비를 반환합니다.
         if (type == EquipItem.EquipItemType.Weapon)
-        {
             return (Item)_equipment.weapon;
-        }
+
         else if (type == EquipItem.EquipItemType.Armor)
-        {
             return (Item)_equipment.armor;
-        }
+
         else if (type == EquipItem.EquipItemType.Shield)
-        {
             return (Item)_equipment.shield;
-        }
 
         return null;
     }
@@ -100,13 +90,10 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
     {
         //현재 장비하고 있는 포션의 인벤토리 넘버를 반환합니다.
         if (type == UseItem.UseItemType.HpPotion)
-        {
             return _equipment.HpPotionNum;
-        }
+
         else if (type == UseItem.UseItemType.MpPotion)
-        {
             return _equipment.MpPotionNum;
-        }
 
         return -1;
     }
@@ -118,24 +105,16 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
         {
             Destroy(gameObject);
         }
-        else
-            DontDestroyOnLoad(this.gameObject);
 
         _inventory = GetComponent<Inventory>();
         _equipment = GetComponent<Equipment>();
 
     }
 
-    private void Start()
-    {
-        uiCanvas = UIManager.instance.gameUI.GetComponent<Canvas>();
-    }
-
-
     public bool AddItem(Item itemTemp, int inventoryNumber = 0, bool load = false)
     {
         //아이템을 추가합니다.
-        if(load == true)
+        if (load == true)
         {
             //로드 상태일시 인벤토리 해당 위치에 추가합니다.
             if (_inventory.AddInventroyItem(itemTemp, inventoryNumber))
@@ -204,10 +183,8 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
                 PlayerManager.instance.Hp += itemInfomationTemp.itemInfomation.RecoveryHp;
 
                 //회복 수치 ui를 출력합니다
-                var ExpUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
-                ExpUITemp.name = "RecoveryHp";
-                ExpUITemp.GetComponent<TextMessageUI>().Setting(string.Format("+ {00}", itemInfomationTemp.itemInfomation.RecoveryHp), new Color(0, 255, 0), PlayerManager.instance.transform.position, new Vector3(10.0f, 0.5f, 0.0f), uiCanvas);
-
+                UIManager.instance.PrintGameText(string.Format("+ {00}", itemInfomationTemp.itemInfomation.RecoveryHp), PlayerManager.instance.transform,
+                    new Vector3(10.0f, 0.5f, 0.0f), new Color(0, 255, 0));
                 ParticleManager.instance.Play(ParticleName.ParticleName_Player_HpPotion, PlayerManager.instance.transform, Vector3.zero);
 
             }
@@ -216,10 +193,8 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
                 PlayerManager.instance.Mp += itemInfomationTemp.itemInfomation.RecoveryMp;
 
                 //회복 수치 ui를 출력합니다
-                var ExpUITemp = Instantiate<GameObject>(TextMessageUIPrefab, uiCanvas.transform);
-                ExpUITemp.name = "RecoveryMp";
-                ExpUITemp.GetComponent<TextMessageUI>().Setting(string.Format("+ {00}", itemInfomationTemp.itemInfomation.RecoveryMp), new Color(0, 0, 255), PlayerManager.instance.transform.position, new Vector3(10.0f, 0.5f, 0.0f), uiCanvas);
-
+                UIManager.instance.PrintGameText(string.Format("+ {00}", itemInfomationTemp.itemInfomation.RecoveryMp), PlayerManager.instance.transform,
+                    new Vector3(10.0f, 0.5f, 0.0f), new Color(0, 0, 255));
                 ParticleManager.instance.Play(ParticleName.ParticleName_Player_MpPotion, PlayerManager.instance.transform, Vector3.zero);
             }
 
@@ -229,7 +204,7 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
 
     }
 
-        //해당 인벤토리에 존재하는 아이템을 장비합니다.
+    //해당 인벤토리에 존재하는 아이템을 장비합니다.
     public bool EquipmentingItem(int num)
     {
         if (num < 0) return false;
@@ -244,6 +219,7 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
             itemTemp = _equipment.Release((EquipItem.EquipItemType)itemInfomationTemp.itemInfomation.DetailKind);
             _equipment.Equip((EquipItem)GetItem(num));
 
+            //원래 장비하고 있던 장비를 인벤토리에 다시 추가합니다.
             if (itemTemp != null)
                 AddItem(itemTemp);
 
@@ -252,15 +228,10 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
         else if ((Item.ItemType)itemInfomationTemp.itemType == Item.ItemType.UseItem)
         {
             if ((UseItem.UseItemType)itemInfomationTemp.itemInfomation.DetailKind == UseItem.UseItemType.HpPotion)
-            {
                 _equipment.HpPotionNum = num;
-
-            }
+            
             else if ((UseItem.UseItemType)itemInfomationTemp.itemInfomation.DetailKind == UseItem.UseItemType.MpPotion)
-            {
                 _equipment.MpPotionNum = num;
-
-            }
         }
 
         return true;
@@ -314,9 +285,10 @@ public class InventoryManager : SingletonMonoBehaviour<InventoryManager>
         EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipWeaponItem));
         EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipArmorItem));
         EquipmentingItem(Item.ItemType.EquipItem, DataManager.instance.ItemSetting(loadData.EquipShieldItem));
-        
+
         //인벤토리를 세팅합니다
-        loadData.ItemList.ForEach((saveItemTemp) => {
+        loadData.ItemList.ForEach((saveItemTemp) =>
+        {
             Item itemTemp = DataManager.instance.ItemSetting(saveItemTemp.ItemID);
             itemTemp.count = saveItemTemp.ItemCount;
             AddItem(itemTemp, saveItemTemp.InventoryNum, true);

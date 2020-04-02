@@ -4,34 +4,32 @@ using UnityEngine;
 
 public class Shop : MonoBehaviour
 {
-    private List<int> ShopItemList;
+    //상점정보를 가지고잇는 클래스입니다.
     public int nowShopItemListCount;
+    private List<int> _shopItemList;
 
     private void Start()
     {
-        ShopItemList = new List<int>();
+        _shopItemList = new List<int>();
         nowShopItemListCount = 0;
     }
 
     public void Setting(List<int> itemIDList)
     {
         nowShopItemListCount = 0;
-        ShopItemList.Clear();
+        _shopItemList.Clear();
         itemIDList.ForEach((id) => {
-            ShopItemList.Add(id);
+            _shopItemList.Add(id);
             nowShopItemListCount++;
             });
     }
 
     public int shopIndexItemID(int index)
     {
-        if(ShopItemList.Count<=index)
-        {
+        if(_shopItemList.Count<=index)
             return -1;
-        }
+
         else
-        {
-            return ShopItemList[index];
-        }
+            return _shopItemList[index];
     }
 }

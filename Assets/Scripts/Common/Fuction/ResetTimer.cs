@@ -12,7 +12,6 @@ public class ResetTimer : StateMachineBehaviour
     {
         
         time += Time.deltaTime;
-        
         animator.SetFloat(timerName, time);//시간을 바꿔준다.
         
     }
@@ -20,11 +19,8 @@ public class ResetTimer : StateMachineBehaviour
     //시간을 리셋한다.
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-
         time = 0;
-        
         animator.SetFloat(timerName, time);        
-
     }
 
 }

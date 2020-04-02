@@ -18,13 +18,10 @@ public class GetItemContents : MonoBehaviour
         StringBuilder stringTemp = new StringBuilder(string.Format("< {00} >", itemNameText));
 
         if(count == 1)
-        {
             stringTemp.Append(" 를 획득");
-        }
+
         else
-        {
             stringTemp.Append(string.Format("x {01} 를 획득", itemNameText));
-        }
 
         _textUI.text = stringTemp.ToString();
 

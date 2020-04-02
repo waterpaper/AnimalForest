@@ -87,8 +87,6 @@ public class Inventory : MonoBehaviour
         if (myInventory[inventoryNumber] != null) return false;
 
         myInventory[inventoryNumber] = itemTemp;
-
-
         return true;
     }
 

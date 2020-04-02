@@ -7,16 +7,14 @@ public class TreeLod : MonoBehaviour
     LODGroup _lodGroup;
     MtreeComponent _component;
     int _beforeLevel;
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         _lodGroup = GetComponent<LODGroup>();
         _component = GetComponent<MtreeComponent>();
         _beforeLevel = 0;
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         LevelofDetailTree(1);

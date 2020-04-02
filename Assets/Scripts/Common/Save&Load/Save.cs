@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Save
 {
+    //정보를 저장하는 기능을 수행하는 클래스입니다.
     public PlayerSaveData saveDataTemp;
     public PlayerState playerStateTemp;
     public Inventory inventoryTemp;

@@ -12,7 +12,7 @@ public class EnemyMovement : MonoBehaviour
     private Rigidbody _enemyRigidbody;
 
     //naviMeshAgent 컴포넌트를 저장할 변수입니다.
-    private NavMeshAgent agent = null;
+    private NavMeshAgent agent;
 
     //회전할때의 속도를 조절하는 계수입니다.
     private float _damping = 5.0f;
@@ -191,7 +191,7 @@ public class EnemyMovement : MonoBehaviour
 
     public void Move()
     {
-        if (agent.isStopped == true)
+        if (agent.enabled && agent.isStopped == true)
         {
             //내비게이션 기능을 활성화 해서 이동을 시작함
             _idle = false;
@@ -254,14 +254,4 @@ public class EnemyMovement : MonoBehaviour
             agent.isStopped = true;
         }
     }
-    /*
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.tag == "Ground")
-        {
-            if (agent != null)
-                agent.enabled = false;
-        }
-    }
-    */
 }

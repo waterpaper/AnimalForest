@@ -96,7 +96,6 @@ public class BossAttack : MonoBehaviour
     public bool IsAttackConfirm(BossAction action)
     {
         //공격 중인지 상태를 확인하고 리턴해줍니다.
-
         if (IsAttacking == false) return false;
 
         if (action == BossAction.Attack)

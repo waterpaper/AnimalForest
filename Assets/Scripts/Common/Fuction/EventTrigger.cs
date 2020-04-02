@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class EventTrigger : MonoBehaviour
 {
+    //해당 이벤트를 세팅해 실행하게 하는 클래스입니다.
     [Header("EvnetTrigger Infomation")]
     public int eventID;
-    public float triggerActiveDistance =3.0f;
-    public EventKind NowEvnetkind;
-    public EventAccess NowAccessKind;
+    public float triggerActiveDistance = 3.0f;
+
+    public EventKind nowEvnetkind;
+    public EventAccess nowAccessKind;
     public GameObject targetObject;
-    public GameObject addConversationObject= null;
+    public GameObject addConversationObject;
 
     private TEvent _Tevent;
     private bool IsStarted = false;
@@ -18,20 +20,14 @@ public class EventTrigger : MonoBehaviour
 
     public void Awake()
     {
-        if(NowEvnetkind == EventKind.EventKind_BlueLight)
-        {
+        //이벤트 종류에 맞는 하위클래스를 생성합니다.
+        if(nowEvnetkind == EventKind.EventKind_BlueLight)
             _Tevent = new Event_BlusLight();
-        }
-        else if(NowEvnetkind == EventKind.EventKind_ChoiceTerrain)
-        {
+        else if(nowEvnetkind == EventKind.EventKind_ChoiceTerrain)
             _Tevent = new Event_ChoiceTerrain();
-        }
 
-        if (NowAccessKind == EventAccess.EventAccess_Player)
-        {
+        if (nowAccessKind == EventAccess.EventAccess_Player)
             targetObject = PlayerManager.instance.gameObject;
-        }
-
 
         if (PlayerManager.instance.IsClearEventList(eventID))
             Destroy(this.gameObject);
@@ -39,7 +35,7 @@ public class EventTrigger : MonoBehaviour
 
     public void LateUpdate()
     {
-        if(NowAccessKind != EventAccess.EventAccess_Not && !IsStarted)
+        if(nowAccessKind != EventAccess.EventAccess_Not && !IsStarted)
         {
             EventStart();
         }
@@ -62,24 +58,16 @@ public class EventTrigger : MonoBehaviour
 
     private bool IsAccessKind_Check()
     {
-        if (NowAccessKind == EventAccess.EventAccess_Player || NowAccessKind == EventAccess.EventAccess_Target)
+        if (nowAccessKind == EventAccess.EventAccess_Player || nowAccessKind == EventAccess.EventAccess_Target)
         {
             //거리를 계산해 근접할 경우만 true를 반환합니다.
             Vector3 offset = targetObject.transform.position - transform.position;
 
             if (Vector3.SqrMagnitude(offset) < triggerActiveDistance * triggerActiveDistance)
-            {
                 return true;
-            }
-            else
-            {
-                return false;
-            }
         }
-        else if (NowAccessKind == EventAccess.EventAccess_Not)
-        {
+        else if (nowAccessKind == EventAccess.EventAccess_Not)
             return true;
-        }
 
         return false;
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Load
 {
+    //정보를 불러오는 로드를 처리하는 클래스입니다.
     public static PlayerSaveData saveDataTemp;
     public ServerDelegate<string> loadDele = new ServerDelegate<string>(LoadData);
 

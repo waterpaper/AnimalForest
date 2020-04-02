@@ -19,17 +19,14 @@ public class TextMessageUI : MonoBehaviour
     //이미지의 위치를 조절할 오프셋
     [HideInInspector] public Vector3 offset = Vector3.zero;
     [HideInInspector] public Vector3 targetPosition = Vector3.zero;
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         uiCamera = canvas.worldCamera;
         rectParent = canvas.GetComponent<RectTransform>();
-
         rectTrans = GetComponent<RectTransform>();
 
         offset.x = Random.Range(-0.5f,0.5f);
-
         Destroy(this.gameObject, 3.0f);
     }
 

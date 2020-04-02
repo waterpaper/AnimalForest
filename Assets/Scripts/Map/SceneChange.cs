@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SceneChange : MonoBehaviour
 {
+    //접근시 원하는 씬으로 바꾸기 위해 설정하는 클래스입니다.
     public SceneKind changeScene;
     public Vector3 spwanLocation;
     private GameObject _player;

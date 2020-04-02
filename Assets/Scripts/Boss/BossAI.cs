@@ -3,19 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum BossAction
-{
-    Idle,
-    Patrol,
-    Trace,
-    Attack,
-    Skill1,
-    Skill2,
-    Hit,
-    Die,
-    End
-}
-
 public class BossAI : MonoBehaviour
 {
     [Header("AI attribute")]
@@ -152,7 +139,6 @@ public class BossAI : MonoBehaviour
     {
         //유한상태기계를 이용하기 위해 각 상태를 체크, 설정합니다.
         //죽지 않았을시 0.3초 마다 반복합니다.
-
         while (IsDeath != true)
         {
             //애니메이터에 현재 이동속도를 입력합니다.

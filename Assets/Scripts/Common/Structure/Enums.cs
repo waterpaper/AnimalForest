@@ -64,6 +64,22 @@ public enum NPCTYPE
 }
 
 /// <summary>
+/// boss enum
+/// </summary>
+public enum BossAction
+{
+    Idle,
+    Patrol,
+    Trace,
+    Attack,
+    Skill1,
+    Skill2,
+    Hit,
+    Die,
+    End
+}
+
+/// <summary>
 /// quest enum
 /// </summary>
 public enum EQuestKind

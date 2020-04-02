@@ -1,23 +1,3 @@
-Skip to content
-Search or jump to¡¦
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@waterpaper 
-waterpaper
-/
-AnimalForest
-2
-00
- Code Issues 0 Pull requests 0 Actions Projects 0 Wiki Security Insights Settings
-AnimalForest/.gitignore
-@waterpaper waterpaper ignore update
-4afc6bc 5 days ago
-469 lines (375 sloc)  7.63 KB
-  
 
 # Created by https://www.gitignore.io/api/unity,windows,visualstudio
 # Edit at https://www.gitignore.io/?templates=unity,windows,visualstudio
@@ -64,7 +44,6 @@ AnimalForest/.gitignore
 *.mat
 *.mp3
 *.wav
-
 
 *.shader
 Thumbs.db
@@ -487,15 +466,3 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/unity,windows,visualstudio
-¨Ï 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About

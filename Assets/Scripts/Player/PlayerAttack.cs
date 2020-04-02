@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
+    //플레이어 공격 클래스입니다.
     public GameObject attackRect;
 
     private void Start()

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ChoiceTerrain : MonoBehaviour
 {
+    //출력될 지형을 선택하는 클래스입니다.
     public int setEvnetID;
     public GameObject terrain_before;
     public GameObject terrain_after;

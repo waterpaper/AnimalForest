@@ -7,20 +7,16 @@ public class BossMovement : MonoBehaviour
 {
     private Transform _bossTransform;
     private Rigidbody _bossRigidbody;
+    private NavMeshAgent _agent;
+    private List<Transform> _wayPointList;
 
-    //naviMeshAgent 컴포넌트를 저장할 변수입니다.
-    private NavMeshAgent agent = null;
-    //회전할때의 속도를 조절하는 계수입니다.
-    private float _damping = 5.0f;
-    //다음 순찰 지점을 지정하는 변수입니다.
-    private int _nextIdx = 0;
+    [Header("Movement Attribute")]
     //추적할 대상을 가지고 있는 변수입니다.
     public GameObject traceTarget;
-    //순찰지점들을 저장하기 위한 list타입 변수입니다.
-    public List<Transform> wayPoints;
-
-    //현재 초기 생성하는 중인지 판단하는 변수입니다.
-    private bool _isSetting = false;
+    //회전할때의 속도를 조절하는 계수입니다.
+    public float damping = 5.0f;
+    //다음 순찰 지점을 지정하는 변수입니다.
+    public int nextIdx = 0;
 
     //순찰 상태를 판단하는 프로퍼티입니다.
     private bool _patrolling;
@@ -44,10 +40,10 @@ public class BossMovement : MonoBehaviour
             _traceing = value;
 
             //다음 목적지의 배열 첨자를 계산
-            _nextIdx = Random.Range(0, wayPoints.Count);
+            nextIdx = Random.Range(0, _wayPointList.Count);
 
             //다음 목적지로 이동명령을 수행
-            StartCoroutine("IENextMovePositionSetting");
+            NextMovePositionSetting();
         }
     }
 
@@ -79,39 +75,25 @@ public class BossMovement : MonoBehaviour
     {
         _bossTransform = GetComponent<Transform>();
         _bossRigidbody = GetComponent<Rigidbody>();
-        agent = GetComponent<NavMeshAgent>();
+        _agent = GetComponent<NavMeshAgent>();
 
-        //목적지에 가까워질수록 속도를 줄이는 옵션을 비활성화
-        agent.autoBraking = false;
-        //자동으로 회전하는 기능을 비활성화
-        agent.updateRotation = false;
-
-        //맵의 순찰 포인트를 저장합니다.
-        var t = GameObject.FindGameObjectsWithTag("WayPoint");
-
-        for (int i = 0; i < t.Length; i++)
-        {
-            wayPoints.Add(t[i].transform);
-        }
+        //옵션을 비활성화합니다.
+        _agent.autoBraking = false;
+        _agent.updateRotation = false;
     }
 
     private void OnEnable()
     {
-        if (agent != null && _isSetting == true)
-        {
-            agent.enabled = true;
-            Stop();
-            agent.isStopped = true;
-        }
-    }
+        var t = GameObject.FindGameObjectsWithTag("WayPoint");
 
-    private void OnDisable()
-    {
-        //초기 생성이 끝낫으면 변수를 다시 false해줍니다.
-        if (_isSetting == false)
+        for (int i = 0; i < t.Length; i++)
         {
-            _isSetting = true;
+            _wayPointList.Add(t[i].transform);
         }
+
+        _agent.enabled = true;
+        Stop();
+        _agent.isStopped = true;
     }
 
     private void FixedUpdate()
@@ -119,7 +101,7 @@ public class BossMovement : MonoBehaviour
         //보스를 회전합니다.
         BossRotation();
 
-        agent.speed = _speed;
+        _agent.speed = _speed;
 
         if (_patrolling)
         {
@@ -133,23 +115,21 @@ public class BossMovement : MonoBehaviour
 
     void BossRotation()
     {
-        if (agent.enabled == true && agent.isStopped == false)
+        //NavMeshAgent가 가야할 방향벡터를 쿼터니언 타입의 각도로 변환해 점진적으로 회전합니다.
+        if (_agent.enabled == true && _agent.isStopped == false)
         {
-            //NavMeshAgent가 가야할 방향벡터를 쿼터니언 타입의 각도로 변환
-            Quaternion rot = Quaternion.LookRotation(agent.desiredVelocity);
-
-            //보간 함수를 사용해 점진적으로 회전시킴
-            _bossTransform.rotation = Quaternion.Slerp(_bossTransform.rotation, rot, Time.deltaTime * _damping);
+            Quaternion rot = Quaternion.LookRotation(_agent.desiredVelocity);
+            _bossTransform.rotation = Quaternion.Slerp(_bossTransform.rotation, rot, Time.deltaTime * damping);
         }
     }
 
     void TraceTarget()
     {
-        if (agent.isPathStale) return;
+        //계산중일시 리턴하고 계산이 끝낫으면 목표 위치를 바꾸고 이동을 활성화합니다.
+        if (_agent.isPathStale) return;
 
-        agent.destination = traceTarget.transform.position;
-        //내비게이션 기능을 활성화 해서 이동을 시작함
-        agent.isStopped = false;
+        _agent.destination = traceTarget.transform.position;
+        _agent.isStopped = false;
 
     }
 
@@ -160,45 +140,40 @@ public class BossMovement : MonoBehaviour
         _idle = false;
         Speed = 0.0f;
 
-        if (agent != null && agent.enabled == true && _isSetting ==true && gameObject.activeSelf == true)
-            agent.isStopped = true;
+        if (_agent != null && _agent.enabled == true && gameObject.activeSelf == true)
+            _agent.isStopped = true;
     }
 
     public void Move()
     {
-        if (agent.isStopped == true)
+        //내비게이션 기능을 활성화 해서 이동을 시작합니다.
+        if (_agent.isStopped == true)
         {
-            //내비게이션 기능을 활성화 해서 이동을 시작합니다.
             _idle = false;
-            agent.isStopped = false;
-            StartCoroutine("IENextMovePositionSetting");
+            _agent.isStopped = false;
+            NextMovePositionSetting();
         }
 
         //navMeshAgent가 이동하고 있고 목적지에 도착햇는지 여부를 계산합니다.
-        if (agent.velocity.sqrMagnitude >= 0.2f * 0.2f && agent.remainingDistance <= 1.0f)
+        if (_agent.velocity.sqrMagnitude >= 0.2f * 0.2f && _agent.remainingDistance <= 1.0f)
         {
-            //다음 목적지의 배열 첨자를 계산
-            _nextIdx = Random.Range(0, wayPoints.Count);
-
-            //다음 목적지로 이동명령을 수행
-            StartCoroutine("IENextMovePositionSetting");
+            //다음 목적지로 이동명령을 수행합니다.
+            nextIdx = Random.Range(0, _wayPointList.Count);
+            NextMovePositionSetting();
         }
     }
 
-    IEnumerator IENextMovePositionSetting()
+    void NextMovePositionSetting()
     {
         //다음 순찰 위치를 설정해주는 함수입니다.
-
         if (gameObject.activeSelf == true)
         {
-            //최단거리 경로 계산이 끝나지 않았다면 다음을 수행하지 않음
-            if (agent.isPathStale) yield return null;
-            //다음 목적지를 wayPoints 배열에서 추출한 위치로 다음 목적지를 지정
-            agent.destination = wayPoints[_nextIdx].position;
-            //내비게이션 기능을 활성화 해서 이동을 시작함
-            agent.isStopped = false;
-        }
+            //최단거리 경로 계산이 끝나지 않았다면 다음을 수행하지 않습니다.
+            if (_agent.isPathStale) return;
 
-        yield return null;
+            //다음 목적지를 wayPoints 배열에서 추출한 위치로 다음 목적지를 지정하고 활성화합니다.
+            _agent.destination = _wayPointList[nextIdx].position;
+            _agent.isStopped = false;
+        }
     }
 }

@@ -14,7 +14,6 @@ public class Boss1_Attack : BossSkillMono, IBossAttack
 
     private void OnEnable()
     {
-        //객체가 on되면 코루틴함수를 실행합니다.
         StartCoroutine(StartAttack());
     }
 
