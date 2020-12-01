@@ -5,34 +5,37 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/TitleScene.unity
-    guid: 666951379db5ff648b974e25c1444972
-  - enabled: 1
-    path: Assets/Scenes/SettingScene.unity
-    guid: 9b32dd982ee90cd4cace5b6a8f236770
-  - enabled: 1
-    path: Assets/Scenes/StartGameScene.unity
-    guid: 1b705f786a572984c8b6ca1c342fc8fb
-  - enabled: 1
-    path: Assets/Scenes/TownScene.unity
-    guid: 49f86558577c06845954545c87b1dcbc
-  - enabled: 1
-    path: Assets/Scenes/Field1_Scene.unity
-    guid: 6883f0159e4320c4e86485376934de08
-  - enabled: 1
-    path: Assets/Scenes/Field1_Boss.unity
-    guid: 83341bcf7cd5d574d9bcd66014fedaf3
-  - enabled: 1
-    path: Assets/Scenes/FadeScene.unity
-    guid: c9432274b044f3c4b918de69c0b50296
-  - enabled: 1
-    path: Assets/Scenes/PlayScene.unity
-    guid: f4985e7b1d2b5fe49bb062b5df69f510
-  - enabled: 1
-    path: Assets/Scenes/GameUiScene.unity
-    guid: 18ddbcbfaf0e6b4459bdff5b2b40562d
-  - enabled: 1
-    path: Assets/Scenes/PlayerCustomScene.unity
-    guid: 485d5d06828e9a643a664a0cfcb374e8
+    guid: 825b95c3190b28444bfc3a789aeac007
   m_configObjects: {}

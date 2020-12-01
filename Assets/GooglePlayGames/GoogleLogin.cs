@@ -13,9 +13,9 @@ public class GoogleLogin : MonoBehaviour
     void Start()
     {
         //구글게임 서비스 활성화
-        PlayGamesPlatform.InitializeInstance(new PlayGamesClientConfiguration.Builder().Build());
+       /* PlayGamesPlatform.InitializeInstance(new PlayGamesClientConfiguration.Builder().Build());
         PlayGamesPlatform.DebugLogEnabled = true;
-        PlayGamesPlatform.Activate();
+        PlayGamesPlatform.Activate();*/
 
         resultTextUI = transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>();
     }
